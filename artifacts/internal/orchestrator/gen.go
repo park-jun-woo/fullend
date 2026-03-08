@@ -3,7 +3,12 @@ package orchestrator
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+
+	oapicodegen "github.com/oapi-codegen/oapi-codegen/v2/pkg/codegen"
+	oapiutil "github.com/oapi-codegen/oapi-codegen/v2/pkg/util"
+	sqlccli "github.com/sqlc-dev/sqlc/pkg/cli"
 
 	"github.com/geul-org/fullend/artifacts/internal/reporter"
 	ssacgenerator "github.com/geul-org/ssac/generator"
@@ -38,6 +43,14 @@ func Gen(specsDir, artifactsDir string) (*reporter.Report, bool) {
 		has[d.Kind] = d
 	}
 
+	// Terraform: optional — warn and skip if not installed.
+	terraformAvailable := true
+	if _, ok := has[KindTerraform]; ok {
+		if _, err := exec.LookPath("terraform"); err != nil {
+			terraformAvailable = false
+		}
+	}
+
 	// Add separator between validate and gen steps.
 	report.Steps = append(report.Steps, reporter.StepResult{
 		Name:    "---",
@@ -55,23 +68,39 @@ func Gen(specsDir, artifactsDir string) (*reporter.Report, bool) {
 		return report, false
 	}
 
-	// 2. sqlc generate
-	report.Steps = append(report.Steps, genSqlc(specsDir))
+	// 2. sqlc generate (Go import)
+	if _, ok := has[KindDDL]; ok {
+		report.Steps = append(report.Steps, genSqlc(specsDir))
+	}
 
-	// 3. SSaC Generate (service functions)
-	// 4. SSaC GenerateModelInterfaces
+	// 3. oapi-codegen (Go import)
+	if _, ok := has[KindOpenAPI]; ok {
+		report.Steps = append(report.Steps, genOpenAPI(specsDir, artifactsDir))
+	}
+
+	// 4. SSaC Generate (service functions)
+	// 5. SSaC GenerateModelInterfaces
 	if d, ok := has[KindSSaC]; ok {
 		report.Steps = append(report.Steps, genSSaC(specsDir, d.Path, artifactsDir)...)
 	}
 
-	// 5. STML Generate (React TSX)
+	// 6. STML Generate (React TSX)
 	if d, ok := has[KindSTML]; ok {
 		report.Steps = append(report.Steps, genSTML(specsDir, d.Path, artifactsDir))
 	}
 
-	// 6. terraform fmt
+	// 7. terraform fmt (외부 도구, 선택)
 	if _, ok := has[KindTerraform]; ok {
-		report.Steps = append(report.Steps, genTerraform(specsDir))
+		if terraformAvailable {
+			report.Steps = append(report.Steps, genTerraform(specsDir))
+		} else {
+			report.Steps = append(report.Steps, reporter.StepResult{
+				Name:    "terraform",
+				Status:  reporter.Skip,
+				Summary: "terraform 미설치, 스킵",
+				Errors:  []string{"[WARN] terraform이 설치되어 있지 않습니다 — HCL 포맷팅을 건너뜁니다"},
+			})
+		}
 	}
 
 	genOk := true
@@ -87,22 +116,79 @@ func Gen(specsDir, artifactsDir string) (*reporter.Report, bool) {
 
 func genSqlc(specsDir string) reporter.StepResult {
 	step := reporter.StepResult{Name: "sqlc"}
-	res := RunExec("sqlc", "generate", "-f", filepath.Join(specsDir, "sqlc.yaml"))
-	if res.Skipped {
+	configPath := filepath.Join(specsDir, "sqlc.yaml")
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		step.Status = reporter.Skip
-		step.Summary = "sqlc not installed, skipped"
+		step.Summary = "sqlc.yaml not found, skipped"
 		return step
 	}
-	if res.Err != nil {
+	code := sqlccli.Run([]string{"generate", "-f", configPath})
+	if code != 0 {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, res.Err.Error())
-		if res.Stderr != "" {
-			step.Errors = append(step.Errors, res.Stderr)
-		}
+		step.Errors = append(step.Errors, fmt.Sprintf("sqlc generate failed (exit %d)", code))
 		return step
 	}
 	step.Status = reporter.Pass
 	step.Summary = "DB models generated"
+	return step
+}
+
+func genOpenAPI(specsDir, artifactsDir string) reporter.StepResult {
+	step := reporter.StepResult{Name: "oapi-gen"}
+	apiPath := filepath.Join(specsDir, "api", "openapi.yaml")
+
+	spec, err := oapiutil.LoadSwagger(apiPath)
+	if err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("OpenAPI load error: %v", err))
+		return step
+	}
+
+	outDir := filepath.Join(artifactsDir, "backend", "api")
+	if err := os.MkdirAll(outDir, 0755); err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("cannot create dir: %v", err))
+		return step
+	}
+
+	// Generate types.
+	typesCfg := oapicodegen.Configuration{
+		PackageName: "api",
+		Generate:    oapicodegen.GenerateOptions{Models: true},
+	}
+	typesCfg = typesCfg.UpdateDefaults()
+	typesCode, err := oapicodegen.Generate(spec, typesCfg)
+	if err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("oapi-codegen types error: %v", err))
+		return step
+	}
+	if err := os.WriteFile(filepath.Join(outDir, "types.gen.go"), []byte(typesCode), 0644); err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("write types.gen.go error: %v", err))
+		return step
+	}
+
+	// Generate server (net/http std).
+	serverCfg := oapicodegen.Configuration{
+		PackageName: "api",
+		Generate:    oapicodegen.GenerateOptions{StdHTTPServer: true},
+	}
+	serverCfg = serverCfg.UpdateDefaults()
+	serverCode, err := oapicodegen.Generate(spec, serverCfg)
+	if err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("oapi-codegen server error: %v", err))
+		return step
+	}
+	if err := os.WriteFile(filepath.Join(outDir, "server.gen.go"), []byte(serverCode), 0644); err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("write server.gen.go error: %v", err))
+		return step
+	}
+
+	step.Status = reporter.Pass
+	step.Summary = "types + server generated"
 	return step
 }
 
@@ -206,11 +292,6 @@ func genTerraform(specsDir string) reporter.StepResult {
 	step := reporter.StepResult{Name: "terraform"}
 	tfDir := filepath.Join(specsDir, "terraform")
 	res := RunExec("terraform", "fmt", tfDir)
-	if res.Skipped {
-		step.Status = reporter.Skip
-		step.Summary = "terraform not installed, skipped"
-		return step
-	}
 	if res.Err != nil {
 		step.Status = reporter.Fail
 		step.Errors = append(step.Errors, res.Err.Error())

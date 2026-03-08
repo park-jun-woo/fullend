@@ -16,6 +16,9 @@ go.sum
 .DS_Store
 Thumbs.db
 
+# Generated artifacts (fullend gen output)
+artifacts/dummy-*/
+
 # Local config
 .clari/
 

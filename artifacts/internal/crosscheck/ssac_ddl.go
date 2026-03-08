@@ -64,10 +64,11 @@ func checkResultType(seq ssacparser.Sequence, st *ssacvalidator.SymbolTable, ctx
 		// Not all types map to DDL tables (e.g. Token, Refund are DTOs).
 		// Emit as WARNING.
 		errs = append(errs, CrossError{
-			Rule:    "SSaC @result ↔ DDL",
-			Context: ctx,
-			Message: fmt.Sprintf("seq[%d] @result type %q has no matching DDL table %q", seqIdx, seq.Result.Type, tableName),
-			Level:   "WARNING",
+			Rule:       "SSaC @result ↔ DDL",
+			Context:    ctx,
+			Message:    fmt.Sprintf("seq[%d] @result type %q has no matching DDL table %q", seqIdx, seq.Result.Type, tableName),
+			Level:      "WARNING",
+			Suggestion: fmt.Sprintf("DDL에 추가: CREATE TABLE %s (...); 또는 model에 // @dto 선언", tableName),
 		})
 	}
 
@@ -105,10 +106,11 @@ func checkParamTypes(seq ssacparser.Sequence, st *ssacvalidator.SymbolTable, ctx
 
 		if _, ok := table.Columns[colName]; !ok {
 			errs = append(errs, CrossError{
-				Rule:    "SSaC @param ↔ DDL",
-				Context: ctx,
-				Message: fmt.Sprintf("seq[%d] @param %s (→ %s) not found in table %s", seqIdx, p.Name, colName, tableName),
-				Level:   "WARNING",
+				Rule:       "SSaC @param ↔ DDL",
+				Context:    ctx,
+				Message:    fmt.Sprintf("seq[%d] @param %s (→ %s) not found in table %s", seqIdx, p.Name, colName, tableName),
+				Level:      "WARNING",
+				Suggestion: fmt.Sprintf("DDL에 추가: ALTER TABLE %s ADD COLUMN %s -- TODO: 타입 지정;", tableName, colName),
 			})
 		}
 	}

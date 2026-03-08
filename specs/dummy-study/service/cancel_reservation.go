@@ -25,6 +25,11 @@ import "net/http"
 // @param ReservationID request
 // @param "cancelled"
 
+// @sequence get
+// @model Reservation.FindByID
+// @param ReservationID request
+// @result reservation Reservation
+
 // @sequence call
 // @component notification
 // @param reservation

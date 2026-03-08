@@ -1,0 +1,12 @@
+-- name: FindByID :one
+SELECT * FROM enrollments WHERE id = $1;
+
+-- name: FindByCourseAndUser :one
+SELECT * FROM enrollments WHERE course_id = $1 AND user_id = $2;
+
+-- name: ListByUser :many
+SELECT * FROM enrollments WHERE user_id = $1 ORDER BY created_at DESC;
+
+-- name: Create :one
+INSERT INTO enrollments (user_id, course_id)
+VALUES ($1, $2) RETURNING *;

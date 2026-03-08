@@ -18,13 +18,19 @@ func Print(w io.Writer, r *Report) {
 		case Pass:
 			fmt.Fprintf(w, "✓ %-12s %s\n", step.Name, step.Summary)
 			// Show warnings even on pass.
-			for _, e := range step.Errors {
+			for i, e := range step.Errors {
 				fmt.Fprintf(w, "    %s\n", e)
+				if i < len(step.Suggestions) && step.Suggestions[i] != "" {
+					fmt.Fprintf(w, "      → 제안: %s\n", step.Suggestions[i])
+				}
 			}
 		case Fail:
 			fmt.Fprintf(w, "✗ %-12s %s\n", step.Name, step.Summary)
-			for _, e := range step.Errors {
+			for i, e := range step.Errors {
 				fmt.Fprintf(w, "    %s\n", e)
+				if i < len(step.Suggestions) && step.Suggestions[i] != "" {
+					fmt.Fprintf(w, "      → 제안: %s\n", step.Suggestions[i])
+				}
 			}
 		case Skip:
 			fmt.Fprintf(w, "— %-12s %s\n", step.Name, step.Summary)

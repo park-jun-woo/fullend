@@ -8,16 +8,20 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 
+	ssacparser "github.com/geul-org/ssac/parser"
 	ssacvalidator "github.com/geul-org/ssac/validator"
 )
 
 // CheckOpenAPIDDL validates x-sort, x-filter, x-include against DDL tables.
-func CheckOpenAPIDDL(doc *openapi3.T, st *ssacvalidator.SymbolTable) []CrossError {
+func CheckOpenAPIDDL(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc) []CrossError {
 	var errs []CrossError
 
 	if doc.Paths == nil {
 		return errs
 	}
+
+	// Build funcName → first @model's table name for x-include FK lookup.
+	funcPrimaryTable := buildFuncPrimaryTable(funcs)
 
 	for path, pi := range doc.Paths.Map() {
 		for method, op := range pi.Operations() {
@@ -25,14 +29,33 @@ func CheckOpenAPIDDL(doc *openapi3.T, st *ssacvalidator.SymbolTable) []CrossErro
 				continue
 			}
 			ctx := fmt.Sprintf("%s %s (%s)", method, path, op.OperationID)
+			primaryTable := funcPrimaryTable[op.OperationID]
 
 			errs = append(errs, checkXSort(op, st, ctx)...)
 			errs = append(errs, checkXFilter(op, st, ctx)...)
-			errs = append(errs, checkXInclude(op, st, ctx)...)
+			errs = append(errs, checkXInclude(op, st, ctx, primaryTable)...)
 		}
 	}
 
 	return errs
+}
+
+// buildFuncPrimaryTable maps function names to their primary DDL table.
+// Primary table is derived from the first @model annotation (e.g. "Reservation.FindByID" → "reservations").
+func buildFuncPrimaryTable(funcs []ssacparser.ServiceFunc) map[string]string {
+	m := make(map[string]string)
+	for _, fn := range funcs {
+		for _, seq := range fn.Sequences {
+			if seq.Model != "" {
+				parts := strings.SplitN(seq.Model, ".", 2)
+				if len(parts) >= 1 {
+					m[fn.Name] = modelToTable(parts[0])
+				}
+				break
+			}
+		}
+	}
+	return m
 }
 
 func checkXSort(op *openapi3.Operation, st *ssacvalidator.SymbolTable, ctx string) []CrossError {
@@ -53,10 +76,21 @@ func checkXSort(op *openapi3.Operation, st *ssacvalidator.SymbolTable, ctx strin
 	for _, col := range sortExt.Allowed {
 		snake := pascalToSnake(col)
 		if !columnExistsInAnyTable(snake, st) {
+			table := inferTableFromCtx(op, st)
 			errs = append(errs, CrossError{
-				Rule:    "x-sort ↔ DDL",
-				Context: ctx,
-				Message: fmt.Sprintf("x-sort column %q (→ %s) not found in any DDL table", col, snake),
+				Rule:       "x-sort ↔ DDL",
+				Context:    ctx,
+				Message:    fmt.Sprintf("x-sort column %q (→ %s) not found in any DDL table", col, snake),
+				Suggestion: fmt.Sprintf("DDL에 추가: ALTER TABLE %s ADD COLUMN %s -- TODO: 타입 지정;", table, snake),
+			})
+		} else if !columnHasUsableIndex(snake, st) {
+			table := findTableWithColumn(snake, st)
+			errs = append(errs, CrossError{
+				Rule:       "x-sort ↔ DDL index",
+				Context:    ctx,
+				Message:    fmt.Sprintf("x-sort column %q (→ %s) has no index (performance)", col, snake),
+				Level:      "WARNING",
+				Suggestion: fmt.Sprintf("DDL에 추가: CREATE INDEX idx_%s_%s ON %s(%s);", table, snake, table, snake),
 			})
 		}
 	}
@@ -82,10 +116,12 @@ func checkXFilter(op *openapi3.Operation, st *ssacvalidator.SymbolTable, ctx str
 	for _, col := range filterExt.Allowed {
 		snake := pascalToSnake(col)
 		if !columnExistsInAnyTable(snake, st) {
+			table := inferTableFromCtx(op, st)
 			errs = append(errs, CrossError{
-				Rule:    "x-filter ↔ DDL",
-				Context: ctx,
-				Message: fmt.Sprintf("x-filter column %q (→ %s) not found in any DDL table", col, snake),
+				Rule:       "x-filter ↔ DDL",
+				Context:    ctx,
+				Message:    fmt.Sprintf("x-filter column %q (→ %s) not found in any DDL table", col, snake),
+				Suggestion: fmt.Sprintf("DDL에 추가: ALTER TABLE %s ADD COLUMN %s -- TODO: 타입 지정;", table, snake),
 			})
 		}
 	}
@@ -93,7 +129,7 @@ func checkXFilter(op *openapi3.Operation, st *ssacvalidator.SymbolTable, ctx str
 	return errs
 }
 
-func checkXInclude(op *openapi3.Operation, st *ssacvalidator.SymbolTable, ctx string) []CrossError {
+func checkXInclude(op *openapi3.Operation, st *ssacvalidator.SymbolTable, ctx string, primaryTable string) []CrossError {
 	var errs []CrossError
 
 	raw, ok := op.Extensions["x-include"]
@@ -109,20 +145,110 @@ func checkXInclude(op *openapi3.Operation, st *ssacvalidator.SymbolTable, ctx st
 	}
 
 	for _, resource := range includeExt.Allowed {
-		tableName := strings.ToLower(resource) + "s"
-		if _, exists := st.DDLTables[tableName]; !exists {
-			// Try without adding 's'
-			if _, exists := st.DDLTables[strings.ToLower(resource)]; !exists {
+		refTable := resolveTableName(resource, st)
+		if refTable == "" {
+			guessTable := strings.ToLower(resource) + "s"
+			errs = append(errs, CrossError{
+				Rule:       "x-include ↔ DDL",
+				Context:    ctx,
+				Message:    fmt.Sprintf("x-include resource %q has no matching DDL table", resource),
+				Suggestion: fmt.Sprintf("DDL에 추가: CREATE TABLE %s (...);", guessTable),
+			})
+			continue
+		}
+
+		// If we know the primary table, verify FK relationship.
+		if primaryTable != "" {
+			if !hasFKTo(primaryTable, refTable, st) {
 				errs = append(errs, CrossError{
-					Rule:    "x-include ↔ DDL",
-					Context: ctx,
-					Message: fmt.Sprintf("x-include resource %q has no matching DDL table", resource),
+					Rule:       "x-include ↔ DDL FK",
+					Context:    ctx,
+					Message:    fmt.Sprintf("x-include resource %q (→ %s): no FK from %s to %s", resource, refTable, primaryTable, refTable),
+					Level:      "WARNING",
+					Suggestion: fmt.Sprintf("DDL에 추가: ALTER TABLE %s ADD COLUMN %s_id BIGINT REFERENCES %s(id);", primaryTable, strings.TrimSuffix(refTable, "s"), refTable),
 				})
 			}
 		}
 	}
 
 	return errs
+}
+
+// inferTableFromCtx guesses the primary table name from the operation's path.
+// e.g. "/courses/{CourseID}" → "courses", "/me/enrollments" → "enrollments"
+func inferTableFromCtx(op *openapi3.Operation, st *ssacvalidator.SymbolTable) string {
+	if op.OperationID != "" {
+		// Try deriving from operationId: ListCourses → courses, GetCourse → courses
+		name := op.OperationID
+		for _, prefix := range []string{"List", "Get", "Create", "Update", "Delete"} {
+			name = strings.TrimPrefix(name, prefix)
+		}
+		if name != "" {
+			table := modelToTable(name)
+			if _, ok := st.DDLTables[table]; ok {
+				return table
+			}
+		}
+	}
+	return "???"
+}
+
+// findTableWithColumn returns the first table name containing the given column.
+func findTableWithColumn(col string, st *ssacvalidator.SymbolTable) string {
+	for tableName, table := range st.DDLTables {
+		if _, ok := table.Columns[col]; ok {
+			return tableName
+		}
+	}
+	return "???"
+}
+
+// resolveTableName finds the DDL table for a resource name.
+func resolveTableName(resource string, st *ssacvalidator.SymbolTable) string {
+	candidates := []string{
+		strings.ToLower(resource) + "s",
+		strings.ToLower(resource),
+		pascalToSnake(resource) + "s",
+		pascalToSnake(resource),
+	}
+	for _, c := range candidates {
+		if _, ok := st.DDLTables[c]; ok {
+			return c
+		}
+	}
+	return ""
+}
+
+// hasFKTo checks if srcTable has a FK pointing to dstTable.
+func hasFKTo(srcTable, dstTable string, st *ssacvalidator.SymbolTable) bool {
+	table, ok := st.DDLTables[srcTable]
+	if !ok {
+		return false
+	}
+	for _, fk := range table.ForeignKeys {
+		if fk.RefTable == dstTable {
+			return true
+		}
+	}
+	return false
+}
+
+// columnHasUsableIndex checks if a column has a usable index (leading column or single-column index).
+func columnHasUsableIndex(col string, st *ssacvalidator.SymbolTable) bool {
+	for _, table := range st.DDLTables {
+		if _, ok := table.Columns[col]; !ok {
+			continue
+		}
+		for _, idx := range table.Indexes {
+			if len(idx.Columns) > 0 && idx.Columns[0] == col {
+				return true // Leading column in index
+			}
+			if len(idx.Columns) == 1 && idx.Columns[0] == col {
+				return true // Single-column index
+			}
+		}
+	}
+	return false
 }
 
 // unmarshalExt handles kin-openapi extension values which may be json.RawMessage.

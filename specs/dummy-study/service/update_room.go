@@ -22,6 +22,11 @@ import "net/http"
 // @param Capacity request
 // @param Location request
 
+// @sequence get
+// @model Room.FindByID
+// @param RoomID request
+// @result room Room
+
 // @sequence response json
 // @var room
 func UpdateRoom(w http.ResponseWriter, r *http.Request) {}

@@ -20,12 +20,17 @@ func Run(input *CrossValidateInput) []CrossError {
 
 	// OpenAPI x-extensions ↔ DDL
 	if input.OpenAPIDoc != nil && input.SymbolTable != nil {
-		errs = append(errs, CheckOpenAPIDDL(input.OpenAPIDoc, input.SymbolTable)...)
+		errs = append(errs, CheckOpenAPIDDL(input.OpenAPIDoc, input.SymbolTable, input.ServiceFuncs)...)
 	}
 
 	// SSaC ↔ DDL
 	if input.ServiceFuncs != nil && input.SymbolTable != nil {
 		errs = append(errs, CheckSSaCDDL(input.ServiceFuncs, input.SymbolTable)...)
+	}
+
+	// SSaC ↔ OpenAPI (function name ↔ operationId)
+	if input.ServiceFuncs != nil && input.SymbolTable != nil {
+		errs = append(errs, CheckSSaCOpenAPI(input.ServiceFuncs, input.SymbolTable)...)
 	}
 
 	return errs

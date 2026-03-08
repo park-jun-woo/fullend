@@ -107,6 +107,7 @@ func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ss
 			hasError = true
 		}
 		step.Errors = append(step.Errors, fmt.Sprintf("%s: %s — %s", prefix, ce.Context, ce.Message))
+		step.Suggestions = append(step.Suggestions, ce.Suggestion)
 	}
 
 	if hasError {
