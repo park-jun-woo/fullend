@@ -86,6 +86,11 @@ func Generate(input *GlueInput) error {
 		return fmt.Errorf("frontend setup: %w", err)
 	}
 
+	// Hurl smoke test generation.
+	if err := generateHurlTests(input.OpenAPIDoc, input.ArtifactsDir); err != nil {
+		return fmt.Errorf("hurl-gen: %w", err)
+	}
+
 	return nil
 }
 

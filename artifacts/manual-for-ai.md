@@ -335,10 +335,25 @@ type NotificationService interface {
 | SSaC 함수명 → operationId | SSaC 함수에 대응하는 operationId가 있는가 | ERROR |
 | operationId → SSaC 함수명 | operationId에 대응하는 SSaC 함수가 있는가 | WARNING |
 
+## 런타임 검증 (Hurl)
+
+`fullend gen`은 OpenAPI에서 Hurl 스모크 테스트를 자동 생성한다.
+
+```bash
+# 서버 실행 후:
+hurl --test --variable host=http://localhost:8080 artifacts/<project>/tests/smoke.hurl
+```
+
+생성 내용:
+- 인증 흐름 (Register → Login → token 캡처)
+- 리소스별 CRUD (POST → GET → PUT → DELETE, 의존 순서)
+- 응답 스키마 assertion (jsonpath)
+- x-pagination/sort/filter/include 파라미터 반영
+
 ## fullend CLI
 
 ```bash
 fullend validate <specs-dir>                 # 개별 검증 + 교차 검증
-fullend gen <specs-dir> <artifacts-dir>      # validate → 코드젠
+fullend gen <specs-dir> <artifacts-dir>      # validate → 코드젠 + Hurl 테스트 생성
 fullend status <specs-dir>                   # SSOT 현황 요약
 ```

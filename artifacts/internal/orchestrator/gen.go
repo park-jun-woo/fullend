@@ -102,7 +102,19 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string) (*reporter.R
 	// 7. Glue code generation (Server struct + main.go + frontend setup)
 	report.Steps = append(report.Steps, genGlue(specsDir, artifactsDir, has, stmlDeps, stmlPages, stmlPageOps))
 
-	// 8. terraform fmt (외부 도구, 선택)
+	// 8. Hurl smoke test generation (part of glue-gen, report separately)
+	{
+		testsDir := filepath.Join(artifactsDir, "tests")
+		if _, err := os.Stat(filepath.Join(testsDir, "smoke.hurl")); err == nil {
+			report.Steps = append(report.Steps, reporter.StepResult{
+				Name:    "hurl-gen",
+				Status:  reporter.Pass,
+				Summary: "smoke.hurl generated",
+			})
+		}
+	}
+
+	// 9. terraform fmt (외부 도구, 선택)
 	if _, ok := has[KindTerraform]; ok {
 		if terraformAvailable {
 			report.Steps = append(report.Steps, genTerraform(specsDir))

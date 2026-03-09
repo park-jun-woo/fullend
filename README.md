@@ -72,6 +72,17 @@ Individual tools (SSaC, STML) validate within their own layer. fullend catches m
 - **SSaC @param ↔ DDL** — parameter names match table columns
 - **STML ↔ SSaC** (indirect) — both reference the same OpenAPI operationIds
 
+## Runtime Testing
+
+`fullend gen` also generates [Hurl](https://hurl.dev) smoke test scenarios from OpenAPI specs.
+
+```bash
+# Start your server, then:
+hurl --test --variable host=http://localhost:8080 artifacts/my-project/tests/smoke.hurl
+```
+
+Generated tests cover: auth flow, CRUD operations, response schema validation, pagination/sort/filter/include parameters.
+
 ## Related Projects
 
 - [SSaC](https://github.com/geul-org/ssac) — Service Sequences as Code
