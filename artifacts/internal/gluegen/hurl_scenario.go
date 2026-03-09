@@ -155,7 +155,7 @@ func writeActionHurlV2(buf *strings.Builder, step scenario.Step, statusCode stri
 		if step.Capture == "token" {
 			*hasToken = true
 			buf.WriteString("[Captures]\n")
-			buf.WriteString("token: jsonpath \"$.token.AccessToken\"\n")
+			buf.WriteString("token: jsonpath \"$.token\"\n")
 		} else {
 			// Infer capture from response schema — skip if response is an array.
 			captureVar, jsonPath := inferScenarioCapture(step.Capture, info.Op)
@@ -380,7 +380,7 @@ func findJSONVarRef(json, fieldName string) string {
 func inferScenarioCapture(captureName string, op *openapi3.Operation) (string, string) {
 	respSchema := getResponseSchema(op)
 	if respSchema == nil {
-		return captureName + "_id", "$." + captureName + ".ID"
+		return captureName + "_id", "$." + captureName + ".id"
 	}
 
 	// Look for a response field matching the capture name.
@@ -396,7 +396,7 @@ func inferScenarioCapture(captureName string, op *openapi3.Operation) (string, s
 			}
 			if prop.Properties != nil {
 				if _, hasID := prop.Properties["ID"]; hasID {
-					return captureName + "_id", "$." + name + ".ID"
+					return captureName + "_id", "$." + name + ".id"
 				}
 			}
 		}

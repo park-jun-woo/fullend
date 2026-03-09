@@ -206,7 +206,7 @@ func writeAuthSection(buf *strings.Builder, doc *openapi3.T, captures map[string
 		buf.WriteString(body + "\n")
 		buf.WriteString("\nHTTP 200\n")
 		buf.WriteString("[Captures]\n")
-		buf.WriteString("token: jsonpath \"$.token.AccessToken\"\n")
+		buf.WriteString("token: jsonpath \"$.token\"\n")
 		captures["token"] = true
 
 		buf.WriteString("[Asserts]\n")

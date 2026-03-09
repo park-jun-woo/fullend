@@ -88,6 +88,7 @@ func generateRequestBody(schema *openapi3.Schema) (string, map[string]interface{
 }
 
 // generateResponseAssertions builds jsonpath assertions from a response schema.
+// Response field names are converted to snake_case to match sqlc-generated JSON tags.
 func generateResponseAssertions(schema *openapi3.Schema, sentValues map[string]interface{}) []string {
 	if schema == nil {
 		return nil
@@ -102,10 +103,10 @@ func generateResponseAssertions(schema *openapi3.Schema, sentValues map[string]i
 			asserts = append(asserts, fmt.Sprintf("jsonpath %q isCollection", prefix))
 		} else if prop.Type.Slice()[0] == "object" {
 			asserts = append(asserts, fmt.Sprintf("jsonpath %q exists", prefix))
-			// Check nested ID field.
+			// Check nested ID field (use snake_case for sqlc JSON tags).
 			if nested := prop.Properties; nested != nil {
 				if _, hasID := nested["ID"]; hasID {
-					asserts = append(asserts, fmt.Sprintf("jsonpath %q exists", prefix+".ID"))
+					asserts = append(asserts, fmt.Sprintf("jsonpath %q exists", prefix+".id"))
 				}
 			}
 		} else {
@@ -169,7 +170,8 @@ func needsAuth(op *openapi3.Operation) bool {
 }
 
 // inferCaptureField finds the response field that contains an ID to capture.
-// e.g. response has "course" object with "ID" → capture "course_id" from "$.course.ID"
+// e.g. response has "course" object with "ID" → capture "course_id" from "$.course.id"
+// Uses snake_case field names to match sqlc-generated JSON tags.
 func inferCaptureField(respSchema *openapi3.Schema) (varName, jsonPath string) {
 	if respSchema == nil {
 		return "", ""
@@ -182,7 +184,7 @@ func inferCaptureField(respSchema *openapi3.Schema) (varName, jsonPath string) {
 		// Check if this object has an ID field.
 		if prop.Properties != nil {
 			if _, hasID := prop.Properties["ID"]; hasID {
-				return strings.ToLower(name) + "_id", "$." + name + ".ID"
+				return strings.ToLower(name) + "_id", "$." + name + ".id"
 			}
 		}
 	}

@@ -1,6 +1,10 @@
 package service
 
-import "net/http"
+import (
+	"net/http"
+
+	_ "github.com/geul-org/fullend/pkg/auth"
+)
 
 // @sequence get
 // @model User.FindByEmail
@@ -18,10 +22,10 @@ import "net/http"
 //
 // @sequence call
 // @func auth.issueToken
-// @param user.ID
-// @param user.Email
-// @param user.Role
-// @result token Token
+// @param user.ID -> UserID
+// @param user.Email -> Email
+// @param user.Role -> Role
+// @result token IssueTokenResponse.AccessToken
 //
 // @sequence response json
 // @var token

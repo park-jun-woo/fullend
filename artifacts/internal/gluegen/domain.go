@@ -65,9 +65,9 @@ func transformServiceFilesWithDomains(intDir string, serviceFuncs []ssacparser.S
 	return nil
 }
 
-// generateAuthStubWithDomains creates model/auth.go (shared types) and service/auth.go (helper).
+// generateAuthStubWithDomains creates model/auth.go with shared auth types.
+// JWT middleware is provided by github.com/geul-org/fullend/pkg/middleware.
 func generateAuthStubWithDomains(intDir string, modulePath string) error {
-	// 1. Generate model/auth.go with shared auth types.
 	modelDir := filepath.Join(intDir, "model")
 	if err := os.MkdirAll(modelDir, 0755); err != nil {
 		return err
@@ -75,50 +75,17 @@ func generateAuthStubWithDomains(intDir string, modulePath string) error {
 
 	modelAuth := `package model
 
-import "net/http"
+import "github.com/geul-org/fullend/pkg/middleware"
 
-// CurrentUser represents the authenticated user.
-type CurrentUser struct {
-	UserID int64
-	Email  string
-	Name   string
-	Role   string
-}
+// CurrentUser is the authenticated user extracted by JWT middleware.
+type CurrentUser = middleware.CurrentUser
 
 // Authorizer checks permissions.
 type Authorizer interface {
 	Check(user *CurrentUser, action, resource string, id interface{}) (bool, error)
 }
-
-// CurrentUserFunc extracts the authenticated user from a request.
-type CurrentUserFunc func(r *http.Request) *CurrentUser
 `
-	if err := os.WriteFile(filepath.Join(modelDir, "auth.go"), []byte(modelAuth), 0644); err != nil {
-		return err
-	}
-
-	// 2. Generate service/auth.go with currentUser helper.
-	serviceDir := filepath.Join(intDir, "service")
-	if err := os.MkdirAll(serviceDir, 0755); err != nil {
-		return err
-	}
-
-	serviceAuth := fmt.Sprintf(`package service
-
-import (
-	"net/http"
-
-	"%s/internal/model"
-)
-
-// DefaultCurrentUser extracts the authenticated user from the request.
-// TODO: Implement JWT token parsing.
-func DefaultCurrentUser(r *http.Request) *model.CurrentUser {
-	return &model.CurrentUser{}
-}
-`, modulePath)
-
-	return os.WriteFile(filepath.Join(serviceDir, "auth.go"), []byte(serviceAuth), 0644)
+	return os.WriteFile(filepath.Join(modelDir, "auth.go"), []byte(modelAuth), 0644)
 }
 
 // generateServerStructWithDomains creates per-domain handler.go files and central server.go.
@@ -172,8 +139,7 @@ func generateDomainHandler(serviceDir, domain string, serviceFuncs []ssacparser.
 	}
 
 	if needsAuth {
-		b.WriteString("\tAuthz       model.Authorizer\n")
-		b.WriteString("\tCurrentUser model.CurrentUserFunc\n")
+		b.WriteString("\tAuthz model.Authorizer\n")
 	}
 
 	b.WriteString("}\n")
@@ -191,7 +157,35 @@ func generateDomainHandler(serviceDir, domain string, serviceFuncs []ssacparser.
 	return os.WriteFile(path, []byte(b.String()), 0644)
 }
 
-// generateCentralServer creates service/server.go that composes domain handlers.
+// opHasSecurity returns true if an OpenAPI operation has a non-empty security requirement.
+func opHasSecurity(op *openapi3.Operation) bool {
+	if op.Security == nil {
+		return false
+	}
+	// security: [] means explicitly no auth.
+	// security: [{bearerAuth: []}] means auth required.
+	return len(*op.Security) > 0
+}
+
+// convertPathParamsGin converts OpenAPI path params {Name} to gin style :Name.
+func convertPathParamsGin(path string) string {
+	result := path
+	for {
+		start := strings.Index(result, "{")
+		if start < 0 {
+			break
+		}
+		end := strings.Index(result[start:], "}")
+		if end < 0 {
+			break
+		}
+		paramName := result[start+1 : start+end]
+		result = result[:start] + ":" + paramName + result[start+end+1:]
+	}
+	return result
+}
+
+// generateCentralServer creates service/server.go that composes domain handlers with gin router.
 func generateCentralServer(serviceDir string, domains []string, serviceFuncs []ssacparser.ServiceFunc, modulePath string, doc *openapi3.T) error {
 	// Build operationId → domain map.
 	opDomains := make(map[string]string)
@@ -249,10 +243,27 @@ func generateCentralServer(serviceDir string, domains []string, serviceFuncs []s
 		b.WriteString("}\n\n")
 	}
 
-	// Handler function with routes.
-	b.WriteString("// Handler creates an http.Handler that routes requests to the Server.\n")
-	b.WriteString("func Handler(s *Server) http.Handler {\n")
-	b.WriteString("\tmux := http.NewServeMux()\n")
+	// Detect security schemes from OpenAPI.
+	hasBearer := false
+	if doc != nil && doc.Components != nil && doc.Components.SecuritySchemes != nil {
+		for _, ref := range doc.Components.SecuritySchemes {
+			if ref.Value != nil && ref.Value.Type == "http" && ref.Value.Scheme == "bearer" {
+				hasBearer = true
+				break
+			}
+		}
+	}
+
+	// SetupRouter creates a gin.Engine with routes.
+	b.WriteString("// SetupRouter creates a gin.Engine that routes requests to the Server.\n")
+	b.WriteString("func SetupRouter(s *Server) *gin.Engine {\n")
+	b.WriteString("\tr := gin.Default()\n\n")
+
+	if hasBearer {
+		b.WriteString("\t// Auth group — JWT middleware extracts currentUser into context.\n")
+		b.WriteString("\tauth := r.Group(\"/\")\n")
+		b.WriteString("\tauth.Use(middleware.BearerAuth(\"secret\"))\n\n")
+	}
 
 	if doc != nil {
 		for pathStr, pathItem := range doc.Paths.Map() {
@@ -260,8 +271,7 @@ func generateCentralServer(serviceDir string, domains []string, serviceFuncs []s
 				if op.OperationID == "" {
 					continue
 				}
-				muxPath := convertPathParams(pathStr)
-				pattern := fmt.Sprintf("%s %s", method, muxPath)
+				ginPath := convertPathParamsGin(pathStr)
 				handlerName := op.OperationID
 
 				// Determine target: s.Domain.Method or s.Method.
@@ -273,78 +283,48 @@ func generateCentralServer(serviceDir string, domains []string, serviceFuncs []s
 					target = fmt.Sprintf("s.%s", handlerName)
 				}
 
-				// Path params.
-				var pathParams []pathParamInfo
-				if pathItem.Parameters != nil {
-					for _, p := range pathItem.Parameters {
-						if p.Value != nil && p.Value.In == "path" {
-							pathParams = append(pathParams, pathParamInfo{
-								Name:   p.Value.Name,
-								GoName: snakeToGo(p.Value.Name),
-								IsInt:  p.Value.Schema != nil && p.Value.Schema.Value != nil && p.Value.Schema.Value.Type != nil && ((*p.Value.Schema.Value.Type)[0] == "integer"),
-							})
-						}
-					}
-				}
-				if op.Parameters != nil {
-					for _, p := range op.Parameters {
-						if p.Value != nil && p.Value.In == "path" {
-							pathParams = append(pathParams, pathParamInfo{
-								Name:   p.Value.Name,
-								GoName: snakeToGo(p.Value.Name),
-								IsInt:  p.Value.Schema != nil && p.Value.Schema.Value != nil && p.Value.Schema.Value.Type != nil && ((*p.Value.Schema.Value.Type)[0] == "integer"),
-							})
-						}
-					}
+				// Determine route group from OpenAPI security field.
+				needsAuth := opHasSecurity(op)
+				ginMethod := strings.ToUpper(method)
+				var routerVar string
+				if needsAuth && hasBearer {
+					routerVar = "auth"
+				} else {
+					routerVar = "r"
 				}
 
-				if len(pathParams) == 0 {
-					b.WriteString(fmt.Sprintf("\tmux.HandleFunc(\"%s\", %s)\n", pattern, target))
-				} else {
-					b.WriteString(fmt.Sprintf("\tmux.HandleFunc(\"%s\", func(w http.ResponseWriter, r *http.Request) {\n", pattern))
-					for _, pp := range pathParams {
-						lcName := lcFirst(pp.GoName)
-						if pp.IsInt {
-							b.WriteString(fmt.Sprintf("\t\t%sStr := r.PathValue(\"%s\")\n", lcName, pp.Name))
-							b.WriteString(fmt.Sprintf("\t\t%s, err := strconv.ParseInt(%sStr, 10, 64)\n", lcName, lcName))
-							b.WriteString("\t\tif err != nil {\n")
-							b.WriteString("\t\t\thttp.Error(w, \"invalid path parameter\", http.StatusBadRequest)\n")
-							b.WriteString("\t\t\treturn\n")
-							b.WriteString("\t\t}\n")
-						} else {
-							b.WriteString(fmt.Sprintf("\t\t%s := r.PathValue(\"%s\")\n", lcName, pp.Name))
-						}
-					}
-					var args []string
-					args = append(args, "w", "r")
-					for _, pp := range pathParams {
-						args = append(args, lcFirst(pp.GoName))
-					}
-					b.WriteString(fmt.Sprintf("\t\t%s(%s)\n", target, strings.Join(args, ", ")))
-					b.WriteString("\t})\n")
+				switch ginMethod {
+				case "GET":
+					b.WriteString(fmt.Sprintf("\t%s.GET(%q, %s)\n", routerVar, ginPath, target))
+				case "POST":
+					b.WriteString(fmt.Sprintf("\t%s.POST(%q, %s)\n", routerVar, ginPath, target))
+				case "PUT":
+					b.WriteString(fmt.Sprintf("\t%s.PUT(%q, %s)\n", routerVar, ginPath, target))
+				case "DELETE":
+					b.WriteString(fmt.Sprintf("\t%s.DELETE(%q, %s)\n", routerVar, ginPath, target))
+				case "PATCH":
+					b.WriteString(fmt.Sprintf("\t%s.PATCH(%q, %s)\n", routerVar, ginPath, target))
+				default:
+					b.WriteString(fmt.Sprintf("\t%s.Handle(%q, %q, %s)\n", routerVar, ginMethod, ginPath, target))
 				}
 			}
 		}
 	}
 
-	b.WriteString("\treturn mux\n")
+	b.WriteString("\n\treturn r\n")
 	b.WriteString("}\n")
 
 	// Build imports.
-	content := b.String()
 	var imports []string
-	// Only import model if flat funcs reference it.
+	imports = append(imports, "\"github.com/gin-gonic/gin\"")
+	if hasBearer {
+		imports = append(imports, "\"github.com/geul-org/fullend/pkg/middleware\"")
+	}
 	if len(flatModels) > 0 || hasFlatFuncs {
 		imports = append(imports, fmt.Sprintf("\"%s/internal/model\"", modulePath))
 	}
 	for _, d := range domains {
 		imports = append(imports, fmt.Sprintf("%ssvc \"%s/internal/service/%s\"", d, modulePath, d))
-	}
-	if strings.Contains(content, "http.") {
-		imports = append(imports, "\"net/http\"")
-	}
-	if strings.Contains(content, "strconv.") {
-		imports = append(imports, "\"strconv\"")
 	}
 
 	var header strings.Builder
@@ -356,7 +336,7 @@ func generateCentralServer(serviceDir string, domains []string, serviceFuncs []s
 	header.WriteString(")\n\n")
 
 	// Replace package+import block.
-	body := content
+	body := b.String()
 	if idx := strings.Index(body, "// Server composes"); idx > 0 {
 		body = body[idx:]
 	}
@@ -378,7 +358,7 @@ func generateMainWithDomains(artifactsDir string, serviceFuncs []ssacparser.Serv
 		if err := os.MkdirAll(filepath.Join(artifactsDir, "backend"), 0755); err != nil {
 			return err
 		}
-		goModContent := fmt.Sprintf("module %s\n\ngo 1.22\n", modulePath)
+		goModContent := fmt.Sprintf("module %s\n\ngo 1.22\n\nrequire github.com/gin-gonic/gin v1.10.0\n", modulePath)
 		if err := os.WriteFile(goModPath, []byte(goModContent), 0644); err != nil {
 			return err
 		}
@@ -390,6 +370,13 @@ func generateMainWithDomains(artifactsDir string, serviceFuncs []ssacparser.Serv
 
 	domains := uniqueDomains(serviceFuncs)
 	flatModels := collectModelsForDomain(serviceFuncs, "")
+	anyNeedsAuth := false
+	for _, d := range domains {
+		if domainNeedsAuth(serviceFuncs, d) {
+			anyNeedsAuth = true
+			break
+		}
+	}
 
 	// Build init block.
 	var initLines []string
@@ -411,7 +398,7 @@ func generateMainWithDomains(artifactsDir string, serviceFuncs []ssacparser.Serv
 			handlerLines = append(handlerLines, fmt.Sprintf("\t\t\t%s: model.New%sModel(conn),", mFieldName, m))
 		}
 		if domainNeedsAuth(serviceFuncs, domain) {
-			handlerLines = append(handlerLines, "\t\t\tCurrentUser: service.DefaultCurrentUser,")
+			handlerLines = append(handlerLines, "\t\t\tAuthz: az,")
 		}
 
 		initLines = append(initLines, fmt.Sprintf("\t\t%s: &%ssvc.Handler{", fieldName, domain))
@@ -428,10 +415,24 @@ func generateMainWithDomains(artifactsDir string, serviceFuncs []ssacparser.Serv
 	var extraImports []string
 	extraImports = append(extraImports, fmt.Sprintf("\n\t\"%s/internal/model\"", modulePath))
 	extraImports = append(extraImports, fmt.Sprintf("\t\"%s/internal/service\"", modulePath))
+	if anyNeedsAuth {
+		extraImports = append(extraImports, fmt.Sprintf("\t\"%s/internal/authz\"", modulePath))
+	}
 	for _, d := range domains {
 		extraImports = append(extraImports, fmt.Sprintf("\t%ssvc \"%s/internal/service/%s\"", d, modulePath, d))
 	}
 	importBlock := strings.Join(extraImports, "\n")
+
+	// Authz init block.
+	authzBlock := ""
+	if anyNeedsAuth {
+		authzBlock = `
+	az, err := authz.New(conn)
+	if err != nil {
+		log.Fatalf("authz init failed: %v", err)
+	}
+`
+	}
 
 	src := fmt.Sprintf(`package main
 
@@ -439,7 +440,6 @@ import (
 	"database/sql"
 	"flag"
 	"log"
-	"net/http"
 
 	_ "github.com/lib/pq"
 %s
@@ -460,16 +460,16 @@ func main() {
 	if err := conn.Ping(); err != nil {
 		log.Fatalf("database ping failed: %%v", err)
 	}
-
+%s
 	server := &service.Server{
 %s
 	}
 
-	handler := service.Handler(server)
+	r := service.SetupRouter(server)
 	log.Printf("server listening on %%s", *addr)
-	log.Fatal(http.ListenAndServe(*addr, handler))
+	log.Fatal(r.Run(*addr))
 }
-`, importBlock, initBlock)
+`, importBlock, authzBlock, initBlock)
 
 	path := filepath.Join(artifactsDir, "backend", "cmd", "main.go")
 	return os.WriteFile(path, []byte(src), 0644)

@@ -215,25 +215,26 @@ func transformSource(src string, models, funcs, components []string, modulePath 
 		src = strings.ReplaceAll(src, c+".", rcv+"."+fieldName+".")
 	}
 
-	// Replace authz and currentUser.
+	// Replace authz references — currentUser is extracted by SSaC codegen via c.MustGet("currentUser").
 	if isDomain {
-		src = strings.ReplaceAll(src, "authz.Check(currentUser,", rcv+".Authz.Check("+rcv+".CurrentUser(r),")
-		src = strings.ReplaceAll(src, "currentUser.UserID", rcv+".CurrentUser(r).UserID")
-		src = strings.ReplaceAll(src, "currentUser.ID", rcv+".CurrentUser(r).ID")
+		src = strings.ReplaceAll(src, "authz.Check(currentUser,", rcv+".Authz.Check(currentUser,")
 	} else {
-		src = strings.ReplaceAll(src, "authz.Check(currentUser,", "s.Authz.Check(s.currentUser(r),")
-		src = strings.ReplaceAll(src, "currentUser.UserID", "s.currentUser(r).UserID")
-		src = strings.ReplaceAll(src, "currentUser.ID", "s.currentUser(r).ID")
+		src = strings.ReplaceAll(src, "authz.Check(currentUser,", "s.Authz.Check(currentUser,")
 	}
 
 	// Qualify model package types used in service code.
 	if strings.Contains(src, "QueryOpts{}") {
 		funcName := extractFuncName(src)
 		if cfg, ok := xConfigs[funcName]; ok {
-			src = strings.ReplaceAll(src, "QueryOpts{}", "model.ParseQueryOpts(r, "+cfg+")")
+			src = strings.ReplaceAll(src, "QueryOpts{}", "model.ParseQueryOpts(c, "+cfg+")")
 		} else {
 			src = strings.ReplaceAll(src, "QueryOpts{}", "model.QueryOpts{}")
 		}
+	}
+
+	// Add model import when model package types are used (QueryOpts, CurrentUser, etc.)
+	needsModel := strings.Contains(src, "model.QueryOpts") || strings.Contains(src, "model.ParseQueryOpts") || strings.Contains(src, "*model.CurrentUser")
+	if needsModel {
 		modelImport := fmt.Sprintf("\"%s/internal/model\"", modulePath)
 		if !strings.Contains(src, modelImport) {
 			src = strings.Replace(src, "import (", "import (\n\t"+modelImport, 1)

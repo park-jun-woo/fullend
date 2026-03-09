@@ -1,12 +1,13 @@
 # fullend — AI SSOT Integration Guide
 
-> Rules for writing 9 SSOTs (OpenAPI, SQL DDL, SSaC, STML, Mermaid stateDiagram, OPA Rego, Gherkin Scenario, Func Spec, Terraform) in a single project.
-> Does not explain OpenAPI/SQL DDL/Terraform syntax. Covers only SSaC/STML/stateDiagram/OPA Rego/Gherkin/Func syntax and cross-SSOT connection rules.
+> Rules for writing 10 SSOTs (fullend.yaml, OpenAPI, SQL DDL, SSaC, STML, Mermaid stateDiagram, OPA Rego, Gherkin Scenario, Func Spec, Terraform) in a single project.
+> Does not explain OpenAPI/SQL DDL/Terraform syntax. Covers only fullend.yaml/SSaC/STML/stateDiagram/OPA Rego/Gherkin/Func syntax and cross-SSOT connection rules.
 
 ## Project Directory Structure
 
 ```
 <project-root>/
+├── fullend.yaml                  # Project config (required)
 ├── api/openapi.yaml              # OpenAPI 3.x (with x- extensions)
 ├── db/
 │   ├── *.sql                     # DDL (CREATE TABLE, CREATE INDEX)
@@ -23,6 +24,52 @@
 │   └── components/*.tsx          # React component wrappers (optional)
 └── terraform/*.tf                # HCL infrastructure declarations
 ```
+
+## fullend.yaml — Project Configuration
+
+Required file at specs root. Kubernetes-style declarative YAML.
+
+```yaml
+apiVersion: fullend/v1
+kind: Project
+
+metadata:
+  name: <project-name>
+
+backend:
+  lang: go                          # Backend language
+  framework: gin                    # Backend framework
+  module: github.com/org/project    # Go module path (used in go.mod, imports)
+  middleware:                        # Middleware list (must match OpenAPI securitySchemes names)
+    - bearerAuth
+
+frontend:
+  lang: typescript                  # Frontend language
+  framework: react                  # Frontend framework
+  bundler: vite                     # Bundler
+  name: project-web                 # npm package name
+
+deploy:
+  image: ghcr.io/org/project        # Container image (optional)
+  domain: project.example.com       # Service domain (optional)
+```
+
+### Required Fields
+
+| Field | Description |
+|-------|-------------|
+| `apiVersion` | Must be `fullend/v1` |
+| `kind` | Must be `Project` |
+| `metadata.name` | Project identifier |
+| `backend.module` | Go module path |
+
+### Cross-validation Rules
+
+| Rule | Level |
+|------|-------|
+| `backend.middleware` names must match OpenAPI `securitySchemes` keys | ERROR |
+| OpenAPI `securitySchemes` keys must exist in `backend.middleware` | ERROR |
+| Endpoint `security` references must exist in `backend.middleware` | ERROR |
 
 ## SSaC — Service Logic Declarations
 
@@ -250,7 +297,7 @@ SSaC에서 `@func pkg.funcName` 으로 참조:
 ```go
 out, err := auth.HashPassword(auth.HashPasswordRequest{Password: password})
 if err != nil {
-    http.Error(w, "hashPassword 호출 실패", http.StatusInternalServerError)
+    c.JSON(http.StatusInternalServerError, gin.H{"error": "hashPassword 호출 실패"})
     return
 }
 hashedPassword := out.HashedPassword
@@ -285,6 +332,66 @@ func CalculateRefund(req CalculateRefundRequest) (CalculateRefundResponse, error
 ```
 
 LLM에 이 에러 메시지를 그대로 전달하면 `@description`만 채우고 본체를 구현할 수 있다.
+
+## Middleware — gin Middleware (pkg/middleware/)
+
+fullend provides built-in gin middleware. Automatically wired based on OpenAPI `securitySchemes`.
+
+### BearerAuth Middleware
+
+```go
+// pkg/middleware/bearerauth.go
+func BearerAuth(secret string) gin.HandlerFunc
+```
+
+- `fullend.yaml` `backend.middleware`에 `bearerAuth` 선언 + OpenAPI `securitySchemes`에 `bearerAuth` 존재 시 적용
+- `Authorization: Bearer <token>` → `auth.VerifyToken` → `c.Set("currentUser", &CurrentUser{...})`
+- abort하지 않음 — 토큰 없거나 유효하지 않으면 빈 `CurrentUser{}` 세팅. authorize 시퀀스가 권한 검사 담당.
+
+### CurrentUser Type
+
+```go
+// pkg/middleware/bearerauth.go
+type CurrentUser struct {
+    UserID int64
+    Email  string
+    Role   string
+}
+```
+
+생성 프로젝트의 `model/auth.go`에서 타입 앨리어스로 연결:
+```go
+type CurrentUser = middleware.CurrentUser
+```
+
+SSaC codegen이 `c.MustGet("currentUser").(*model.CurrentUser)` 생성 → 미들웨어가 세팅한 값을 핸들러에서 사용.
+
+### Route Grouping (OpenAPI security)
+
+OpenAPI `security` 필드가 라우트 그룹 결정의 SSOT:
+
+```yaml
+paths:
+  /login:
+    post:
+      operationId: Login
+      # security 없음 → public group (미들웨어 없음)
+  /courses:
+    post:
+      operationId: CreateCourse
+      security:
+        - bearerAuth: []    # → auth group (JWT 미들웨어 적용)
+```
+
+생성 코드:
+```go
+r := gin.Default()
+auth := r.Group("/")
+auth.Use(middleware.BearerAuth("secret"))
+
+r.POST("/login", s.Auth.Login)              // public
+auth.POST("/courses", s.Course.CreateCourse) // JWT 미들웨어 적용
+```
 
 ## STML — UI Declarations
 
@@ -616,7 +723,7 @@ stateDiagram-v2
 ```go
 // guard state -> 409 Conflict if transition not allowed
 if !coursestate.CanTransition(course.Published, "PublishCourse") {
-    http.Error(w, "state transition not allowed", http.StatusConflict)
+    c.JSON(http.StatusConflict, gin.H{"error": "state transition not allowed"})
     return
 }
 ```

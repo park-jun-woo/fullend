@@ -13,9 +13,10 @@ func generateQueryOpts(modelDir string) error {
 
 import (
 	"fmt"
-	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 // QueryOptsConfig defines allowed values for parsing query parameters.
@@ -50,14 +51,14 @@ type IncludeConfig struct {
 	Allowed []string
 }
 
-// ParseQueryOpts extracts QueryOpts from an HTTP request, validated against config.
-func ParseQueryOpts(r *http.Request, cfg QueryOptsConfig) QueryOpts {
+// ParseQueryOpts extracts QueryOpts from a gin context, validated against config.
+func ParseQueryOpts(c *gin.Context, cfg QueryOptsConfig) QueryOpts {
 	var opts QueryOpts
 
 	// Pagination
 	if cfg.Pagination != nil {
 		opts.Limit = cfg.Pagination.DefaultLimit
-		if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
+		if limitStr := c.Query("limit"); limitStr != "" {
 			if v, err := strconv.Atoi(limitStr); err == nil && v > 0 {
 				opts.Limit = v
 			}
@@ -67,9 +68,9 @@ func ParseQueryOpts(r *http.Request, cfg QueryOptsConfig) QueryOpts {
 		}
 
 		if cfg.Pagination.Style == "cursor" {
-			opts.Cursor = r.URL.Query().Get("cursor")
+			opts.Cursor = c.Query("cursor")
 		} else {
-			if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
+			if offsetStr := c.Query("offset"); offsetStr != "" {
 				if v, err := strconv.Atoi(offsetStr); err == nil && v >= 0 {
 					opts.Offset = v
 				}
@@ -85,12 +86,12 @@ func ParseQueryOpts(r *http.Request, cfg QueryOptsConfig) QueryOpts {
 			opts.SortDir = "asc"
 		}
 
-		if sortBy := r.URL.Query().Get("sortBy"); sortBy != "" {
+		if sortBy := c.Query("sortBy"); sortBy != "" {
 			if containsStr(cfg.Sort.Allowed, sortBy) {
 				opts.SortCol = sortBy
 			}
 		}
-		if sortDir := r.URL.Query().Get("sortDir"); sortDir == "asc" || sortDir == "desc" {
+		if sortDir := c.Query("sortDir"); sortDir == "asc" || sortDir == "desc" {
 			opts.SortDir = sortDir
 		}
 	}
@@ -99,7 +100,7 @@ func ParseQueryOpts(r *http.Request, cfg QueryOptsConfig) QueryOpts {
 	if cfg.Filter != nil {
 		opts.Filters = make(map[string]string)
 		for _, col := range cfg.Filter.Allowed {
-			if val := r.URL.Query().Get(col); val != "" {
+			if val := c.Query(col); val != "" {
 				opts.Filters[col] = val
 			}
 		}
@@ -107,7 +108,7 @@ func ParseQueryOpts(r *http.Request, cfg QueryOptsConfig) QueryOpts {
 
 	// Include
 	if cfg.Include != nil {
-		if incStr := r.URL.Query().Get("include"); incStr != "" {
+		if incStr := c.Query("include"); incStr != "" {
 			for _, inc := range strings.Split(incStr, ",") {
 				inc = strings.TrimSpace(inc)
 				if containsStr(cfg.Include.Allowed, inc) {

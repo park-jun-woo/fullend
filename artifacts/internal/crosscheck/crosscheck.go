@@ -22,6 +22,7 @@ type CrossValidateInput struct {
 	ProjectFuncSpecs []funcspec.FuncSpec
 	FullendPkgSpecs  []funcspec.FuncSpec
 	DTOTypes         map[string]bool // model types marked with @dto (skip DDL matching)
+	Middleware       []string        // from fullend.yaml backend.middleware
 }
 
 // Run executes all cross-validation rules and returns collected errors.
@@ -61,6 +62,11 @@ func Run(input *CrossValidateInput) []CrossError {
 	// Func ↔ SSaC
 	if input.ServiceFuncs != nil {
 		errs = append(errs, CheckFuncs(input.ServiceFuncs, input.FullendPkgSpecs, input.ProjectFuncSpecs, input.SymbolTable, input.OpenAPIDoc)...)
+	}
+
+	// Middleware ↔ OpenAPI securitySchemes
+	if input.OpenAPIDoc != nil && input.Middleware != nil {
+		errs = append(errs, CheckMiddleware(input.Middleware, input.OpenAPIDoc)...)
 	}
 
 	return errs

@@ -109,6 +109,18 @@ fullend ships with built-in function implementations that can be used via SSaC `
 
 Projects can override these by providing custom implementations in `specs/<project>/func/<pkg>/`.
 
+## Middleware (pkg/middleware/)
+
+fullend provides built-in gin middleware, automatically wired based on OpenAPI `securitySchemes`:
+
+| Middleware | Trigger | Description |
+|---|---|---|
+| `JWT(secret)` | `securitySchemes.bearerAuth` (type: http, scheme: bearer) | Extracts JWT → sets `CurrentUser` in gin context |
+
+Route grouping is determined by OpenAPI `security` field on each operation:
+- Operations with `security: [{bearerAuth: []}]` → auth group (middleware applied)
+- Operations without `security` → public group (no middleware)
+
 ## Cross-Validation
 
 Individual tools (SSaC, STML) validate within their own layer. fullend catches mismatches **between** layers:
@@ -178,6 +190,7 @@ Projects that fullend's generated code depends on at runtime:
 - [Vite](https://vite.dev/) — Frontend build tool
 - [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework
 - [TypeScript](https://www.typescriptlang.org/) — Type-safe JavaScript
+- [Gin](https://gin-gonic.com/) — HTTP web framework for Go
 - [lib/pq](https://github.com/lib/pq) — PostgreSQL driver for Go
 
 ## License

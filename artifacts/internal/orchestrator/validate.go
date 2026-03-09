@@ -11,6 +11,7 @@ import (
 	"github.com/geul-org/fullend/artifacts/internal/crosscheck"
 	"github.com/geul-org/fullend/artifacts/internal/funcspec"
 	"github.com/geul-org/fullend/artifacts/internal/policy"
+	"github.com/geul-org/fullend/artifacts/internal/projectconfig"
 	"github.com/geul-org/fullend/artifacts/internal/reporter"
 	"github.com/geul-org/fullend/artifacts/internal/scenario"
 	"github.com/geul-org/fullend/artifacts/internal/statemachine"
@@ -21,7 +22,7 @@ import (
 )
 
 // allKinds defines the display order of SSOT kinds for validation.
-var allKinds = []SSOTKind{KindOpenAPI, KindDDL, KindSSaC, KindModel, KindSTML, KindStates, KindPolicy, KindScenario, KindFunc, KindTerraform}
+var allKinds = []SSOTKind{KindConfig, KindOpenAPI, KindDDL, KindSSaC, KindModel, KindSTML, KindStates, KindPolicy, KindScenario, KindFunc, KindTerraform}
 
 // Validate runs individual SSOT validations on the detected sources,
 // then runs cross-validation if OpenAPI + DDL + SSaC are all present.
@@ -47,6 +48,7 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 	var parsedPolicies []*policy.Policy
 	var parsedFeatures []*scenario.Feature
 	var projectFuncSpecs []funcspec.FuncSpec
+	var projConfig *projectconfig.ProjectConfig
 	var modelDir string
 
 	done := make(map[SSOTKind]bool)
@@ -84,6 +86,10 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 		}
 
 		switch kind {
+		case KindConfig:
+			step, cfg := validateConfig(d.Path)
+			report.Steps = append(report.Steps, step)
+			projConfig = cfg
 		case KindOpenAPI:
 			step, doc := validateOpenAPI(d.Path)
 			report.Steps = append(report.Steps, step)
@@ -130,12 +136,12 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 	}
 
 	// Cross-validation step.
-	report.Steps = append(report.Steps, runCrossValidate(openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, parsedFeatures, projectFuncSpecs, modelDir))
+	report.Steps = append(report.Steps, runCrossValidate(openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, parsedFeatures, projectFuncSpecs, modelDir, projConfig))
 
 	return report
 }
 
-func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, features []*scenario.Feature, projectFuncSpecs []funcspec.FuncSpec, modelDir string) reporter.StepResult {
+func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, features []*scenario.Feature, projectFuncSpecs []funcspec.FuncSpec, modelDir string, projConfig *projectconfig.ProjectConfig) reporter.StepResult {
 	step := reporter.StepResult{Name: "Cross"}
 
 	// Require OpenAPI + DDL + SSaC for cross-validation.
@@ -156,6 +162,11 @@ func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ss
 	// Load @dto types from model files.
 	dtoTypes := loadDTOTypes(modelDir)
 
+	var middleware []string
+	if projConfig != nil {
+		middleware = projConfig.Backend.Middleware
+	}
+
 	input := &crosscheck.CrossValidateInput{
 		OpenAPIDoc:       doc,
 		SymbolTable:      st,
@@ -166,6 +177,7 @@ func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ss
 		ProjectFuncSpecs: projectFuncSpecs,
 		FullendPkgSpecs:  fullendPkgSpecs,
 		DTOTypes:         dtoTypes,
+		Middleware:       middleware,
 	}
 
 	cerrs := crosscheck.Run(input)
@@ -494,4 +506,24 @@ func validateSTML(root, frontendDir string) reporter.StepResult {
 	}
 	step.Summary = fmt.Sprintf("%d pages, %d bindings", len(pages), bindings)
 	return step
+}
+
+func validateConfig(path string) (reporter.StepResult, *projectconfig.ProjectConfig) {
+	step := reporter.StepResult{Name: string(KindConfig)}
+	cfg, err := projectconfig.Load(filepath.Dir(path))
+	if err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, err.Error())
+		return step, nil
+	}
+	step.Status = reporter.Pass
+	parts := []string{cfg.Metadata.Name}
+	if cfg.Backend.Module != "" {
+		parts = append(parts, cfg.Backend.Lang+"/"+cfg.Backend.Framework)
+	}
+	if cfg.Frontend.Name != "" {
+		parts = append(parts, cfg.Frontend.Lang+"/"+cfg.Frontend.Framework)
+	}
+	step.Summary = strings.Join(parts, ", ")
+	return step, cfg
 }

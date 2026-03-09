@@ -1,6 +1,10 @@
 package service
 
-import "net/http"
+import (
+	"net/http"
+
+	_ "github.com/geul-org/fullend/pkg/auth"
+)
 
 // @sequence get
 // @model User.FindByEmail
@@ -14,7 +18,7 @@ import "net/http"
 // @func auth.verifyPassword
 // @param user.PasswordHash
 // @param Password request
-// @message "비밀번호가 일치하지 않습니다" 401
+// @message "비밀번호가 일치하지 않습니다"
 
 // @sequence post
 // @model Session.Create

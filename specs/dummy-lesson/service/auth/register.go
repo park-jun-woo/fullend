@@ -1,6 +1,10 @@
 package service
 
-import "net/http"
+import (
+	"net/http"
+
+	_ "github.com/geul-org/fullend/pkg/auth"
+)
 
 // @sequence get
 // @model User.FindByEmail
@@ -13,7 +17,7 @@ import "net/http"
 // @sequence call
 // @func auth.hashPassword
 // @param Password request
-// @result hashedPassword string
+// @result hashedPassword HashPasswordResponse.HashedPassword
 //
 // @sequence post
 // @model User.Create

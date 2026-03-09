@@ -20,6 +20,7 @@ const (
 	KindPolicy    SSOTKind = "Policy"
 	KindScenario  SSOTKind = "Scenario"
 	KindFunc      SSOTKind = "Func"
+	KindConfig    SSOTKind = "Config"
 )
 
 // DetectedSSOT holds the kind and resolved directory path.
@@ -92,6 +93,12 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 		found = append(found, DetectedSSOT{Kind: KindScenario, Path: scenarioDir})
 	}
 
+	// Check for fullend.yaml (project config).
+	configPath := filepath.Join(abs, "fullend.yaml")
+	if _, err := os.Stat(configPath); err == nil {
+		found = append(found, DetectedSSOT{Kind: KindConfig, Path: configPath})
+	}
+
 	// Check for func/ directory (custom func spec files).
 	funcDir := filepath.Join(abs, "func")
 	if fi, err := os.Stat(funcDir); err == nil && fi.IsDir() {
@@ -108,7 +115,7 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 // AllSSOTKinds returns all SSOT kinds that fullend manages.
 func AllSSOTKinds() []SSOTKind {
 	return []SSOTKind{
-		KindOpenAPI, KindDDL, KindSSaC, KindModel,
+		KindConfig, KindOpenAPI, KindDDL, KindSSaC, KindModel,
 		KindSTML, KindStates, KindPolicy, KindScenario, KindFunc, KindTerraform,
 	}
 }
@@ -125,6 +132,7 @@ var kindNames = map[string]SSOTKind{
 	"terraform": KindTerraform,
 	"scenario":  KindScenario,
 	"func":      KindFunc,
+	"config":    KindConfig,
 }
 
 // KindFromString parses a CLI --skip value into a SSOTKind.

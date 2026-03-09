@@ -11,6 +11,7 @@ import (
 
 	"github.com/geul-org/fullend/artifacts/internal/gluegen"
 	"github.com/geul-org/fullend/artifacts/internal/policy"
+	"github.com/geul-org/fullend/artifacts/internal/projectconfig"
 	"github.com/geul-org/fullend/artifacts/internal/reporter"
 	"github.com/geul-org/fullend/artifacts/internal/scenario"
 	"github.com/geul-org/fullend/artifacts/internal/statemachine"
@@ -123,12 +124,12 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 
 	// 9. State machine code generation.
 	if d, ok := has[KindStates]; ok {
-		report.Steps = append(report.Steps, genStateMachines(d.Path, artifactsDir))
+		report.Steps = append(report.Steps, genStateMachines(d.Path, specsDir, artifactsDir))
 	}
 
 	// 10. OPA Authorizer code generation.
 	if d, ok := has[KindPolicy]; ok {
-		report.Steps = append(report.Steps, genAuthz(d.Path, artifactsDir))
+		report.Steps = append(report.Steps, genAuthz(d.Path, specsDir, artifactsDir))
 	}
 
 	// 11. Scenario Hurl generation.
@@ -362,8 +363,8 @@ func genSTML(profile *TargetProfile, specsDir, frontendDir, artifactsDir string)
 func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, stmlDeps map[string]string, stmlPages []string, stmlPageOps map[string]string) reporter.StepResult {
 	step := reporter.StepResult{Name: "glue-gen"}
 
-	// Determine module path.
-	modulePath := determineModulePath(artifactsDir)
+	// Determine module path from fullend.yaml, fallback to directory-based.
+	modulePath := determineModulePath(specsDir, artifactsDir)
 
 	input := &gluegen.GlueInput{
 		ArtifactsDir: artifactsDir,
@@ -408,8 +409,14 @@ func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, stmlD
 	return step
 }
 
-func determineModulePath(artifactsDir string) string {
-	// Check if backend/go.mod already exists.
+func determineModulePath(specsDir, artifactsDir string) string {
+	// 1. Try fullend.yaml first.
+	cfg, err := projectconfig.Load(specsDir)
+	if err == nil && cfg.Backend.Module != "" {
+		return cfg.Backend.Module
+	}
+
+	// 2. Fallback: check existing backend/go.mod.
 	goModPath := filepath.Join(artifactsDir, "backend", "go.mod")
 	if data, err := os.ReadFile(goModPath); err == nil {
 		for _, line := range strings.Split(string(data), "\n") {
@@ -418,12 +425,13 @@ func determineModulePath(artifactsDir string) string {
 			}
 		}
 	}
-	// Derive from directory name.
+
+	// 3. Last resort: derive from directory name.
 	base := filepath.Base(artifactsDir)
 	return base + "/backend"
 }
 
-func genStateMachines(statesDir, artifactsDir string) reporter.StepResult {
+func genStateMachines(statesDir, specsDir, artifactsDir string) reporter.StepResult {
 	step := reporter.StepResult{Name: "state-gen"}
 
 	diagrams, err := statemachine.ParseDir(statesDir)
@@ -438,7 +446,7 @@ func genStateMachines(statesDir, artifactsDir string) reporter.StepResult {
 		return step
 	}
 
-	modulePath := determineModulePath(artifactsDir)
+	modulePath := determineModulePath(specsDir, artifactsDir)
 	if err := gluegen.GenerateStateMachines(diagrams, artifactsDir, modulePath); err != nil {
 		step.Status = reporter.Fail
 		step.Errors = append(step.Errors, fmt.Sprintf("state-gen error: %v", err))
@@ -450,7 +458,7 @@ func genStateMachines(statesDir, artifactsDir string) reporter.StepResult {
 	return step
 }
 
-func genAuthz(policyDir, artifactsDir string) reporter.StepResult {
+func genAuthz(policyDir, specsDir, artifactsDir string) reporter.StepResult {
 	step := reporter.StepResult{Name: "authz-gen"}
 
 	policies, err := policy.ParseDir(policyDir)
@@ -465,7 +473,7 @@ func genAuthz(policyDir, artifactsDir string) reporter.StepResult {
 		return step
 	}
 
-	modulePath := determineModulePath(artifactsDir)
+	modulePath := determineModulePath(specsDir, artifactsDir)
 	if err := gluegen.GenerateAuthzPackage(policies, artifactsDir, modulePath); err != nil {
 		step.Status = reporter.Fail
 		step.Errors = append(step.Errors, fmt.Sprintf("authz-gen error: %v", err))
