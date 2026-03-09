@@ -185,32 +185,55 @@ func HashPassword(in HashPasswordInput) (HashPasswordOutput, error) {
 
 fullend ships with built-in default implementations in `pkg/`:
 
-| Package | Function | Description | Dependencies |
+#### auth — 인증
+
+| Function | Description | Input | Output |
 |---|---|---|---|
-| `auth` | `hashPassword` | bcrypt 해싱 — 평문 비밀번호를 bcrypt 해시로 변환 | `golang.org/x/crypto/bcrypt` |
-| `auth` | `verifyPassword` | bcrypt 검증 — 저장된 해시와 평문 비밀번호 일치 확인 | `golang.org/x/crypto/bcrypt` |
-| `auth` | `issueToken` | JWT 발급 — 인증된 사용자 정보로 JWT 액세스 토큰 발급 | `github.com/golang-jwt/jwt/v5` |
+| `hashPassword` | bcrypt 해싱 | `{ Password }` | `{ HashedPassword }` |
+| `verifyPassword` | bcrypt 검증 | `{ PasswordHash, Password }` | `{}` (error=불일치) |
+| `issueToken` | JWT 액세스 토큰 발급 (24h) | `{ UserID, Email, Role }` | `{ AccessToken }` |
+| `verifyToken` | JWT 검증 → claims 추출 | `{ Token, Secret }` | `{ UserID, Email, Role }` |
+| `refreshToken` | 리프레시 토큰 발급 (7일) | `{ UserID, Email, Role }` | `{ RefreshToken }` |
+| `generateResetToken` | 비밀번호 리셋용 랜덤 토큰 | `{}` | `{ Token }` |
 
-#### auth.hashPassword
+#### crypto — 암호화
 
-```
-Input:  { Password string }
-Output: { HashedPassword string }
-```
+| Function | Description | Input | Output |
+|---|---|---|---|
+| `encrypt` | AES-256-GCM 암호화 | `{ Plaintext, Key(hex) }` | `{ Ciphertext(base64) }` |
+| `decrypt` | AES-256-GCM 복호화 | `{ Ciphertext(base64), Key(hex) }` | `{ Plaintext }` |
+| `generateOTP` | TOTP 시크릿 + QR URL 생성 | `{ Issuer, AccountName }` | `{ Secret, URL }` |
+| `verifyOTP` | TOTP 코드 검증 | `{ Code, Secret }` | `{}` (error=불일치) |
 
-#### auth.verifyPassword
+#### storage — S3 호환 파일 스토리지
 
-```
-Input:  { PasswordHash string, Password string }
-Output: {} (empty — error means mismatch)
-```
+| Function | Description | Input | Output |
+|---|---|---|---|
+| `uploadFile` | 파일 업로드 | `{ Bucket, Key, Data, ContentType, Endpoint, Region }` | `{ URL }` |
+| `deleteFile` | 파일 삭제 | `{ Bucket, Key, Endpoint, Region }` | `{}` |
+| `presignURL` | 서명된 다운로드 URL | `{ Bucket, Key, ExpiresIn, Endpoint, Region }` | `{ URL }` |
 
-#### auth.issueToken
+#### mail — 이메일
 
-```
-Input:  { UserID int64, Email string, Role string }
-Output: { AccessToken string }
-```
+| Function | Description | Input | Output |
+|---|---|---|---|
+| `sendEmail` | SMTP 평문 이메일 | `{ Host, Port, Username, Password, From, To, Subject, Body }` | `{}` |
+| `sendTemplateEmail` | Go 템플릿 HTML 이메일 | `{ Host, Port, Username, Password, From, To, Subject, TemplateName, Data }` | `{}` |
+
+#### text — 텍스트 처리
+
+| Function | Description | Input | Output |
+|---|---|---|---|
+| `generateSlug` | URL-safe slug 생성 | `{ Text }` | `{ Slug }` |
+| `sanitizeHTML` | XSS 방지 HTML 정제 | `{ HTML }` | `{ Sanitized }` |
+| `truncateText` | 유니코드 안전 텍스트 자르기 | `{ Text, MaxLength, Suffix }` | `{ Truncated }` |
+
+#### image — 이미지 처리
+
+| Function | Description | Input | Output |
+|---|---|---|---|
+| `resizeImage` | 이미지 리사이즈 | `{ Data, Width, Height, Format }` | `{ Data }` |
+| `generateThumbnail` | 정사각형 썸네일 생성 | `{ Data, Size }` | `{ Data }` |
 
 ### SSaC Usage
 

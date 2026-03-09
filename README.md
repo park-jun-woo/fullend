@@ -88,7 +88,24 @@ fullend ships with built-in function implementations that can be used via SSaC `
 |---|---|---|
 | `auth` | `hashPassword` | bcrypt password hashing |
 | `auth` | `verifyPassword` | bcrypt password verification |
-| `auth` | `issueToken` | JWT access token generation |
+| `auth` | `issueToken` | JWT access token generation (24h) |
+| `auth` | `verifyToken` | JWT token verification + claims extraction |
+| `auth` | `refreshToken` | Refresh token generation (7 days) |
+| `auth` | `generateResetToken` | Random hex token for password reset |
+| `crypto` | `encrypt` | AES-256-GCM symmetric encryption |
+| `crypto` | `decrypt` | AES-256-GCM decryption |
+| `crypto` | `generateOTP` | TOTP secret + QR provisioning URL |
+| `crypto` | `verifyOTP` | TOTP code verification |
+| `storage` | `uploadFile` | S3-compatible file upload |
+| `storage` | `deleteFile` | S3-compatible file deletion |
+| `storage` | `presignURL` | S3 presigned download URL |
+| `mail` | `sendEmail` | SMTP plain text email |
+| `mail` | `sendTemplateEmail` | Go template HTML email via SMTP |
+| `text` | `generateSlug` | Unicode to URL-safe slug |
+| `text` | `sanitizeHTML` | XSS prevention HTML sanitization |
+| `text` | `truncateText` | Unicode-safe text truncation |
+| `image` | `resizeImage` | Image resize with format conversion |
+| `image` | `generateThumbnail` | Square crop thumbnail generation |
 
 Projects can override these by providing custom implementations in `specs/<project>/func/<pkg>/`.
 
