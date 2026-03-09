@@ -13,3 +13,4 @@ CREATE TABLE courses (
 CREATE INDEX idx_courses_instructor ON courses (instructor_id);
 CREATE INDEX idx_courses_category   ON courses (category);
 CREATE INDEX idx_courses_created    ON courses (created_at);
+CREATE INDEX idx_courses_price      ON courses (price);

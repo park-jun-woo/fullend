@@ -3,7 +3,7 @@ package service
 import "net/http"
 
 // @sequence authorize
-// @action update
+// @action publish
 // @resource course
 // @id CourseID
 //

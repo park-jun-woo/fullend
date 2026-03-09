@@ -19,8 +19,10 @@ import "net/http"
 // @param reservation.Status
 
 // @sequence call
-// @func calculateRefund
-// @param reservation
+// @func billing.calculateRefund
+// @param reservation.ID
+// @param reservation.StartAt
+// @param reservation.EndAt
 // @result refund Refund
 
 // @sequence put

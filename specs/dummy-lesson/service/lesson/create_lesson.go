@@ -3,8 +3,8 @@ package service
 import "net/http"
 
 // @sequence authorize
-// @action update
-// @resource course
+// @action create
+// @resource lesson
 // @id CourseID
 //
 // @sequence get

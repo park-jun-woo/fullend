@@ -11,3 +11,4 @@ CREATE TABLE reviews (
 );
 
 CREATE INDEX idx_reviews_course ON reviews (course_id, created_at);
+CREATE INDEX idx_reviews_rating ON reviews (rating);

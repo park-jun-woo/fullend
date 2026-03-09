@@ -21,6 +21,7 @@ type CrossValidateInput struct {
 	Features         []*scenario.Feature
 	ProjectFuncSpecs []funcspec.FuncSpec
 	FullendPkgSpecs  []funcspec.FuncSpec
+	DTOTypes         map[string]bool // model types marked with @dto (skip DDL matching)
 }
 
 // Run executes all cross-validation rules and returns collected errors.
@@ -34,7 +35,7 @@ func Run(input *CrossValidateInput) []CrossError {
 
 	// SSaC ↔ DDL
 	if input.ServiceFuncs != nil && input.SymbolTable != nil {
-		errs = append(errs, CheckSSaCDDL(input.ServiceFuncs, input.SymbolTable)...)
+		errs = append(errs, CheckSSaCDDL(input.ServiceFuncs, input.SymbolTable, input.DTOTypes)...)
 	}
 
 	// SSaC ↔ OpenAPI (function name ↔ operationId)

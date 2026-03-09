@@ -2,6 +2,11 @@ package service
 
 import "net/http"
 
+// @sequence authorize
+// @action enroll
+// @resource course
+// @id CourseID
+//
 // @sequence get
 // @model Course.FindByID
 // @param CourseID request
@@ -30,7 +35,7 @@ import "net/http"
 // @param UserID currentUser
 // @param enrollment.ID
 // @param course.Price
-// @param PaymentMethod request
+// @param PaymentMethod request -> method
 // @param "pending"
 // @result payment Payment
 //

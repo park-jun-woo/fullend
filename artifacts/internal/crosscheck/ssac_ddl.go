@@ -18,7 +18,7 @@ var primitiveTypes = map[string]bool{
 }
 
 // CheckSSaCDDL validates SSaC @result types and @param types against DDL.
-func CheckSSaCDDL(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable) []CrossError {
+func CheckSSaCDDL(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable, dtoTypes map[string]bool) []CrossError {
 	var errs []CrossError
 
 	for _, fn := range funcs {
@@ -27,7 +27,7 @@ func CheckSSaCDDL(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable)
 		for i, seq := range fn.Sequences {
 			// Rule 4: @result Type ↔ DDL table
 			if seq.Result != nil && seq.Result.Type != "" {
-				errs = append(errs, checkResultType(seq, st, ctx, i)...)
+				errs = append(errs, checkResultType(seq, st, ctx, i, dtoTypes)...)
 			}
 
 			// Rule 5: @param type ↔ DDL column type (when @model is present)
@@ -48,13 +48,18 @@ func normalizeTypeName(t string) string {
 	return t
 }
 
-func checkResultType(seq ssacparser.Sequence, st *ssacvalidator.SymbolTable, ctx string, seqIdx int) []CrossError {
+func checkResultType(seq ssacparser.Sequence, st *ssacvalidator.SymbolTable, ctx string, seqIdx int, dtoTypes map[string]bool) []CrossError {
 	var errs []CrossError
 
 	typeName := normalizeTypeName(seq.Result.Type)
 
 	// Skip primitive Go types.
 	if primitiveTypes[typeName] {
+		return errs
+	}
+
+	// Skip @dto types (no DDL table).
+	if dtoTypes != nil && dtoTypes[typeName] {
 		return errs
 	}
 
@@ -96,11 +101,15 @@ func checkParamTypes(seq ssacparser.Sequence, st *ssacvalidator.SymbolTable, ctx
 			continue // Only check request params that map to columns
 		}
 
-		colName := pascalToSnake(p.Name)
+		// Use explicit column mapping if provided (e.g. @param PaymentMethod request -> method).
+		colName := p.Column
+		if colName == "" {
+			colName = pascalToSnake(p.Name)
+		}
 
 		// Handle {Model}ID → id pattern.
 		// e.g. @model Room.FindByID with @param RoomID → check "id" column.
-		if strings.EqualFold(p.Name, modelName+"ID") {
+		if p.Column == "" && strings.EqualFold(p.Name, modelName+"ID") {
 			colName = "id"
 		}
 

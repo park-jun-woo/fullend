@@ -47,6 +47,7 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 	var parsedPolicies []*policy.Policy
 	var parsedFeatures []*scenario.Feature
 	var projectFuncSpecs []funcspec.FuncSpec
+	var modelDir string
 
 	done := make(map[SSOTKind]bool)
 
@@ -122,18 +123,19 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 			projectFuncSpecs = specs
 		case KindModel:
 			report.Steps = append(report.Steps, validateModel(d.Path))
+			modelDir = d.Path
 		case KindTerraform:
 			report.Steps = append(report.Steps, validateTerraform(d.Path))
 		}
 	}
 
 	// Cross-validation step.
-	report.Steps = append(report.Steps, runCrossValidate(openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, parsedFeatures, projectFuncSpecs))
+	report.Steps = append(report.Steps, runCrossValidate(openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, parsedFeatures, projectFuncSpecs, modelDir))
 
 	return report
 }
 
-func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, features []*scenario.Feature, projectFuncSpecs []funcspec.FuncSpec) reporter.StepResult {
+func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, features []*scenario.Feature, projectFuncSpecs []funcspec.FuncSpec, modelDir string) reporter.StepResult {
 	step := reporter.StepResult{Name: "Cross"}
 
 	// Require OpenAPI + DDL + SSaC for cross-validation.
@@ -151,6 +153,9 @@ func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ss
 		}
 	}
 
+	// Load @dto types from model files.
+	dtoTypes := loadDTOTypes(modelDir)
+
 	input := &crosscheck.CrossValidateInput{
 		OpenAPIDoc:       doc,
 		SymbolTable:      st,
@@ -160,6 +165,7 @@ func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ss
 		Features:         features,
 		ProjectFuncSpecs: projectFuncSpecs,
 		FullendPkgSpecs:  fullendPkgSpecs,
+		DTOTypes:         dtoTypes,
 	}
 
 	cerrs := crosscheck.Run(input)
@@ -426,6 +432,40 @@ func findFullendPkgRoot() string {
 		dir = parent
 	}
 	return ""
+}
+
+// loadDTOTypes scans model/*.go files for types preceded by a // @dto comment.
+func loadDTOTypes(modelDir string) map[string]bool {
+	dtoTypes := make(map[string]bool)
+	if modelDir == "" {
+		return dtoTypes
+	}
+	matches, _ := filepath.Glob(filepath.Join(modelDir, "*.go"))
+	for _, path := range matches {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			continue
+		}
+		lines := strings.Split(string(data), "\n")
+		dtoNext := false
+		for _, line := range lines {
+			trimmed := strings.TrimSpace(line)
+			if trimmed == "// @dto" || strings.HasPrefix(trimmed, "// @dto ") {
+				dtoNext = true
+				continue
+			}
+			if dtoNext && strings.HasPrefix(trimmed, "type ") {
+				parts := strings.Fields(trimmed)
+				if len(parts) >= 2 {
+					dtoTypes[parts[1]] = true
+				}
+				dtoNext = false
+			} else if dtoNext && trimmed != "" && !strings.HasPrefix(trimmed, "//") {
+				dtoNext = false
+			}
+		}
+	}
+	return dtoTypes
 }
 
 func validateSTML(root, frontendDir string) reporter.StepResult {
