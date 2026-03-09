@@ -136,7 +136,12 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 		report.Steps = append(report.Steps, genScenarioHurl(d.Path, specsDir, artifactsDir))
 	}
 
-	// 12. terraform fmt (외부 도구, 선택)
+	// 12. Func copy (custom func specs → artifacts).
+	if d, ok := has[KindFunc]; ok {
+		report.Steps = append(report.Steps, genFunc(d.Path, specsDir, artifactsDir))
+	}
+
+	// 13. terraform fmt (외부 도구, 선택)
 	if _, ok := has[KindTerraform]; ok {
 		if terraformAvailable {
 			report.Steps = append(report.Steps, genTerraform(specsDir))
@@ -516,6 +521,55 @@ func genScenarioHurl(scenarioDir, specsDir, artifactsDir string) reporter.StepRe
 	}
 	step.Status = reporter.Pass
 	step.Summary = fmt.Sprintf("%d feature files → %d hurl files", len(features), len(features))
+	return step
+}
+
+func genFunc(funcDir, specsDir, artifactsDir string) reporter.StepResult {
+	step := reporter.StepResult{Name: "func-gen"}
+
+	// Copy custom func files from specs/<project>/func/<pkg>/ → artifacts/<project>/backend/internal/<pkg>/.
+	entries, err := os.ReadDir(funcDir)
+	if err != nil {
+		step.Status = reporter.Skip
+		step.Summary = "no func/ directory"
+		return step
+	}
+
+	copied := 0
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		pkg := entry.Name()
+		srcDir := filepath.Join(funcDir, pkg)
+		dstDir := filepath.Join(artifactsDir, "backend", "internal", pkg)
+
+		if err := os.MkdirAll(dstDir, 0755); err != nil {
+			step.Status = reporter.Fail
+			step.Errors = append(step.Errors, fmt.Sprintf("cannot create dir %s: %v", dstDir, err))
+			return step
+		}
+
+		files, _ := filepath.Glob(filepath.Join(srcDir, "*.go"))
+		for _, f := range files {
+			data, err := os.ReadFile(f)
+			if err != nil {
+				step.Status = reporter.Fail
+				step.Errors = append(step.Errors, fmt.Sprintf("read %s: %v", f, err))
+				return step
+			}
+			dst := filepath.Join(dstDir, filepath.Base(f))
+			if err := os.WriteFile(dst, data, 0644); err != nil {
+				step.Status = reporter.Fail
+				step.Errors = append(step.Errors, fmt.Sprintf("write %s: %v", dst, err))
+				return step
+			}
+			copied++
+		}
+	}
+
+	step.Status = reporter.Pass
+	step.Summary = fmt.Sprintf("%d func files copied", copied)
 	return step
 }
 

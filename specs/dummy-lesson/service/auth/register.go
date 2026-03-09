@@ -11,7 +11,7 @@ import "net/http"
 // @message "이미 가입된 이메일입니다"
 //
 // @sequence call
-// @func hashPassword
+// @func auth.hashPassword
 // @param Password request
 // @result hashedPassword string
 //

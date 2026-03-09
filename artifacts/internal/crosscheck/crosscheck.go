@@ -3,6 +3,7 @@ package crosscheck
 import (
 	"github.com/getkin/kin-openapi/openapi3"
 
+	"github.com/geul-org/fullend/artifacts/internal/funcspec"
 	"github.com/geul-org/fullend/artifacts/internal/policy"
 	"github.com/geul-org/fullend/artifacts/internal/scenario"
 	"github.com/geul-org/fullend/artifacts/internal/statemachine"
@@ -12,12 +13,14 @@ import (
 
 // CrossValidateInput holds the pre-loaded data from individual validations.
 type CrossValidateInput struct {
-	OpenAPIDoc    *openapi3.T
-	SymbolTable   *ssacvalidator.SymbolTable
-	ServiceFuncs  []ssacparser.ServiceFunc
-	StateDiagrams []*statemachine.StateDiagram
-	Policies      []*policy.Policy
-	Features      []*scenario.Feature
+	OpenAPIDoc       *openapi3.T
+	SymbolTable      *ssacvalidator.SymbolTable
+	ServiceFuncs     []ssacparser.ServiceFunc
+	StateDiagrams    []*statemachine.StateDiagram
+	Policies         []*policy.Policy
+	Features         []*scenario.Feature
+	ProjectFuncSpecs []funcspec.FuncSpec
+	FullendPkgSpecs  []funcspec.FuncSpec
 }
 
 // Run executes all cross-validation rules and returns collected errors.
@@ -52,6 +55,11 @@ func Run(input *CrossValidateInput) []CrossError {
 	// Scenario ↔ OpenAPI/States
 	if len(input.Features) > 0 {
 		errs = append(errs, CheckScenarios(input.Features, input.OpenAPIDoc, input.StateDiagrams)...)
+	}
+
+	// Func ↔ SSaC
+	if input.ServiceFuncs != nil {
+		errs = append(errs, CheckFuncs(input.ServiceFuncs, input.FullendPkgSpecs, input.ProjectFuncSpecs)...)
 	}
 
 	return errs

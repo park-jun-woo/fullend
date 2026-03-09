@@ -7,6 +7,7 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 
+	"github.com/geul-org/fullend/artifacts/internal/funcspec"
 	"github.com/geul-org/fullend/artifacts/internal/policy"
 	"github.com/geul-org/fullend/artifacts/internal/scenario"
 	"github.com/geul-org/fullend/artifacts/internal/statemachine"
@@ -49,6 +50,8 @@ func Status(root string, detected []DetectedSSOT) []StatusLine {
 			lines = append(lines, statusPolicy(relPath, d.Path))
 		case KindScenario:
 			lines = append(lines, statusScenario(relPath, d.Path))
+		case KindFunc:
+			lines = append(lines, statusFunc(relPath, d.Path))
 		case KindTerraform:
 			lines = append(lines, statusTerraform(relPath, d.Path))
 		case KindModel:
@@ -156,6 +159,25 @@ func statusScenario(relPath, dir string) StatusLine {
 		summary = fmt.Sprintf("%d features, %d scenarios", len(features), totalScenarios)
 	}
 	return StatusLine{Kind: KindScenario, Path: relPath, Summary: summary}
+}
+
+func statusFunc(relPath, dir string) StatusLine {
+	summary := "?"
+	specs, err := funcspec.ParseDir(dir)
+	if err == nil {
+		stubs := 0
+		for _, s := range specs {
+			if !s.HasBody {
+				stubs++
+			}
+		}
+		if stubs > 0 {
+			summary = fmt.Sprintf("%d funcs (%d TODO)", len(specs), stubs)
+		} else {
+			summary = fmt.Sprintf("%d funcs", len(specs))
+		}
+	}
+	return StatusLine{Kind: KindFunc, Path: relPath, Summary: summary}
 }
 
 func statusTerraform(relPath, dir string) StatusLine {

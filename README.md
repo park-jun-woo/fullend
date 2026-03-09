@@ -1,6 +1,6 @@
 # fullend
 
-Full-stack SSOT orchestrator — validates consistency across 8 SSOT sources (STML, OpenAPI, SSaC, SQL DDL, Mermaid stateDiagram, OPA Rego, Gherkin Scenario, Terraform) and generates code from them in a single CLI.
+Full-stack SSOT orchestrator — validates consistency across 9 SSOT sources (STML, OpenAPI, SSaC, SQL DDL, Mermaid stateDiagram, OPA Rego, Gherkin Scenario, Func Spec, Terraform) and generates code from them in a single CLI.
 
 ```
 specs/
@@ -8,6 +8,7 @@ specs/
 ├── db/*.sql               → SQL DDL + sqlc queries
 ├── service/*.go           → SSaC (comment DSL)
 ├── model/*.go             → Go interfaces
+├── func/<pkg>/*.go        → Custom func implementations (optional)
 ├── states/*.md            → Mermaid stateDiagram (state transitions)
 ├── policy/*.rego          → OPA Rego (authorization policies)
 ├── scenario/*.feature     → Gherkin (business scenarios)
@@ -25,7 +26,7 @@ go install github.com/geul-org/fullend/artifacts/cmd/fullend@latest
 
 ### validate
 
-Validates each SSOT individually, then cross-validates consistency between layers. All 9 SSOTs are required by default; use `--skip` to exclude specific kinds.
+Validates each SSOT individually, then cross-validates consistency between layers. 9 SSOTs are required by default; Func is optional (only when `func/` exists). Use `--skip` to exclude specific kinds.
 
 ```bash
 fullend validate <specs-dir>
@@ -41,13 +42,14 @@ fullend validate --skip states,terraform <specs-dir>
 ✓ States       1 diagrams, 3 transitions
 ✓ Policy       1 files, 5 rules, 3 ownership mappings
 ✓ Scenario     4 features, 5 scenarios
+✓ Func         3 funcs
 ✓ Terraform    2 files
 ✓ Cross        0 mismatches
 
 All SSOT sources are consistent.
 ```
 
-Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `scenario`, `terraform`
+Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `scenario`, `func`, `terraform`
 
 ### gen
 
@@ -75,7 +77,20 @@ SSOT Status:
   States       states                         1 diagrams, 3 transitions
   Policy       policy                         1 files, 5 rules
   Scenario     scenario                       4 features, 5 scenarios
+  Func         func                           3 funcs
 ```
+
+## Default Functions (pkg/)
+
+fullend ships with built-in function implementations that can be used via SSaC `@func`:
+
+| Package | Function | Description |
+|---|---|---|
+| `auth` | `hashPassword` | bcrypt password hashing |
+| `auth` | `verifyPassword` | bcrypt password verification |
+| `auth` | `issueToken` | JWT access token generation |
+
+Projects can override these by providing custom implementations in `specs/<project>/func/<pkg>/`.
 
 ## Cross-Validation
 
@@ -93,6 +108,7 @@ Individual tools (SSaC, STML) validate within their own layer. fullend catches m
 - **Policy ↔ States** — state transition events with authorize have matching Rego rules
 - **Scenario ↔ OpenAPI** — operationIds, methods, and request fields match
 - **Scenario ↔ States** — step order follows state transition rules
+- **Func ↔ SSaC** — @func references have matching implementations
 - **STML ↔ SSaC** (indirect) — both reference the same OpenAPI operationIds
 
 ## Runtime Testing

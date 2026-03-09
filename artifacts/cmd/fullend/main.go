@@ -16,7 +16,7 @@ Commands:
   gen      [--skip kind,...] <specs-dir> <artifacts-dir> Generate code from specs
   status   <specs-dir>                                   Show SSOT status summary
 
-Skip kinds: openapi, ddl, ssac, model, stml, states, policy, terraform
+Skip kinds: openapi, ddl, ssac, model, stml, states, policy, scenario, func, terraform
 `
 
 func main() {
@@ -69,7 +69,7 @@ func parseSkipFlag(args []string) (map[orchestrator.SSOTKind]bool, []string) {
 				s = strings.TrimSpace(s)
 				kind, ok := orchestrator.KindFromString(s)
 				if !ok {
-					fmt.Fprintf(os.Stderr, "unknown SSOT kind: %q\nvalid kinds: openapi, ddl, ssac, model, stml, states, policy, terraform\n", s)
+					fmt.Fprintf(os.Stderr, "unknown SSOT kind: %q\nvalid kinds: openapi, ddl, ssac, model, stml, states, policy, scenario, func, terraform\n", s)
 					os.Exit(2)
 				}
 				skipKinds[kind] = true

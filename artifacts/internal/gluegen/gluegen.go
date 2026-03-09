@@ -115,12 +115,13 @@ func collectModels(funcs []ssacparser.ServiceFunc) []string {
 	return result
 }
 
-// collectFuncs extracts @func references.
+// collectFuncs extracts @func references that are NOT package-level (no Package set).
+// Package-level funcs (seq.Package != "") are called directly, not via Handler fields.
 func collectFuncs(funcs []ssacparser.ServiceFunc) []string {
 	seen := make(map[string]bool)
 	for _, fn := range funcs {
 		for _, seq := range fn.Sequences {
-			if seq.Func != "" {
+			if seq.Func != "" && seq.Package == "" {
 				seen[seq.Func] = true
 			}
 		}
@@ -484,7 +485,7 @@ func collectModelsForDomain(funcs []ssacparser.ServiceFunc, domain string) []str
 	return result
 }
 
-// collectFuncsForDomain extracts @func references for a specific domain.
+// collectFuncsForDomain extracts @func references (without Package) for a specific domain.
 func collectFuncsForDomain(funcs []ssacparser.ServiceFunc, domain string) []string {
 	seen := make(map[string]bool)
 	for _, fn := range funcs {
@@ -492,7 +493,7 @@ func collectFuncsForDomain(funcs []ssacparser.ServiceFunc, domain string) []stri
 			continue
 		}
 		for _, seq := range fn.Sequences {
-			if seq.Func != "" {
+			if seq.Func != "" && seq.Package == "" {
 				seen[seq.Func] = true
 			}
 		}

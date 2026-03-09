@@ -1,7 +1,7 @@
 # fullend — AI SSOT Integration Guide
 
-> Rules for writing 8 SSOTs (OpenAPI, SQL DDL, SSaC, STML, Mermaid stateDiagram, OPA Rego, Gherkin Scenario, Terraform) in a single project.
-> Does not explain OpenAPI/SQL DDL/Terraform syntax. Covers only SSaC/STML/stateDiagram/OPA Rego/Gherkin syntax and cross-SSOT connection rules.
+> Rules for writing 9 SSOTs (OpenAPI, SQL DDL, SSaC, STML, Mermaid stateDiagram, OPA Rego, Gherkin Scenario, Func Spec, Terraform) in a single project.
+> Does not explain OpenAPI/SQL DDL/Terraform syntax. Covers only SSaC/STML/stateDiagram/OPA Rego/Gherkin/Func syntax and cross-SSOT connection rules.
 
 ## Project Directory Structure
 
@@ -12,7 +12,8 @@
 │   ├── *.sql                     # DDL (CREATE TABLE, CREATE INDEX)
 │   └── queries/*.sql             # sqlc queries (-- name: Method :cardinality)
 ├── service/*.go                  # SSaC declarations (Go comment DSL)
-├── model/*.go                    # Go interfaces (component, func definitions)
+├── model/*.go                    # Go interfaces (component definitions)
+├── func/<pkg>/*.go               # Custom func implementations (optional)
 ├── states/*.md                   # Mermaid stateDiagram (state transitions)
 ├── policy/*.rego                 # OPA Rego (authorization policies)
 ├── scenario/*.feature            # Gherkin scenarios (fixed-pattern)
@@ -32,13 +33,14 @@
 // @model <Model.Method>   — resource model.method
 // @param <Name> <source> [-> column]  — source: request | currentUser | varName | "literal". -> column: explicit DDL column mapping
 // @result <var> <Type>    — result binding
-// @message "msg"          — custom error message (optional)
+// @message "msg" [STATUS] — custom error message (optional, STATUS default 500)
 // @var <name>             — variable to return in response
 // @action @resource @id   — authorize only (all 3 required)
-// @component | @func      — call only (one required)
+// @component              — call only (component reference)
+// @func <pkg.funcName>    — call only (package-level function reference)
 ```
 
-### 11 Sequence Types
+### 10 Sequence Types
 
 | Type | Purpose | Required Tags |
 |---|---|---|
@@ -50,9 +52,31 @@
 | post | Create | @model, @result |
 | put | Update | @model |
 | delete | Delete | @model |
-| password | Password verification | @param x2 (hash, plain) |
 | call | External component/function call | @component or @func |
 | response | JSON response return | (none, @var optional) |
+
+### @func — Package-Level Function Call
+
+`@func` references a package-level function with a standardized signature: `func(In) (Out, error)`.
+
+```go
+// Value form — captures result
+// @sequence call
+// @func auth.hashPassword
+// @param Password request
+// @result hashedPassword string
+
+// Guard form — no result, error = rejection
+// @sequence call
+// @func auth.verifyPassword
+// @param user.PasswordHash
+// @param Password request
+// @message "비밀번호가 일치하지 않습니다" 401
+```
+
+`@message` on a call sequence:
+- With `@message`: error → responds with that message and status code (guard form)
+- Without `@message`: error → responds with `"funcName 호출 실패" 500` (default)
 
 ### Example: All Sequence Types
 
@@ -70,18 +94,11 @@
 // @sequence guard nil course
 // @message "Course not found"
 //
-// @sequence get
-// @model Enrollment.FindByCourseAndUser
-// @param CourseID request
-// @param UserID currentUser
-// @result existing Enrollment
-//
-// @sequence guard exists existing
-// @message "Already enrolled"
-//
-// @sequence password
+// @sequence call
+// @func auth.verifyPassword
 // @param user.PasswordHash
 // @param Password request
+// @message "Wrong password" 401
 //
 // @sequence post
 // @model Enrollment.Create
@@ -109,6 +126,7 @@ func EnrollCourse(w http.ResponseWriter, r *http.Request) {}
 | `request` | HTTP request body/query | `r.FormValue("Name")` |
 | `currentUser` | Authenticated user info | `currentUser.Name` |
 | variable name | @result variable from previous sequence | Direct reference |
+| `var.Field` | Field of a previous @result variable | `var.Field` |
 | `"literal"` | Hardcoded string | Used as-is |
 
 `-> column` mapping: `@param PaymentMethod request -> method` — explicit DDL column mapping instead of auto snake_case conversion.
@@ -122,6 +140,128 @@ OpenAPI: operationId: EnrollCourse
 SSaC:    func EnrollCourse(...)
 STML:    data-action="EnrollCourse"
 ```
+
+## Func Spec — External Function Declarations
+
+`func/<pkg>/*.go` files define custom function implementations. Each file follows a fixed pattern:
+
+```go
+package auth
+
+import "golang.org/x/crypto/bcrypt"
+
+// @func hashPassword
+// @description 평문 비밀번호를 bcrypt 해시로 변환한다
+
+type HashPasswordInput struct {
+    Password string
+}
+
+type HashPasswordOutput struct {
+    HashedPassword string
+}
+
+func HashPassword(in HashPasswordInput) (HashPasswordOutput, error) {
+    hash, err := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
+    return HashPasswordOutput{HashedPassword: string(hash)}, err
+}
+```
+
+### Rules
+
+- **`@func`**: Function identifier (matches SSaC `@func pkg.funcName`)
+- **`@description`**: Natural language one-liner (LLM uses this to implement the body)
+- **Input/Output struct**: Go structs are the spec. No additional annotations needed.
+- **Signature**: Always `func FuncName(in FuncNameInput) (FuncNameOutput, error)`
+- **Package-level function**: No Service struct dependency
+
+### Fallback Chain
+
+1. `specs/<project>/func/<pkg>/` — Project custom (highest priority)
+2. `pkg/<pkg>/` — fullend default (fallback)
+3. Neither → ERROR with skeleton suggestion
+
+### fullend Default Functions (pkg/)
+
+fullend ships with built-in default implementations in `pkg/`:
+
+| Package | Function | Description | Dependencies |
+|---|---|---|---|
+| `auth` | `hashPassword` | bcrypt 해싱 — 평문 비밀번호를 bcrypt 해시로 변환 | `golang.org/x/crypto/bcrypt` |
+| `auth` | `verifyPassword` | bcrypt 검증 — 저장된 해시와 평문 비밀번호 일치 확인 | `golang.org/x/crypto/bcrypt` |
+| `auth` | `issueToken` | JWT 발급 — 인증된 사용자 정보로 JWT 액세스 토큰 발급 | `github.com/golang-jwt/jwt/v5` |
+
+#### auth.hashPassword
+
+```
+Input:  { Password string }
+Output: { HashedPassword string }
+```
+
+#### auth.verifyPassword
+
+```
+Input:  { PasswordHash string, Password string }
+Output: {} (empty — error means mismatch)
+```
+
+#### auth.issueToken
+
+```
+Input:  { UserID int64, Email string, Role string }
+Output: { AccessToken string }
+```
+
+### SSaC Usage
+
+SSaC에서 `@func pkg.funcName` 으로 참조:
+
+```go
+// @sequence call
+// @func auth.hashPassword
+// @param Password request
+// @result hashedPassword string
+```
+
+생성 코드:
+```go
+out, err := auth.HashPassword(auth.HashPasswordInput{Password: password})
+if err != nil {
+    http.Error(w, "hashPassword 호출 실패", http.StatusInternalServerError)
+    return
+}
+hashedPassword := out.HashedPassword
+```
+
+### Missing Func Error
+
+구현이 없는 @func 참조 시, fullend validate가 스켈레톤을 자동 제안:
+
+```
+ERROR: @func billing.calculateRefund — 구현 없음
+
+다음 파일을 작성하세요: func/billing/calculate_refund.go
+
+package billing
+
+// @func calculateRefund
+// @description <이 함수가 무엇을 하는지 한 줄로 설명>
+
+type CalculateRefundInput struct {
+    Reservation Reservation
+}
+
+type CalculateRefundOutput struct {
+    Refund Refund
+}
+
+func CalculateRefund(in CalculateRefundInput) (CalculateRefundOutput, error) {
+    // TODO: implement
+    return CalculateRefundOutput{}, nil
+}
+```
+
+LLM에 이 에러 메시지를 그대로 전달하면 `@description`만 채우고 본체를 구현할 수 있다.
 
 ## STML — UI Declarations
 
@@ -285,7 +425,7 @@ Singularization rules: `ies`->`y`, `sses`->`ss`, `xes`->`x`, otherwise remove tr
 
 ## model/*.go Rules
 
-Defines reference targets for SSaC `@component` and `@func`.
+Defines reference targets for SSaC `@component`.
 
 ```go
 // model/notification.go
@@ -298,7 +438,6 @@ type NotificationService interface {
 ```
 
 - `type XxxInterface interface` -> referenceable via `@component xxx`
-- `func Xxx(...)` -> referenceable via `@func xxx`
 - Structs with `// @dto` comment -> skip DDL table matching (for pure DTOs like Token, Refund)
 
 ## Gherkin Scenario — Cross-Endpoint Test Declarations
@@ -359,8 +498,8 @@ Feature: Instructor creates and publishes a course
          OpenAPI (operationId)
            |               |
     SSaC (funcName)    STML (data-fetch/action)
-      |         |          |             |
-  DDL (tables)  States   Policy    Scenario (.feature)
+      |    |    |          |             |
+  DDL  Func  States   Policy    Scenario (.feature)
       |
   sqlc queries (model.method)
 ```
@@ -374,6 +513,7 @@ Feature: Instructor creates and publishes a course
 | STML data-fetch/action | OpenAPI operationId | Identical (PascalCase) |
 | SSaC @model Model | DDL table name | PascalCase -> snake_case + plural (`Course` -> `courses`) |
 | SSaC @model .Method | sqlc query `-- name:` | Identical (`FindByID` = `FindByID`) |
+| SSaC @func pkg.name | Func spec @func name | Identical (`hashPassword` = `hashPassword`) |
 | x-sort/filter allowed | DDL column name | Identical snake_case |
 | x-include allowed | DDL FK relation | `FKColumn:RefTable.RefColumn` -> DDL FK mapping |
 
@@ -405,6 +545,8 @@ After individual tools (ssac validate, stml validate) run their own checks, full
 | Scenario -> OpenAPI method | Scenario step METHOD matches OpenAPI method | ERROR |
 | Scenario -> OpenAPI fields | Scenario JSON fields exist in request schema | ERROR |
 | Scenario -> States | Scenario step order follows state transitions | WARNING |
+| Func -> SSaC @func | @func reference has matching implementation | ERROR |
+| Func body | Function body is not a TODO stub | WARNING |
 
 ## Mermaid stateDiagram — State Transition Declarations
 
@@ -534,10 +676,10 @@ fullend gen      [--skip kind,...] <specs-dir> <artifacts-dir> # validate -> cod
 fullend status   <specs-dir>                                   # SSOT summary
 ```
 
-All 9 SSOTs (OpenAPI, DDL, SSaC, Model, STML, States, Policy, Scenario, Terraform) are **required by default**. Missing SSOTs cause an ERROR. Use `--skip` to explicitly exclude:
+9 required SSOTs (OpenAPI, DDL, SSaC, Model, STML, States, Policy, Scenario, Terraform) cause an ERROR if missing. Func is optional (detected only when `func/` exists). Use `--skip` to explicitly exclude:
 
 ```bash
 fullend validate --skip states,terraform,scenario specs/my-project
 ```
 
-Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `scenario`, `terraform`
+Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `scenario`, `func`, `terraform`

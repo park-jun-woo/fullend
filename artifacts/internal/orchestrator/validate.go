@@ -2,11 +2,14 @@ package orchestrator
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/geul-org/fullend/artifacts/internal/crosscheck"
+	"github.com/geul-org/fullend/artifacts/internal/funcspec"
 	"github.com/geul-org/fullend/artifacts/internal/policy"
 	"github.com/geul-org/fullend/artifacts/internal/reporter"
 	"github.com/geul-org/fullend/artifacts/internal/scenario"
@@ -18,7 +21,7 @@ import (
 )
 
 // allKinds defines the display order of SSOT kinds for validation.
-var allKinds = []SSOTKind{KindOpenAPI, KindDDL, KindSSaC, KindModel, KindSTML, KindStates, KindPolicy, KindScenario, KindTerraform}
+var allKinds = []SSOTKind{KindOpenAPI, KindDDL, KindSSaC, KindModel, KindSTML, KindStates, KindPolicy, KindScenario, KindFunc, KindTerraform}
 
 // Validate runs individual SSOT validations on the detected sources,
 // then runs cross-validation if OpenAPI + DDL + SSaC are all present.
@@ -43,6 +46,7 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 	var stateDiagrams []*statemachine.StateDiagram
 	var parsedPolicies []*policy.Policy
 	var parsedFeatures []*scenario.Feature
+	var projectFuncSpecs []funcspec.FuncSpec
 
 	done := make(map[SSOTKind]bool)
 
@@ -59,6 +63,14 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 					Name:    string(kind),
 					Status:  reporter.Skip,
 					Summary: "skipped (--skip)",
+				})
+			} else if kind == KindFunc {
+				// Func is optional — no func/ dir is not an error.
+				// SSaC @func references with missing implementations are caught by crosscheck.
+				report.Steps = append(report.Steps, reporter.StepResult{
+					Name:    string(kind),
+					Status:  reporter.Skip,
+					Summary: "no func/ directory",
 				})
 			} else {
 				report.Steps = append(report.Steps, reporter.StepResult{
@@ -104,6 +116,10 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 			step, features := validateScenario(d.Path)
 			report.Steps = append(report.Steps, step)
 			parsedFeatures = features
+		case KindFunc:
+			step, specs := validateFunc(d.Path)
+			report.Steps = append(report.Steps, step)
+			projectFuncSpecs = specs
 		case KindModel:
 			report.Steps = append(report.Steps, validateModel(d.Path))
 		case KindTerraform:
@@ -112,12 +128,12 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 	}
 
 	// Cross-validation step.
-	report.Steps = append(report.Steps, runCrossValidate(openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, parsedFeatures))
+	report.Steps = append(report.Steps, runCrossValidate(openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, parsedFeatures, projectFuncSpecs))
 
 	return report
 }
 
-func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, features []*scenario.Feature) reporter.StepResult {
+func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, features []*scenario.Feature, projectFuncSpecs []funcspec.FuncSpec) reporter.StepResult {
 	step := reporter.StepResult{Name: "Cross"}
 
 	// Require OpenAPI + DDL + SSaC for cross-validation.
@@ -127,13 +143,23 @@ func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ss
 		return step
 	}
 
+	// Try to load fullend pkg/ specs from the module root.
+	var fullendPkgSpecs []funcspec.FuncSpec
+	if pkgRoot := findFullendPkgRoot(); pkgRoot != "" {
+		if specs, err := funcspec.ParseDir(pkgRoot); err == nil {
+			fullendPkgSpecs = specs
+		}
+	}
+
 	input := &crosscheck.CrossValidateInput{
-		OpenAPIDoc:    doc,
-		SymbolTable:   st,
-		ServiceFuncs:  funcs,
-		StateDiagrams: diagrams,
-		Policies:      policies,
-		Features:      features,
+		OpenAPIDoc:       doc,
+		SymbolTable:      st,
+		ServiceFuncs:     funcs,
+		StateDiagrams:    diagrams,
+		Policies:         policies,
+		Features:         features,
+		ProjectFuncSpecs: projectFuncSpecs,
+		FullendPkgSpecs:  fullendPkgSpecs,
 	}
 
 	cerrs := crosscheck.Run(input)
@@ -340,6 +366,66 @@ func validateScenario(scenarioDir string) (reporter.StepResult, []*scenario.Feat
 	step.Status = reporter.Pass
 	step.Summary = fmt.Sprintf("%d features, %d scenarios", len(features), totalScenarios)
 	return step, features
+}
+
+func validateFunc(funcDir string) (reporter.StepResult, []funcspec.FuncSpec) {
+	step := reporter.StepResult{Name: string(KindFunc)}
+	specs, err := funcspec.ParseDir(funcDir)
+	if err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("Func parse error: %v", err))
+		return step, nil
+	}
+	if len(specs) == 0 {
+		step.Status = reporter.Skip
+		step.Summary = "no func spec files found"
+		return step, nil
+	}
+
+	// Count stubs.
+	stubs := 0
+	for _, s := range specs {
+		if !s.HasBody {
+			stubs++
+		}
+	}
+
+	step.Status = reporter.Pass
+	if stubs > 0 {
+		step.Summary = fmt.Sprintf("%d funcs (%d TODO)", len(specs), stubs)
+	} else {
+		step.Summary = fmt.Sprintf("%d funcs", len(specs))
+	}
+	return step, specs
+}
+
+// findFullendPkgRoot locates the fullend pkg/ directory.
+// Walks up from CWD looking for go.mod with module github.com/geul-org/fullend.
+func findFullendPkgRoot() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		return ""
+	}
+	for {
+		goModPath := filepath.Join(dir, "go.mod")
+		if data, err := os.ReadFile(goModPath); err == nil {
+			for _, line := range strings.Split(string(data), "\n") {
+				if strings.TrimSpace(line) == "module github.com/geul-org/fullend" {
+					pkgDir := filepath.Join(dir, "pkg")
+					if fi, err := os.Stat(pkgDir); err == nil && fi.IsDir() {
+						return pkgDir
+					}
+					return ""
+				}
+			}
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+	return ""
 }
 
 func validateSTML(root, frontendDir string) reporter.StepResult {

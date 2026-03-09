@@ -19,6 +19,7 @@ const (
 	KindStates    SSOTKind = "States"
 	KindPolicy    SSOTKind = "Policy"
 	KindScenario  SSOTKind = "Scenario"
+	KindFunc      SSOTKind = "Func"
 )
 
 // DetectedSSOT holds the kind and resolved directory path.
@@ -91,6 +92,16 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 		found = append(found, DetectedSSOT{Kind: KindScenario, Path: scenarioDir})
 	}
 
+	// Check for func/ directory (custom func spec files).
+	funcDir := filepath.Join(abs, "func")
+	if fi, err := os.Stat(funcDir); err == nil && fi.IsDir() {
+		// Check for any .go files in subdirectories.
+		funcMatches, _ := filepath.Glob(filepath.Join(funcDir, "*", "*.go"))
+		if len(funcMatches) > 0 {
+			found = append(found, DetectedSSOT{Kind: KindFunc, Path: funcDir})
+		}
+	}
+
 	return found, nil
 }
 
@@ -98,7 +109,7 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 func AllSSOTKinds() []SSOTKind {
 	return []SSOTKind{
 		KindOpenAPI, KindDDL, KindSSaC, KindModel,
-		KindSTML, KindStates, KindPolicy, KindScenario, KindTerraform,
+		KindSTML, KindStates, KindPolicy, KindScenario, KindFunc, KindTerraform,
 	}
 }
 
@@ -113,6 +124,7 @@ var kindNames = map[string]SSOTKind{
 	"policy":    KindPolicy,
 	"terraform": KindTerraform,
 	"scenario":  KindScenario,
+	"func":      KindFunc,
 }
 
 // KindFromString parses a CLI --skip value into a SSOTKind.
