@@ -39,10 +39,6 @@ import "net/http"
 // @param "pending"
 // @result payment Payment
 //
-// @sequence call
-// @component notification
-// @param enrollment
-//
 // @sequence response json
 // @var enrollment
 // @var payment

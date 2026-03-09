@@ -12,7 +12,7 @@ import (
 )
 
 // transformServiceFilesWithDomains transforms service files in both flat and domain subdirectories.
-func transformServiceFilesWithDomains(intDir string, serviceFuncs []ssacparser.ServiceFunc, models, funcs, components []string, modulePath string, xConfigs map[string]string) error {
+func transformServiceFilesWithDomains(intDir string, serviceFuncs []ssacparser.ServiceFunc, models, funcs []string, modulePath string, xConfigs map[string]string) error {
 	serviceDir := filepath.Join(intDir, "service")
 
 	// Transform flat files (Domain="") directly in serviceDir.
@@ -29,7 +29,7 @@ func transformServiceFilesWithDomains(intDir string, serviceFuncs []ssacparser.S
 		if err != nil {
 			return err
 		}
-		transformed := transformSource(string(src), models, funcs, components, modulePath, xConfigs, false)
+		transformed := transformSource(string(src), models, funcs, modulePath, xConfigs, false)
 		if err := os.WriteFile(path, []byte(transformed), 0644); err != nil {
 			return err
 		}
@@ -55,7 +55,7 @@ func transformServiceFilesWithDomains(intDir string, serviceFuncs []ssacparser.S
 			if err != nil {
 				return err
 			}
-			transformed := transformSource(string(src), models, funcs, components, modulePath, xConfigs, true)
+			transformed := transformSource(string(src), models, funcs, modulePath, xConfigs, true)
 			if err := os.WriteFile(path, []byte(transformed), 0644); err != nil {
 				return err
 			}
@@ -113,7 +113,6 @@ func generateDomainHandler(serviceDir, domain string, serviceFuncs []ssacparser.
 
 	models := collectModelsForDomain(serviceFuncs, domain)
 	funcs := collectFuncsForDomain(serviceFuncs, domain)
-	components := collectComponentsForDomain(serviceFuncs, domain)
 	needsAuth := domainNeedsAuth(serviceFuncs, domain)
 
 	var b strings.Builder
@@ -128,11 +127,6 @@ func generateDomainHandler(serviceDir, domain string, serviceFuncs []ssacparser.
 		b.WriteString(fmt.Sprintf("\t%s model.%sModel\n", fieldName, m))
 	}
 
-	for _, c := range components {
-		fieldName := ucFirst(c)
-		b.WriteString(fmt.Sprintf("\t%s %sService\n", fieldName, fieldName))
-	}
-
 	for _, f := range funcs {
 		fieldName := ucFirst(f)
 		b.WriteString(fmt.Sprintf("\t%s func(args ...interface{}) (interface{}, error)\n", fieldName))
@@ -143,15 +137,6 @@ func generateDomainHandler(serviceDir, domain string, serviceFuncs []ssacparser.
 	}
 
 	b.WriteString("}\n")
-
-	// Component interfaces.
-	for _, c := range components {
-		typeName := ucFirst(c) + "Service"
-		b.WriteString(fmt.Sprintf("\n// %s provides %s functionality.\n", typeName, c))
-		b.WriteString(fmt.Sprintf("type %s interface {\n", typeName))
-		b.WriteString("\tExecute(args ...interface{}) error\n")
-		b.WriteString("}\n")
-	}
 
 	path := filepath.Join(domainDir, "handler.go")
 	return os.WriteFile(path, []byte(b.String()), 0644)
@@ -198,8 +183,7 @@ func generateCentralServer(serviceDir string, domains []string, serviceFuncs []s
 	// Collect flat (Domain="") resources.
 	flatModels := collectModelsForDomain(serviceFuncs, "")
 	flatFuncs := collectFuncsForDomain(serviceFuncs, "")
-	flatComponents := collectComponentsForDomain(serviceFuncs, "")
-	hasFlatFuncs := len(flatModels) > 0 || len(flatFuncs) > 0 || len(flatComponents) > 0
+	hasFlatFuncs := len(flatModels) > 0 || len(flatFuncs) > 0
 
 	var b strings.Builder
 	b.WriteString("package service\n\n")
@@ -219,10 +203,6 @@ func generateCentralServer(serviceDir string, domains []string, serviceFuncs []s
 		fieldName := ucFirst(lcFirst(m) + "Model")
 		b.WriteString(fmt.Sprintf("\t%s model.%sModel\n", fieldName, m))
 	}
-	for _, c := range flatComponents {
-		fieldName := ucFirst(c)
-		b.WriteString(fmt.Sprintf("\t%s %sService\n", fieldName, fieldName))
-	}
 	for _, f := range flatFuncs {
 		fieldName := ucFirst(f)
 		b.WriteString(fmt.Sprintf("\t%s func(args ...interface{}) (interface{}, error)\n", fieldName))
@@ -233,15 +213,6 @@ func generateCentralServer(serviceDir string, domains []string, serviceFuncs []s
 	}
 
 	b.WriteString("}\n\n")
-
-	// Flat component interfaces.
-	for _, c := range flatComponents {
-		typeName := ucFirst(c) + "Service"
-		b.WriteString(fmt.Sprintf("// %s provides %s functionality.\n", typeName, c))
-		b.WriteString(fmt.Sprintf("type %s interface {\n", typeName))
-		b.WriteString("\tExecute(args ...interface{}) error\n")
-		b.WriteString("}\n\n")
-	}
 
 	// Detect security schemes from OpenAPI.
 	hasBearer := false

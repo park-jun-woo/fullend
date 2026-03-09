@@ -13,7 +13,7 @@
 │   ├── *.sql                     # DDL (CREATE TABLE, CREATE INDEX)
 │   └── queries/*.sql             # sqlc queries (-- name: Method :cardinality)
 ├── service/*.go                  # SSaC declarations (Go comment DSL)
-├── model/*.go                    # Go interfaces (component definitions)
+├── model/*.go                    # Go structs (// @dto for non-DDL types)
 ├── func/<pkg>/*.go               # Custom func implementations (optional)
 ├── states/*.md                   # Mermaid stateDiagram (state transitions)
 ├── policy/*.rego                 # OPA Rego (authorization policies)
@@ -83,7 +83,6 @@ deploy:
 // @message "msg" [STATUS] — custom error message (optional, STATUS default 500)
 // @var <name>             — variable to return in response
 // @action @resource @id   — authorize only (all 3 required)
-// @component              — call only (component reference)
 // @func <pkg.funcName>    — call only (package-level function reference)
 ```
 
@@ -99,7 +98,7 @@ deploy:
 | post | Create | @model, @result |
 | put | Update | @model |
 | delete | Delete | @model |
-| call | External component/function call | @component or @func |
+| call | External function call | @func |
 | response | JSON response return | (none, @var optional) |
 
 ### @func — Package-Level Function Call
@@ -156,10 +155,6 @@ deploy:
 // @sequence put
 // @model Course.IncrementEnrollCount
 // @param CourseID request
-//
-// @sequence call
-// @component notification
-// @param enrollment
 //
 // @sequence response json
 // @var enrollment
@@ -555,19 +550,6 @@ Singularization rules: `ies`->`y`, `sses`->`ss`, `xes`->`x`, otherwise remove tr
 
 ## model/*.go Rules
 
-Defines reference targets for SSaC `@component`.
-
-```go
-// model/notification.go
-package model
-
-// NotificationService is a notification component.
-type NotificationService interface {
-    Send(userID int64, message string) error
-}
-```
-
-- `type XxxInterface interface` -> referenceable via `@component xxx`
 - Structs with `// @dto` comment -> skip DDL table matching (for pure DTOs like Token, Refund)
 
 ## Gherkin Scenario — Cross-Endpoint Test Declarations

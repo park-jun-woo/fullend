@@ -10,7 +10,7 @@ import (
 )
 
 // generateServerStruct creates service/server.go with Server struct definition and Handler function.
-func generateServerStruct(intDir string, models, funcs, components []string, modulePath string, doc *openapi3.T) error {
+func generateServerStruct(intDir string, models, funcs []string, modulePath string, doc *openapi3.T) error {
 	serviceDir := filepath.Join(intDir, "service")
 	if err := os.MkdirAll(serviceDir, 0755); err != nil {
 		return err
@@ -31,10 +31,6 @@ func generateServerStruct(intDir string, models, funcs, components []string, mod
 		fieldName := ucFirst(lcFirst(m) + "Model")
 		fields = append(fields, fmt.Sprintf("\t%s model.%sModel", fieldName, m))
 	}
-	for _, c := range components {
-		fieldName := ucFirst(c)
-		fields = append(fields, fmt.Sprintf("\t%s %sService", fieldName, fieldName))
-	}
 	for _, f := range funcs {
 		fieldName := ucFirst(f)
 		fields = append(fields, fmt.Sprintf("\t%s func(args ...interface{}) (interface{}, error)", fieldName))
@@ -54,15 +50,6 @@ func generateServerStruct(intDir string, models, funcs, components []string, mod
 	b.WriteString("type Authorizer interface {\n")
 	b.WriteString("\tCheck(user *CurrentUser, action, resource string, id interface{}) (bool, error)\n")
 	b.WriteString("}\n\n")
-
-	// Component interfaces.
-	for _, c := range components {
-		typeName := ucFirst(c) + "Service"
-		b.WriteString(fmt.Sprintf("// %s provides %s functionality.\n", typeName, c))
-		b.WriteString(fmt.Sprintf("type %s interface {\n", typeName))
-		b.WriteString("\tExecute(args ...interface{}) error\n")
-		b.WriteString("}\n\n")
-	}
 
 	// Handler function.
 	b.WriteString("// Handler creates an http.Handler that routes requests to the Server.\n")

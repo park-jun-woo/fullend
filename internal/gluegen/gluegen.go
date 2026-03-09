@@ -44,9 +44,8 @@ func Generate(input *GlueInput) error {
 	if hasDomains(input.ServiceFuncs) {
 		// Domain mode: per-domain Handler + central Server.
 		allFuncs := collectFuncs(input.ServiceFuncs)
-		allComponents := collectComponents(input.ServiceFuncs)
 
-		if err := transformServiceFilesWithDomains(intDir, input.ServiceFuncs, models, allFuncs, allComponents, input.ModulePath, xConfigs); err != nil {
+		if err := transformServiceFilesWithDomains(intDir, input.ServiceFuncs, models, allFuncs, input.ModulePath, xConfigs); err != nil {
 			return fmt.Errorf("service transform (domain): %w", err)
 		}
 		if err := generateAuthStubWithDomains(intDir, input.ModulePath); err != nil {
@@ -61,12 +60,11 @@ func Generate(input *GlueInput) error {
 	} else {
 		// Flat mode: single Server with all fields (unchanged).
 		funcs := collectFuncs(input.ServiceFuncs)
-		components := collectComponents(input.ServiceFuncs)
 
-		if err := transformServiceFiles(intDir, models, funcs, components, input.ModulePath, xConfigs); err != nil {
+		if err := transformServiceFiles(intDir, models, funcs, input.ModulePath, xConfigs); err != nil {
 			return fmt.Errorf("service transform: %w", err)
 		}
-		if err := generateServerStruct(intDir, models, funcs, components, input.ModulePath, input.OpenAPIDoc); err != nil {
+		if err := generateServerStruct(intDir, models, funcs, input.ModulePath, input.OpenAPIDoc); err != nil {
 			return fmt.Errorf("server.go: %w", err)
 		}
 		if err := generateAuthStub(intDir); err != nil {
@@ -134,27 +132,9 @@ func collectFuncs(funcs []ssacparser.ServiceFunc) []string {
 	return result
 }
 
-// collectComponents extracts @component references.
-func collectComponents(funcs []ssacparser.ServiceFunc) []string {
-	seen := make(map[string]bool)
-	for _, fn := range funcs {
-		for _, seq := range fn.Sequences {
-			if seq.Component != "" {
-				seen[seq.Component] = true
-			}
-		}
-	}
-	var result []string
-	for name := range seen {
-		result = append(result, name)
-	}
-	sort.Strings(result)
-	return result
-}
-
 // transformServiceFiles reads each .go file in internal/service/,
 // converts standalone functions to Server methods, and writes them back in place.
-func transformServiceFiles(intDir string, models, funcs, components []string, modulePath string, xConfigs map[string]string) error {
+func transformServiceFiles(intDir string, models, funcs []string, modulePath string, xConfigs map[string]string) error {
 	serviceDir := filepath.Join(intDir, "service")
 	entries, err := os.ReadDir(serviceDir)
 	if err != nil {
@@ -174,7 +154,7 @@ func transformServiceFiles(intDir string, models, funcs, components []string, mo
 			return err
 		}
 
-		transformed := transformSource(string(src), models, funcs, components, modulePath, xConfigs, false)
+		transformed := transformSource(string(src), models, funcs, modulePath, xConfigs, false)
 		if err := os.WriteFile(path, []byte(transformed), 0644); err != nil {
 			return err
 		}
@@ -185,7 +165,7 @@ func transformServiceFiles(intDir string, models, funcs, components []string, mo
 
 // transformSource converts a standalone function source to a struct method.
 // isDomain: false → (s *Server) receiver, true → (h *Handler) receiver.
-func transformSource(src string, models, funcs, components []string, modulePath string, xConfigs map[string]string, isDomain bool) string {
+func transformSource(src string, models, funcs []string, modulePath string, xConfigs map[string]string, isDomain bool) string {
 	rcv := "s"
 	rcvType := "*Server"
 	if isDomain {
@@ -207,12 +187,6 @@ func transformSource(src string, models, funcs, components []string, modulePath 
 	for _, f := range funcs {
 		fieldName := ucFirst(f)
 		src = strings.ReplaceAll(src, f+"(", rcv+"."+fieldName+"(")
-	}
-
-	// Replace component references: notification. → {rcv}.Notification.
-	for _, c := range components {
-		fieldName := ucFirst(c)
-		src = strings.ReplaceAll(src, c+".", rcv+"."+fieldName+".")
 	}
 
 	// Replace authz references — currentUser is extracted by SSaC codegen via c.MustGet("currentUser").
@@ -496,27 +470,6 @@ func collectFuncsForDomain(funcs []ssacparser.ServiceFunc, domain string) []stri
 		for _, seq := range fn.Sequences {
 			if seq.Func != "" && seq.Package == "" {
 				seen[seq.Func] = true
-			}
-		}
-	}
-	var result []string
-	for name := range seen {
-		result = append(result, name)
-	}
-	sort.Strings(result)
-	return result
-}
-
-// collectComponentsForDomain extracts @component references for a specific domain.
-func collectComponentsForDomain(funcs []ssacparser.ServiceFunc, domain string) []string {
-	seen := make(map[string]bool)
-	for _, fn := range funcs {
-		if fn.Domain != domain {
-			continue
-		}
-		for _, seq := range fn.Sequences {
-			if seq.Component != "" {
-				seen[seq.Component] = true
 			}
 		}
 	}
