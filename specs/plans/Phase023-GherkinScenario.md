@@ -1,3 +1,5 @@
+✅ 완료
+
 # Phase 023: Gherkin 시나리오 SSOT + Hurl 2단계 생성
 
 ## 목표
@@ -371,11 +373,18 @@ Generated tests include:
 
 ---
 
+## 구현 시 주의사항
+
+1. **Phase 22 (필수 SSOT) 반영**: `KindScenario`를 `allKinds`, `kindNames`에 추가. `--skip scenario` 지원 필요.
+2. **Then 뒤 액션 스텝**: 예시에서 `Then GET ListCourses → courses`처럼 Then 뒤에도 액션이 올 수 있음. 정규식 `reActionStep`에 `Then`도 포함해야 함. 스텝 파싱 시 키워드가 아니라 내용(METHOD 존재 여부)으로 액션/어설션을 구분.
+3. **dummy-study 시나리오**: dummy-lesson만 작성됨. dummy-study용 .feature도 최소 1개 작성하거나, `--skip scenario`로 validate 통과 가능.
+
 ## 의존성
 
 - **Phase019 완료** ✅ (Hurl 1단계, hurl_util.go 재사용)
 - **Phase020 완료** ✅ (stateDiagram, 교차 검증 연동)
-- **Phase021 완료 필요** — OPA Rego 인가 정책 (네거티브 auth 시나리오 실행에 필요)
+- **Phase021 완료** ✅ — OPA Rego 인가 정책
+- **Phase022 완료** ✅ — 필수 SSOT + --skip (KindScenario 추가 필요)
 - **kin-openapi**: 이미 사용 중
 - **Gherkin 파서**: 자체 구현 (고정 패턴 정규식, 외부 라이브러리 불필요)
 

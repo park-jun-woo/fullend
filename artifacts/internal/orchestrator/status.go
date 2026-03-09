@@ -7,6 +7,9 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 
+	"github.com/geul-org/fullend/artifacts/internal/policy"
+	"github.com/geul-org/fullend/artifacts/internal/scenario"
+	"github.com/geul-org/fullend/artifacts/internal/statemachine"
 	ssacparser "github.com/geul-org/ssac/parser"
 	ssacvalidator "github.com/geul-org/ssac/validator"
 	stmlparser "github.com/geul-org/stml/parser"
@@ -40,6 +43,12 @@ func Status(root string, detected []DetectedSSOT) []StatusLine {
 			lines = append(lines, statusSSaC(relPath, d.Path))
 		case KindSTML:
 			lines = append(lines, statusSTML(relPath, d.Path))
+		case KindStates:
+			lines = append(lines, statusStates(relPath, d.Path))
+		case KindPolicy:
+			lines = append(lines, statusPolicy(relPath, d.Path))
+		case KindScenario:
+			lines = append(lines, statusScenario(relPath, d.Path))
 		case KindTerraform:
 			lines = append(lines, statusTerraform(relPath, d.Path))
 		case KindModel:
@@ -108,6 +117,45 @@ func statusSTML(relPath, dir string) StatusLine {
 		summary = fmt.Sprintf("%d pages", len(pages))
 	}
 	return StatusLine{Kind: KindSTML, Path: relPath, Summary: summary}
+}
+
+func statusStates(relPath, dir string) StatusLine {
+	summary := "?"
+	diagrams, err := statemachine.ParseDir(dir)
+	if err == nil {
+		totalTransitions := 0
+		for _, d := range diagrams {
+			totalTransitions += len(d.Transitions)
+		}
+		summary = fmt.Sprintf("%d diagrams, %d transitions", len(diagrams), totalTransitions)
+	}
+	return StatusLine{Kind: KindStates, Path: relPath, Summary: summary}
+}
+
+func statusPolicy(relPath, dir string) StatusLine {
+	summary := "?"
+	policies, err := policy.ParseDir(dir)
+	if err == nil {
+		totalRules := 0
+		for _, p := range policies {
+			totalRules += len(p.Rules)
+		}
+		summary = fmt.Sprintf("%d files, %d rules", len(policies), totalRules)
+	}
+	return StatusLine{Kind: KindPolicy, Path: relPath, Summary: summary}
+}
+
+func statusScenario(relPath, dir string) StatusLine {
+	summary := "?"
+	features, err := scenario.ParseDir(dir)
+	if err == nil {
+		totalScenarios := 0
+		for _, f := range features {
+			totalScenarios += len(f.Scenarios)
+		}
+		summary = fmt.Sprintf("%d features, %d scenarios", len(features), totalScenarios)
+	}
+	return StatusLine{Kind: KindScenario, Path: relPath, Summary: summary}
 }
 
 func statusTerraform(relPath, dir string) StatusLine {

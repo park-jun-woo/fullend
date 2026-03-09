@@ -18,6 +18,7 @@ const (
 	KindTerraform SSOTKind = "Terraform"
 	KindStates    SSOTKind = "States"
 	KindPolicy    SSOTKind = "Policy"
+	KindScenario  SSOTKind = "Scenario"
 )
 
 // DetectedSSOT holds the kind and resolved directory path.
@@ -84,6 +85,12 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 		found = append(found, DetectedSSOT{Kind: KindPolicy, Path: policyDir})
 	}
 
+	// Check for scenario/ directory (Gherkin .feature files).
+	scenarioDir := filepath.Join(abs, "scenario")
+	if scenarioMatches, _ := filepath.Glob(filepath.Join(scenarioDir, "*.feature")); len(scenarioMatches) > 0 {
+		found = append(found, DetectedSSOT{Kind: KindScenario, Path: scenarioDir})
+	}
+
 	return found, nil
 }
 
@@ -91,7 +98,7 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 func AllSSOTKinds() []SSOTKind {
 	return []SSOTKind{
 		KindOpenAPI, KindDDL, KindSSaC, KindModel,
-		KindSTML, KindStates, KindPolicy, KindTerraform,
+		KindSTML, KindStates, KindPolicy, KindScenario, KindTerraform,
 	}
 }
 
@@ -105,6 +112,7 @@ var kindNames = map[string]SSOTKind{
 	"states":    KindStates,
 	"policy":    KindPolicy,
 	"terraform": KindTerraform,
+	"scenario":  KindScenario,
 }
 
 // KindFromString parses a CLI --skip value into a SSOTKind.

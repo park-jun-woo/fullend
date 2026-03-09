@@ -1,7 +1,7 @@
 # fullend — AI SSOT Integration Guide
 
-> Rules for writing 7 SSOTs (OpenAPI, SQL DDL, SSaC, STML, Mermaid stateDiagram, OPA Rego, Terraform) in a single project.
-> Does not explain OpenAPI/SQL DDL/Terraform syntax. Covers only SSaC/STML/stateDiagram/OPA Rego syntax and cross-SSOT connection rules.
+> Rules for writing 8 SSOTs (OpenAPI, SQL DDL, SSaC, STML, Mermaid stateDiagram, OPA Rego, Gherkin Scenario, Terraform) in a single project.
+> Does not explain OpenAPI/SQL DDL/Terraform syntax. Covers only SSaC/STML/stateDiagram/OPA Rego/Gherkin syntax and cross-SSOT connection rules.
 
 ## Project Directory Structure
 
@@ -15,6 +15,7 @@
 ├── model/*.go                    # Go interfaces (component, func definitions)
 ├── states/*.md                   # Mermaid stateDiagram (state transitions)
 ├── policy/*.rego                 # OPA Rego (authorization policies)
+├── scenario/*.feature            # Gherkin scenarios (fixed-pattern)
 ├── frontend/
 │   ├── *.html                    # STML declarations (HTML5 + data-*)
 │   ├── *.custom.ts               # Frontend computed functions (optional)
@@ -300,14 +301,66 @@ type NotificationService interface {
 - `func Xxx(...)` -> referenceable via `@func xxx`
 - Structs with `// @dto` comment -> skip DDL table matching (for pure DTOs like Token, Refund)
 
+## Gherkin Scenario — Cross-Endpoint Test Declarations
+
+`scenario/*.feature` files declare cross-endpoint business scenarios and invariants using a constrained Gherkin syntax (fixed patterns, machine-parseable).
+
+### Tags
+
+| Tag | Meaning | Hurl Output |
+|---|---|---|
+| `@scenario` | Business scenario | `scenario-{feature}.hurl` |
+| `@invariant` | Invariant verification | `invariant-{feature}.hurl` |
+
+### Action Steps (Given/When/Then/And)
+
+```
+METHOD operationId {JSON} → result     # request + capture
+METHOD operationId {JSON}              # request only
+METHOD operationId → result            # no-body request + capture
+METHOD operationId                     # no-body request only
+```
+
+- `METHOD`: `GET`, `POST`, `PUT`, `DELETE`
+- `operationId`: OpenAPI operationId (PascalCase)
+- `{JSON}`: Request parameters. Unquoted `var.Field` = variable reference
+- `→ result`: Capture response as variable. `→ token` auto-injects Authorization header
+
+### Assertion Steps (Then/And)
+
+```
+status == CODE                         # HTTP status code
+response.field exists                  # field existence
+response.field == value                # value equality
+response.array contains var.Field      # array inclusion
+response.array excludes var.Field      # array exclusion
+response.array count > N               # array size
+```
+
+### Example
+
+```gherkin
+@scenario
+Feature: Instructor creates and publishes a course
+
+  Scenario: Full course lifecycle
+    Given POST Register {"Email": "inst@test.com", "Password": "Pass1234!", "Name": "Instructor"} → user
+    And POST Login {"Email": "inst@test.com", "Password": "Pass1234!"} → token
+    When POST CreateCourse {"Title": "Go 101", "Category": "dev", "Level": "beginner", "Price": 10000} → course
+    And PUT PublishCourse {"CourseID": course.ID}
+    Then GET ListCourses → courses
+    And response.courses contains course.ID
+    And status == 200
+```
+
 ## SSOT Connection Map
 
 ```
          OpenAPI (operationId)
            |               |
     SSaC (funcName)    STML (data-fetch/action)
-      |         |          |
-  DDL (tables)  States   Policy (OPA Rego)
+      |         |          |             |
+  DDL (tables)  States   Policy    Scenario (.feature)
       |
   sqlc queries (model.method)
 ```
@@ -348,6 +401,10 @@ After individual tools (ssac validate, stml validate) run their own checks, full
 | Policy @ownership -> DDL | @ownership table.column exists in DDL | ERROR |
 | Policy @ownership via -> DDL | via join table.fk exists in DDL | ERROR |
 | Policy <-> States | Transition event with authorize -> Rego allow rule exists | WARNING |
+| Scenario -> OpenAPI operationId | Scenario step operationId exists in OpenAPI | ERROR |
+| Scenario -> OpenAPI method | Scenario step METHOD matches OpenAPI method | ERROR |
+| Scenario -> OpenAPI fields | Scenario JSON fields exist in request schema | ERROR |
+| Scenario -> States | Scenario step order follows state transitions | WARNING |
 
 ## Mermaid stateDiagram — State Transition Declarations
 
@@ -457,18 +514,17 @@ SSaC `authorize` sequence `@action`/`@resource` maps to Rego `allow` rule `input
 
 ## Runtime Testing (Hurl)
 
-`fullend gen` auto-generates Hurl smoke tests from OpenAPI specs.
+`fullend gen` auto-generates Hurl tests from OpenAPI specs and Gherkin scenarios.
 
 ```bash
 # After starting the server:
-hurl --test --variable host=http://localhost:8080 artifacts/<project>/tests/smoke.hurl
+hurl --test --variable host=http://localhost:8080 artifacts/<project>/tests/*.hurl
 ```
 
-Generated content:
-- Auth flow (Register -> Login -> token capture)
-- Per-resource CRUD (POST -> GET -> PUT -> DELETE, dependency order)
-- Response schema assertions (jsonpath)
-- x-pagination/sort/filter/include parameter coverage
+Generated tests include:
+- **smoke.hurl** — OpenAPI endpoint smoke tests (auto-generated)
+- **scenario-*.hurl** — Business scenario tests (from .feature files)
+- **invariant-*.hurl** — Cross-endpoint invariant tests (from .feature files)
 
 ## fullend CLI
 
@@ -478,10 +534,10 @@ fullend gen      [--skip kind,...] <specs-dir> <artifacts-dir> # validate -> cod
 fullend status   <specs-dir>                                   # SSOT summary
 ```
 
-All 8 SSOTs (OpenAPI, DDL, SSaC, Model, STML, States, Policy, Terraform) are **required by default**. Missing SSOTs cause an ERROR. Use `--skip` to explicitly exclude:
+All 9 SSOTs (OpenAPI, DDL, SSaC, Model, STML, States, Policy, Scenario, Terraform) are **required by default**. Missing SSOTs cause an ERROR. Use `--skip` to explicitly exclude:
 
 ```bash
-fullend validate --skip states,terraform specs/my-project
+fullend validate --skip states,terraform,scenario specs/my-project
 ```
 
-Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `terraform`
+Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `scenario`, `terraform`

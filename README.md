@@ -1,6 +1,6 @@
 # fullend
 
-Full-stack SSOT orchestrator — validates consistency across 7 SSOT sources (STML, OpenAPI, SSaC, SQL DDL, Mermaid stateDiagram, OPA Rego, Terraform) and generates code from them in a single CLI.
+Full-stack SSOT orchestrator — validates consistency across 8 SSOT sources (STML, OpenAPI, SSaC, SQL DDL, Mermaid stateDiagram, OPA Rego, Gherkin Scenario, Terraform) and generates code from them in a single CLI.
 
 ```
 specs/
@@ -10,6 +10,7 @@ specs/
 ├── model/*.go             → Go interfaces
 ├── states/*.md            → Mermaid stateDiagram (state transitions)
 ├── policy/*.rego          → OPA Rego (authorization policies)
+├── scenario/*.feature     → Gherkin (business scenarios)
 ├── frontend/*.html        → STML (HTML5 + data-*)
 └── terraform/*.tf         → HCL
 ```
@@ -24,7 +25,7 @@ go install github.com/geul-org/fullend/artifacts/cmd/fullend@latest
 
 ### validate
 
-Validates each SSOT individually, then cross-validates consistency between layers. All 8 SSOTs are required by default; use `--skip` to exclude specific kinds.
+Validates each SSOT individually, then cross-validates consistency between layers. All 9 SSOTs are required by default; use `--skip` to exclude specific kinds.
 
 ```bash
 fullend validate <specs-dir>
@@ -39,13 +40,14 @@ fullend validate --skip states,terraform <specs-dir>
 ✓ STML         4 pages, 6 bindings
 ✓ States       1 diagrams, 3 transitions
 ✓ Policy       1 files, 5 rules, 3 ownership mappings
+✓ Scenario     4 features, 5 scenarios
 ✓ Terraform    2 files
 ✓ Cross        0 mismatches
 
 All SSOT sources are consistent.
 ```
 
-Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `terraform`
+Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `scenario`, `terraform`
 
 ### gen
 
@@ -72,6 +74,7 @@ SSOT Status:
   STML         frontend                       4 pages
   States       states                         1 diagrams, 3 transitions
   Policy       policy                         1 files, 5 rules
+  Scenario     scenario                       4 features, 5 scenarios
 ```
 
 ## Cross-Validation
@@ -88,18 +91,23 @@ Individual tools (SSaC, STML) validate within their own layer. fullend catches m
 - **Policy ↔ SSaC** — authorize (action, resource) pairs match Rego allow rules
 - **Policy ↔ DDL** — @ownership table/column references exist in DDL
 - **Policy ↔ States** — state transition events with authorize have matching Rego rules
+- **Scenario ↔ OpenAPI** — operationIds, methods, and request fields match
+- **Scenario ↔ States** — step order follows state transition rules
 - **STML ↔ SSaC** (indirect) — both reference the same OpenAPI operationIds
 
 ## Runtime Testing
 
-`fullend gen` also generates [Hurl](https://hurl.dev) smoke test scenarios from OpenAPI specs.
+`fullend gen` generates [Hurl](https://hurl.dev) tests from OpenAPI specs and Gherkin scenarios.
 
 ```bash
 # Start your server, then:
-hurl --test --variable host=http://localhost:8080 artifacts/my-project/tests/smoke.hurl
+hurl --test --variable host=http://localhost:8080 artifacts/my-project/tests/*.hurl
 ```
 
-Generated tests cover: auth flow, CRUD operations, response schema validation, pagination/sort/filter/include parameters.
+Generated tests include:
+- **smoke.hurl** — OpenAPI endpoint smoke tests (auto-generated)
+- **scenario-*.hurl** — Business scenario tests (from .feature files)
+- **invariant-*.hurl** — Cross-endpoint invariant tests (from .feature files)
 
 ## Related Projects
 

@@ -12,6 +12,7 @@ import (
 	"github.com/geul-org/fullend/artifacts/internal/gluegen"
 	"github.com/geul-org/fullend/artifacts/internal/policy"
 	"github.com/geul-org/fullend/artifacts/internal/reporter"
+	"github.com/geul-org/fullend/artifacts/internal/scenario"
 	"github.com/geul-org/fullend/artifacts/internal/statemachine"
 	ssacgenerator "github.com/geul-org/ssac/generator"
 	ssacparser "github.com/geul-org/ssac/parser"
@@ -130,7 +131,12 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 		report.Steps = append(report.Steps, genAuthz(d.Path, artifactsDir))
 	}
 
-	// 11. terraform fmt (외부 도구, 선택)
+	// 11. Scenario Hurl generation.
+	if d, ok := has[KindScenario]; ok {
+		report.Steps = append(report.Steps, genScenarioHurl(d.Path, specsDir, artifactsDir))
+	}
+
+	// 12. terraform fmt (외부 도구, 선택)
 	if _, ok := has[KindTerraform]; ok {
 		if terraformAvailable {
 			report.Steps = append(report.Steps, genTerraform(specsDir))
@@ -472,6 +478,45 @@ func countPolicyRules(policies []*policy.Policy) int {
 		total += len(p.Rules)
 	}
 	return total
+}
+
+func genScenarioHurl(scenarioDir, specsDir, artifactsDir string) reporter.StepResult {
+	step := reporter.StepResult{Name: "scenario-gen"}
+
+	features, err := scenario.ParseDir(scenarioDir)
+	if err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("Scenario parse error: %v", err))
+		return step
+	}
+	if len(features) == 0 {
+		step.Status = reporter.Skip
+		step.Summary = "no feature files"
+		return step
+	}
+
+	// Load OpenAPI doc for path resolution.
+	apiPath := filepath.Join(specsDir, "api", "openapi.yaml")
+	doc, err := openapi3.NewLoader().LoadFromFile(apiPath)
+	if err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("OpenAPI load error: %v", err))
+		return step
+	}
+
+	if err := gluegen.GenerateScenarioHurl(features, doc, artifactsDir); err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("scenario-gen error: %v", err))
+		return step
+	}
+
+	totalScenarios := 0
+	for _, f := range features {
+		totalScenarios += len(f.Scenarios)
+	}
+	step.Status = reporter.Pass
+	step.Summary = fmt.Sprintf("%d feature files → %d hurl files", len(features), len(features))
+	return step
 }
 
 func genTerraform(specsDir string) reporter.StepResult {
