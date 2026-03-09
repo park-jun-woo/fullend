@@ -51,8 +51,8 @@ import (
 
 	_ "github.com/lib/pq"
 
-	internal "%s/internal"
 	"%s/internal/model"
+	"%s/internal/service"
 )
 
 func main() {
@@ -71,11 +71,11 @@ func main() {
 		log.Fatalf("database ping failed: %%v", err)
 	}
 
-	server := &internal.Server{
+	server := &service.Server{
 %s
 	}
 
-	handler := internal.Handler(server)
+	handler := service.Handler(server)
 	log.Printf("server listening on %%s", *addr)
 	log.Fatal(http.ListenAndServe(*addr, handler))
 }

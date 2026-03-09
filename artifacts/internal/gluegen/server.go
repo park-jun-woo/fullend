@@ -9,11 +9,16 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
-// generateServerStruct creates server.go with Server struct definition and Handler function.
+// generateServerStruct creates service/server.go with Server struct definition and Handler function.
 func generateServerStruct(intDir string, models, funcs, components []string, modulePath string, doc *openapi3.T) error {
+	serviceDir := filepath.Join(intDir, "service")
+	if err := os.MkdirAll(serviceDir, 0755); err != nil {
+		return err
+	}
+
 	var b strings.Builder
 
-	b.WriteString("package internal\n\n")
+	b.WriteString("package service\n\n")
 
 	// Import model package if there are models.
 	if len(models) > 0 {
@@ -146,14 +151,14 @@ func generateServerStruct(intDir string, models, funcs, components []string, mod
 	}
 
 	var header strings.Builder
-	header.WriteString("package internal\n\n")
+	header.WriteString("package service\n\n")
 	header.WriteString("import (\n")
 	for _, imp := range imports {
 		header.WriteString("\t" + imp + "\n")
 	}
 	header.WriteString(")\n\n")
 
-	// Replace the original "package internal\n\nimport ..." section.
+	// Replace the original "package service\n\nimport ..." section.
 	// Remove the original package + import block and prepend the new one.
 	body := content
 	if idx := strings.Index(body, "// Server implements"); idx > 0 {
@@ -161,7 +166,7 @@ func generateServerStruct(intDir string, models, funcs, components []string, mod
 	}
 	final := header.String() + body
 
-	path := filepath.Join(intDir, "server.go")
+	path := filepath.Join(serviceDir, "server.go")
 	return os.WriteFile(path, []byte(final), 0644)
 }
 

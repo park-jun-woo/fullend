@@ -134,8 +134,7 @@ func collectComponents(funcs []ssacparser.ServiceFunc) []string {
 }
 
 // transformServiceFiles reads each .go file in internal/service/,
-// converts standalone functions to Server methods, and writes them to internal/
-// (same package as server.go).
+// converts standalone functions to Server methods, and writes them back in place.
 func transformServiceFiles(intDir string, models, funcs, components []string, modulePath string) error {
 	serviceDir := filepath.Join(intDir, "service")
 	entries, err := os.ReadDir(serviceDir)
@@ -150,32 +149,23 @@ func transformServiceFiles(intDir string, models, funcs, components []string, mo
 		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".go") {
 			continue
 		}
-		srcPath := filepath.Join(serviceDir, entry.Name())
-		src, err := os.ReadFile(srcPath)
+		path := filepath.Join(serviceDir, entry.Name())
+		src, err := os.ReadFile(path)
 		if err != nil {
 			return err
 		}
 
 		transformed := transformSource(string(src), models, funcs, components, modulePath)
-
-		// Write to intDir (internal/) instead of service/.
-		dstPath := filepath.Join(intDir, entry.Name())
-		if err := os.WriteFile(dstPath, []byte(transformed), 0644); err != nil {
+		if err := os.WriteFile(path, []byte(transformed), 0644); err != nil {
 			return err
 		}
 	}
-
-	// Remove service/ directory after moving all files.
-	os.RemoveAll(serviceDir)
 
 	return nil
 }
 
 // transformSource converts a standalone function source to a Server method.
 func transformSource(src string, models, funcs, components []string, modulePath string) string {
-	// Change package to match internal package.
-	src = strings.Replace(src, "package service", "package internal", 1)
-
 	// Add receiver to function declaration.
 	src = strings.Replace(src, "\nfunc ", "\nfunc (s *Server) ", 1)
 

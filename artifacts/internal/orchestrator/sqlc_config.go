@@ -24,7 +24,12 @@ func generateSqlcConfig(specsDir, artifactsDir string) (string, error) {
 	}
 
 	engine := detectDBEngine(specsDir)
-	dbOutDir := filepath.Join(artifactsDir, "backend", "internal", "db")
+	absOut := filepath.Join(artifactsDir, "backend", "internal", "db")
+	// sqlc resolves out path relative to sqlc.yaml location (specsDir).
+	dbOutDir, err := filepath.Rel(specsDir, absOut)
+	if err != nil {
+		dbOutDir = absOut
+	}
 
 	src := fmt.Sprintf(`version: "2"
 sql:

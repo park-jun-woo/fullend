@@ -5,9 +5,14 @@ import (
 	"path/filepath"
 )
 
-// generateAuthStub creates auth.go with CurrentUser type and extraction stub.
+// generateAuthStub creates service/auth.go with CurrentUser type and extraction stub.
 func generateAuthStub(intDir string) error {
-	src := `package internal
+	serviceDir := filepath.Join(intDir, "service")
+	if err := os.MkdirAll(serviceDir, 0755); err != nil {
+		return err
+	}
+
+	src := `package service
 
 import "net/http"
 
@@ -26,6 +31,6 @@ func (s *Server) currentUser(r *http.Request) *CurrentUser {
 	return &CurrentUser{}
 }
 `
-	path := filepath.Join(intDir, "auth.go")
+	path := filepath.Join(serviceDir, "auth.go")
 	return os.WriteFile(path, []byte(src), 0644)
 }
