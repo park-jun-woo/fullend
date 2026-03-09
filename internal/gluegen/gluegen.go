@@ -316,23 +316,7 @@ func buildQueryOptsConfig(op *openapi3.Operation) string {
 			quotedJoin(allowed)))
 	}
 
-	if incCfg := getExtMap(op, "x-include"); incCfg != nil {
-		allowed := getStrSlice(incCfg, "allowed")
-		// Derive runtime names: "instructor_id:users.id" → "instructor"
-		runtimeAllowed := make([]string, len(allowed))
-		for i, spec := range allowed {
-			colonIdx := strings.Index(spec, ":")
-			if colonIdx > 0 {
-				localCol := spec[:colonIdx]
-				runtimeAllowed[i] = strings.TrimSuffix(localCol, "_id")
-			} else {
-				runtimeAllowed[i] = spec
-			}
-		}
-		parts = append(parts, fmt.Sprintf(
-			"Include: &model.IncludeConfig{Allowed: []string{%s}}",
-			quotedJoin(runtimeAllowed)))
-	}
+	// x-include is codegen metadata only — not a runtime query parameter.
 
 	if len(parts) == 0 {
 		return ""

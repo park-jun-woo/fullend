@@ -367,13 +367,11 @@ func generateMethodFromIface(b *strings.Builder, implName, modelName string, m i
 		b.WriteString("\t\t}\n")
 		b.WriteString("\t\titems = append(items, *v)\n")
 		b.WriteString("\t}\n")
-		// Include loading.
+		// Include loading — always applied (x-include is codegen metadata, not runtime option).
 		for _, inc := range includes {
-			b.WriteString(fmt.Sprintf("\tif containsStr(opts.Includes, %q) {\n", inc.IncludeName))
 			helperName := "include" + strings.ToUpper(inc.IncludeName[:1]) + inc.IncludeName[1:]
-			b.WriteString(fmt.Sprintf("\t\tif err := m.%s(items); err != nil {\n", helperName))
-			b.WriteString("\t\t\treturn nil, 0, err\n")
-			b.WriteString("\t\t}\n")
+			b.WriteString(fmt.Sprintf("\tif err := m.%s(items); err != nil {\n", helperName))
+			b.WriteString("\t\treturn nil, 0, err\n")
 			b.WriteString("\t}\n")
 		}
 		b.WriteString("\treturn items, total, nil\n")

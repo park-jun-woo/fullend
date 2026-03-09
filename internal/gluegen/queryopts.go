@@ -14,7 +14,6 @@ func generateQueryOpts(modelDir string) error {
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +23,6 @@ type QueryOptsConfig struct {
 	Pagination *PaginationConfig
 	Sort       *SortConfig
 	Filter     *FilterConfig
-	Include    *IncludeConfig
 }
 
 // PaginationConfig defines pagination behavior.
@@ -43,11 +41,6 @@ type SortConfig struct {
 
 // FilterConfig defines allowed filter columns.
 type FilterConfig struct {
-	Allowed []string
-}
-
-// IncludeConfig defines allowed include resources.
-type IncludeConfig struct {
 	Allowed []string
 }
 
@@ -102,18 +95,6 @@ func ParseQueryOpts(c *gin.Context, cfg QueryOptsConfig) QueryOpts {
 		for _, col := range cfg.Filter.Allowed {
 			if val := c.Query(col); val != "" {
 				opts.Filters[col] = val
-			}
-		}
-	}
-
-	// Include
-	if cfg.Include != nil {
-		if incStr := c.Query("include"); incStr != "" {
-			for _, inc := range strings.Split(incStr, ",") {
-				inc = strings.TrimSpace(inc)
-				if containsStr(cfg.Include.Allowed, inc) {
-					opts.Includes = append(opts.Includes, inc)
-				}
 			}
 		}
 	}

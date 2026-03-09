@@ -96,7 +96,7 @@ func buildScenarioOrder(doc *openapi3.T) []scenarioStep {
 	}
 
 	// Separate into categories.
-	var authSteps, createSteps, readSteps, updateSteps, deleteSteps []scenarioStep
+	var authSteps, createSteps, readSteps, updateSteps, transitionSteps, deleteSteps []scenarioStep
 	for _, s := range all {
 		if s.IsAuth {
 			authSteps = append(authSteps, s)
@@ -108,7 +108,12 @@ func buildScenarioOrder(doc *openapi3.T) []scenarioStep {
 		case "GET":
 			readSteps = append(readSteps, s)
 		case "PUT":
-			updateSteps = append(updateSteps, s)
+			// State transitions (PUT without request body) go before reads.
+			if s.Operation.RequestBody == nil {
+				transitionSteps = append(transitionSteps, s)
+			} else {
+				updateSteps = append(updateSteps, s)
+			}
 		case "DELETE":
 			deleteSteps = append(deleteSteps, s)
 		}
@@ -123,6 +128,8 @@ func buildScenarioOrder(doc *openapi3.T) []scenarioStep {
 	sortByDepthPath(createSteps)
 	// Sort reads by depth, then path.
 	sortByDepthPath(readSteps)
+	// Sort transitions by depth, then path.
+	sortByDepthPath(transitionSteps)
 	// Sort updates by depth, then path.
 	sortByDepthPath(updateSteps)
 	// Sort deletes by depth DESC (children first), then path.
@@ -133,10 +140,11 @@ func buildScenarioOrder(doc *openapi3.T) []scenarioStep {
 		return deleteSteps[i].Path < deleteSteps[j].Path
 	})
 
-	// Final order: auth → create → read → update → delete
+	// Final order: auth → create → transition → read → update → delete
 	var result []scenarioStep
 	result = append(result, authSteps...)
 	result = append(result, createSteps...)
+	result = append(result, transitionSteps...)
 	result = append(result, readSteps...)
 	result = append(result, updateSteps...)
 	result = append(result, deleteSteps...)
@@ -295,25 +303,11 @@ func buildXQueryParams(op *openapi3.Operation) string {
 	if filterCfg := getExtMap(op, "x-filter"); filterCfg != nil {
 		allowed := getStrSlice(filterCfg, "allowed")
 		if len(allowed) > 0 {
-			params = append(params, allowed[0]+"=test")
+			params = append(params, allowed[0]+"=test_string")
 		}
 	}
 
-	if incCfg := getExtMap(op, "x-include"); incCfg != nil {
-		allowed := getStrSlice(incCfg, "allowed")
-		var names []string
-		for _, spec := range allowed {
-			colonIdx := strings.Index(spec, ":")
-			if colonIdx > 0 {
-				names = append(names, strings.TrimSuffix(spec[:colonIdx], "_id"))
-			} else {
-				names = append(names, spec)
-			}
-		}
-		if len(names) > 0 {
-			params = append(params, "include="+strings.Join(names, ","))
-		}
-	}
+	// x-include is codegen metadata only — no runtime query parameter.
 
 	return strings.Join(params, "&")
 }
