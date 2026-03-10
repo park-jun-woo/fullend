@@ -136,12 +136,12 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 	}
 
 	// Cross-validation step.
-	report.Steps = append(report.Steps, runCrossValidate(openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, parsedFeatures, projectFuncSpecs, modelDir, projConfig))
+	report.Steps = append(report.Steps, runCrossValidate(root, openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, parsedFeatures, projectFuncSpecs, modelDir, projConfig))
 
 	return report
 }
 
-func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, features []*scenario.Feature, projectFuncSpecs []funcspec.FuncSpec, modelDir string, projConfig *projectconfig.ProjectConfig) reporter.StepResult {
+func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, features []*scenario.Feature, projectFuncSpecs []funcspec.FuncSpec, modelDir string, projConfig *projectconfig.ProjectConfig) reporter.StepResult {
 	step := reporter.StepResult{Name: "Cross"}
 
 	// Require OpenAPI + DDL + SSaC for cross-validation.
@@ -167,6 +167,9 @@ func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ss
 		middleware = projConfig.Backend.Middleware
 	}
 
+	// Parse @archived tags from DDL files.
+	archived, _ := crosscheck.ParseArchived(filepath.Join(root, "db"))
+
 	input := &crosscheck.CrossValidateInput{
 		OpenAPIDoc:       doc,
 		SymbolTable:      st,
@@ -178,6 +181,7 @@ func runCrossValidate(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ss
 		FullendPkgSpecs:  fullendPkgSpecs,
 		DTOTypes:         dtoTypes,
 		Middleware:       middleware,
+		Archived:         archived,
 	}
 
 	cerrs := crosscheck.Run(input)
