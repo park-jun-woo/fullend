@@ -190,7 +190,7 @@ func writeAssertLineV2(buf *strings.Builder, a scenario.Assertion, captures map[
 		val := resolveVarRef(a.Value, captures)
 		_, subField := splitVarRef(a.Value)
 		if subField != "" {
-			buf.WriteString(fmt.Sprintf("jsonpath \"$.%s[*].%s\" includes %s\n", a.Field, subField, val))
+			buf.WriteString(fmt.Sprintf("jsonpath \"$.%s[*].%s\" includes %s\n", a.Field, strings.ToLower(subField), val))
 		} else {
 			buf.WriteString(fmt.Sprintf("jsonpath \"$.%s\" includes %s\n", a.Field, val))
 		}
@@ -199,7 +199,7 @@ func writeAssertLineV2(buf *strings.Builder, a scenario.Assertion, captures map[
 		val := resolveVarRef(a.Value, captures)
 		_, subField := splitVarRef(a.Value)
 		if subField != "" {
-			buf.WriteString(fmt.Sprintf("jsonpath \"$.%s[*].%s\" not includes %s\n", a.Field, subField, val))
+			buf.WriteString(fmt.Sprintf("jsonpath \"$.%s[*].%s\" not includes %s\n", a.Field, strings.ToLower(subField), val))
 		} else {
 			buf.WriteString(fmt.Sprintf("jsonpath \"$.%s\" not includes %s\n", a.Field, val))
 		}
@@ -226,11 +226,17 @@ func buildScenarioURL(pathTemplate, json string, captures map[string]bool) strin
 		paramName := result[pos+1 : pos+closeBrace]
 
 		// Try to find value in JSON body.
-		varName := findJSONVarRef(json, paramName)
-		if varName != "" {
-			hurlVar := varRefToHurl(varName)
-			result = result[:pos] + "{{" + hurlVar + "}}" + result[pos+closeBrace+1:]
-			i = pos + len(hurlVar) + 4
+		val, isVarRef := findJSONValue(json, paramName)
+		if val != "" {
+			if isVarRef {
+				hurlVar := varRefToHurl(val)
+				result = result[:pos] + "{{" + hurlVar + "}}" + result[pos+closeBrace+1:]
+				i = pos + len(hurlVar) + 4
+			} else {
+				// Literal value — insert directly into path.
+				result = result[:pos] + val + result[pos+closeBrace+1:]
+				i = pos + len(val)
+			}
 		} else {
 			hurlVar := pascalToSnakeHurl(paramName)
 			result = result[:pos] + "{{" + hurlVar + "}}" + result[pos+closeBrace+1:]
@@ -349,10 +355,12 @@ func splitVarRef(ref string) (string, string) {
 	return ref, ""
 }
 
-// findJSONVarRef looks for a field in JSON and returns the variable reference.
-func findJSONVarRef(json, fieldName string) string {
+// findJSONValue looks for a field in JSON and returns its value.
+// Returns (value, isVarRef). Variable references like course.ID return isVarRef=true.
+// Literals like 1 or "abc" return isVarRef=false.
+func findJSONValue(json, fieldName string) (string, bool) {
 	if json == "" {
-		return ""
+		return "", false
 	}
 	inner := strings.TrimPrefix(strings.TrimSuffix(strings.TrimSpace(json), "}"), "{")
 	parts := splitJSONFields(inner)
@@ -368,11 +376,16 @@ func findJSONVarRef(json, fieldName string) string {
 			continue
 		}
 		val := strings.TrimSpace(part[colonIdx+1:])
+		// Variable reference: unquoted with dot notation (e.g., course.ID)
 		if !strings.HasPrefix(val, `"`) && strings.Contains(val, ".") {
-			return val
+			return val, true
+		}
+		// Literal: number or quoted string
+		if val != "" {
+			return strings.Trim(val, `"`), false
 		}
 	}
-	return ""
+	return "", false
 }
 
 // inferScenarioCapture infers capture variable and jsonpath from response schema.
