@@ -5,7 +5,6 @@ import (
 
 	"github.com/geul-org/fullend/internal/funcspec"
 	ssacparser "github.com/geul-org/ssac/parser"
-	ssacvalidator "github.com/geul-org/ssac/validator"
 )
 
 func TestCheckFuncs_ParamCount(t *testing.T) {
@@ -19,16 +18,16 @@ func TestCheckFuncs_ParamCount(t *testing.T) {
 		HasBody: true,
 	}}
 
-	// 3 args but 2 request fields → ERROR.
+	// 3 inputs but 2 request fields → ERROR.
 	sfs := []ssacparser.ServiceFunc{{
 		Name: "Login",
 		Sequences: []ssacparser.Sequence{{
 			Type:  "call",
 			Model: "auth.VerifyPassword",
-			Args: []ssacparser.Arg{
-				{Source: "user", Field: "PasswordHash"},
-				{Source: "request", Field: "Password"},
-				{Source: "request", Field: "Extra"},
+			Inputs: map[string]string{
+				"PasswordHash": "user.PasswordHash",
+				"Password":     "request.Password",
+				"Extra":        "request.Extra",
 			},
 		}},
 	}}
@@ -61,9 +60,9 @@ func TestCheckFuncs_ParamCountMatch(t *testing.T) {
 		Sequences: []ssacparser.Sequence{{
 			Type:  "call",
 			Model: "auth.VerifyPassword",
-			Args: []ssacparser.Arg{
-				{Source: "user", Field: "PasswordHash"},
-				{Source: "request", Field: "Password"},
+			Inputs: map[string]string{
+				"PasswordHash": "user.PasswordHash",
+				"Password":     "request.Password",
 			},
 		}},
 	}}
@@ -80,7 +79,7 @@ func TestCheckFuncs_ResultResponseMismatch(t *testing.T) {
 	specs := []funcspec.FuncSpec{{
 		Package:        "auth",
 		Name:           "issueToken",
-		RequestFields:  []funcspec.Field{{Name: "ID", Type: "int64"}},
+		RequestFields:  []funcspec.Field{{Name: "UserID", Type: "int64"}},
 		ResponseFields: []funcspec.Field{}, // no response fields
 		HasBody:        true,
 	}}
@@ -88,9 +87,11 @@ func TestCheckFuncs_ResultResponseMismatch(t *testing.T) {
 	sfs := []ssacparser.ServiceFunc{{
 		Name: "Login",
 		Sequences: []ssacparser.Sequence{{
-			Type:   "call",
-			Model:  "auth.IssueToken",
-			Args:   []ssacparser.Arg{{Source: "user", Field: "ID"}},
+			Type:  "call",
+			Model: "auth.IssueToken",
+			Inputs: map[string]string{
+				"UserID": "user.ID",
+			},
 			Result: &ssacparser.Result{Var: "token", Type: "Token"}, // has result
 		}},
 	}}
@@ -121,7 +122,7 @@ func TestCheckFuncs_ResponseIgnoredWarning(t *testing.T) {
 		Sequences: []ssacparser.Sequence{{
 			Type:   "call",
 			Model:  "auth.DoSomething",
-			Args:   nil,
+			Inputs: nil,
 			Result: nil, // no result
 		}},
 	}}
@@ -155,9 +156,9 @@ func TestCheckFuncs_SourceVarUndefined(t *testing.T) {
 		Sequences: []ssacparser.Sequence{{
 			Type:  "call",
 			Model: "auth.VerifyPassword",
-			Args: []ssacparser.Arg{
-				{Source: "user", Field: "PasswordHash"},
-				{Source: "request", Field: "Password"},
+			Inputs: map[string]string{
+				"PasswordHash": "user.PasswordHash",
+				"Password":     "request.Password",
 			},
 		}},
 	}}
@@ -196,9 +197,9 @@ func TestCheckFuncs_SourceVarDefined(t *testing.T) {
 			{
 				Type:  "call",
 				Model: "auth.VerifyPassword",
-				Args: []ssacparser.Arg{
-					{Source: "user", Field: "PasswordHash"},
-					{Source: "request", Field: "Password"},
+				Inputs: map[string]string{
+					"PasswordHash": "user.PasswordHash",
+					"Password":     "request.Password",
 				},
 			},
 		},
@@ -212,76 +213,16 @@ func TestCheckFuncs_SourceVarDefined(t *testing.T) {
 	}
 }
 
-func TestCheckFuncs_PositionalTypeMatch(t *testing.T) {
-	specs := []funcspec.FuncSpec{{
-		Package: "auth",
-		Name:    "verifyPassword",
-		RequestFields: []funcspec.Field{
-			{Name: "PasswordHash", Type: "string"},
-			{Name: "Password", Type: "string"},
-		},
-		HasBody: true,
-	}}
-
-	st := &ssacvalidator.SymbolTable{
-		DDLTables: map[string]ssacvalidator.DDLTable{
-			"User": {
-				Columns: map[string]string{
-					"PasswordHash": "string",
-					"Email":        "string",
-					"ID":           "int64",
-				},
-			},
-		},
-	}
-
-	sfs := []ssacparser.ServiceFunc{{
-		Name: "Login",
-		Sequences: []ssacparser.Sequence{
-			{
-				Type:   "get",
-				Result: &ssacparser.Result{Var: "user", Type: "User"},
-			},
-			{
-				Type:  "call",
-				Model: "auth.VerifyPassword",
-				Args: []ssacparser.Arg{
-					{Source: "user", Field: "PasswordHash"},
-					{Source: "request", Field: "Password"},
-				},
-			},
-		},
-	}}
-
-	errs := CheckFuncs(sfs, specs, nil, st, nil)
-	for _, e := range errs {
-		if e.Level == "ERROR" && contains(e.Message, "타입 불일치") {
-			t.Errorf("unexpected type mismatch: %s", e.Message)
-		}
-	}
-}
-
-func TestCheckFuncs_PositionalTypeMismatch(t *testing.T) {
+func TestCheckFuncs_InputFieldNameMismatch(t *testing.T) {
 	specs := []funcspec.FuncSpec{{
 		Package: "auth",
 		Name:    "issueToken",
 		RequestFields: []funcspec.Field{
-			{Name: "ID", Type: "string"}, // wrong: should be int64
+			{Name: "UserID", Type: "int64"},
 			{Name: "Email", Type: "string"},
 		},
 		HasBody: true,
 	}}
-
-	st := &ssacvalidator.SymbolTable{
-		DDLTables: map[string]ssacvalidator.DDLTable{
-			"User": {
-				Columns: map[string]string{
-					"ID":    "int64",
-					"Email": "string",
-				},
-			},
-		},
-	}
 
 	sfs := []ssacparser.ServiceFunc{{
 		Name: "Login",
@@ -293,24 +234,23 @@ func TestCheckFuncs_PositionalTypeMismatch(t *testing.T) {
 			{
 				Type:  "call",
 				Model: "auth.IssueToken",
-				Args: []ssacparser.Arg{
-					{Source: "user", Field: "ID"},    // DDL: int64
-					{Source: "user", Field: "Email"}, // DDL: string
+				Inputs: map[string]string{
+					"ID":    "user.ID",    // wrong: should be UserID
+					"Email": "user.Email", // correct
 				},
-				Result: &ssacparser.Result{Var: "token", Type: "Token"},
 			},
 		},
 	}}
 
-	errs := CheckFuncs(sfs, specs, nil, st, nil)
+	errs := CheckFuncs(sfs, specs, nil, nil, nil)
 	found := false
 	for _, e := range errs {
-		if e.Level == "ERROR" && contains(e.Message, "타입 불일치") {
+		if e.Level == "ERROR" && contains(e.Message, "Request에 없음") {
 			found = true
 		}
 	}
 	if !found {
-		t.Errorf("expected type mismatch ERROR, got: %+v", errs)
+		t.Errorf("expected field name mismatch ERROR, got: %+v", errs)
 	}
 }
 

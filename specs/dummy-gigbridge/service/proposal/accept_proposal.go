@@ -1,6 +1,6 @@
 package service
 
-import "github.com/gigbridge/api/billing"
+import "github.com/gigbridge/api/internal/billing"
 
 // @get Proposal proposal = Proposal.FindByID(request.ID)
 // @empty proposal "Proposal not found"
@@ -12,7 +12,7 @@ import "github.com/gigbridge/api/billing"
 // @put Proposal.UpdateStatus(proposal.ID, "accepted")
 // @put Gig.AssignFreelancer(gig.ID, proposal.FreelancerID)
 // @put Gig.UpdateStatus(gig.ID, "in_progress")
-// @call int64 transactionID = billing.HoldEscrow(gig.ID, gig.Budget, gig.ClientID)
+// @call int64 transactionID = billing.HoldEscrow({GigID: gig.ID, Amount: gig.Budget, ClientID: gig.ClientID})
 // @get Gig gig = Gig.FindByID(gig.ID)
 // @response {
 //   gig: gig,

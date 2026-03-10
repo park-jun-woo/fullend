@@ -1,8 +1,8 @@
 package service
 
-import "github.com/gigbridge/api/auth"
+import "github.com/geul-org/fullend/pkg/auth"
 
-// @call string hashedPassword = auth.HashPassword(request.Password)
+// @call string hashedPassword = auth.HashPassword({Password: request.Password})
 // @post User user = User.Create(request.Email, hashedPassword, request.Role, request.Name)
 // @response {
 //   user: user

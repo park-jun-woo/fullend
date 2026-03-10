@@ -86,21 +86,35 @@ func CheckFuncs(
 				})
 			}
 
-			// Rule 1: Arg count = Request field count.
-			paramCount := countNonLiteralArgs(seq.Args)
+			// Rule 1: Input field count = Request field count.
+			// @call uses seq.Inputs (map[string]string) since 수정지시서007.
+			inputCount := len(seq.Inputs)
 			reqFieldCount := len(spec.RequestFields)
-			if paramCount != reqFieldCount {
+			if inputCount != reqFieldCount {
 				errs = append(errs, CrossError{
 					Rule:    "Func ↔ SSaC",
 					Context: ctx,
-					Message: fmt.Sprintf("@param %d개, Request 필드 %d개 (불일치)", paramCount, reqFieldCount),
+					Message: fmt.Sprintf("@call Inputs %d개, Request 필드 %d개 (불일치)", inputCount, reqFieldCount),
 					Level:   "ERROR",
 				})
 			}
 
-			// Rule 2: Positional type match.
-			if paramCount == reqFieldCount {
-				errs = append(errs, checkPositionalTypes(ctx, seq, spec, sf.Name, symbolTable, openAPIDoc, definedVars)...)
+			// Rule 2: Input key names must match Request field names.
+			if inputCount > 0 {
+				reqFieldSet := make(map[string]bool)
+				for _, rf := range spec.RequestFields {
+					reqFieldSet[rf.Name] = true
+				}
+				for inputKey := range seq.Inputs {
+					if !reqFieldSet[inputKey] {
+						errs = append(errs, CrossError{
+							Rule:    "Func ↔ SSaC",
+							Context: ctx,
+							Message: fmt.Sprintf("@call Input 필드 %q가 %sRequest에 없음", inputKey, strings.ToUpper(funcName[:1])+funcName[1:]),
+							Level:   "ERROR",
+						})
+					}
+				}
 			}
 
 			// Rule 3: Result ↔ Response match.
@@ -121,18 +135,21 @@ func CheckFuncs(
 			}
 
 			// Rule 4: Source variable defined in prior sequences.
-			for _, arg := range seq.Args {
-				if arg.Source == "request" || arg.Source == "currentUser" || arg.Source == "config" || arg.Literal != "" {
+			for _, value := range seq.Inputs {
+				parts := strings.SplitN(value, ".", 2)
+				source := parts[0]
+				if source == "request" || source == "currentUser" || source == "config" {
 					continue
 				}
-				if arg.Source == "" {
+				// Check if it's a literal (quoted string).
+				if strings.HasPrefix(value, "\"") {
 					continue
 				}
-				if _, ok := definedVars[arg.Source]; !ok {
+				if _, ok := definedVars[source]; !ok {
 					errs = append(errs, CrossError{
 						Rule:    "Func ↔ SSaC",
 						Context: ctx,
-						Message: fmt.Sprintf("arg source %q 미정의", arg.Source),
+						Message: fmt.Sprintf("arg source %q 미정의", source),
 						Level:   "WARNING",
 					})
 				}
@@ -143,75 +160,6 @@ func CheckFuncs(
 	return errs
 }
 
-// countNonLiteralArgs counts args excluding string literals.
-func countNonLiteralArgs(args []ssacparser.Arg) int {
-	count := 0
-	for _, a := range args {
-		if a.Literal == "" {
-			count++
-		}
-	}
-	return count
-}
-
-// checkPositionalTypes validates type match between i-th param and i-th Request field.
-func checkPositionalTypes(
-	ctx string,
-	seq ssacparser.Sequence,
-	spec *funcspec.FuncSpec,
-	funcName string,
-	symbolTable *ssacvalidator.SymbolTable,
-	openAPIDoc *openapi3.T,
-	definedVars map[string]string,
-) []CrossError {
-	var errs []CrossError
-	fieldIdx := 0
-	for _, arg := range seq.Args {
-		if arg.Literal != "" {
-			continue // skip literals
-		}
-		if fieldIdx >= len(spec.RequestFields) {
-			break
-		}
-
-		paramType := resolveArgType(arg, symbolTable, openAPIDoc, funcName, definedVars)
-		reqFieldType := spec.RequestFields[fieldIdx].Type
-
-		if paramType != "" && !typesCompatible(paramType, reqFieldType) {
-			errs = append(errs, CrossError{
-				Rule:    "Func ↔ SSaC",
-				Context: ctx,
-				Message: fmt.Sprintf("%d번째 arg(%s) ≠ Request 필드 %s(%s) 타입 불일치",
-					fieldIdx+1, paramType, spec.RequestFields[fieldIdx].Name, reqFieldType),
-				Level: "ERROR",
-			})
-		}
-		fieldIdx++
-	}
-	return errs
-}
-
-// resolveArgType resolves the Go type of an SSaC arg from DDL or OpenAPI.
-func resolveArgType(arg ssacparser.Arg, st *ssacvalidator.SymbolTable, doc *openapi3.T, funcName string, definedVars map[string]string) string {
-	// request.Field → OpenAPI request schema
-	if arg.Source == "request" && doc != nil {
-		return resolveOpenAPIFieldType(doc, funcName, arg.Field)
-	}
-
-	// variable.Field → DDL column type via SymbolTable
-	if arg.Source != "" && arg.Source != "request" && arg.Source != "currentUser" && arg.Source != "config" && st != nil {
-		// Look up the variable's type from definedVars.
-		typeName, ok := definedVars[arg.Source]
-		if !ok {
-			return ""
-		}
-
-		// Look up column type from SymbolTable.
-		return resolveDDLColumnType(st, typeName, arg.Field)
-	}
-
-	return ""
-}
 
 // resolveDDLColumnType looks up a column's Go type from the SymbolTable.
 // DDLTables: map[string]DDLTable, DDLTable.Columns: map[string]string (column name → Go type).
@@ -330,11 +278,8 @@ func generateSkeleton(pkg, funcName string, seq ssacparser.Sequence) string {
 	}
 
 	var requestFields []string
-	for _, arg := range seq.Args {
-		if arg.Literal != "" {
-			continue // literal
-		}
-		requestFields = append(requestFields, fmt.Sprintf("\t%s string", arg.Field))
+	for key := range seq.Inputs {
+		requestFields = append(requestFields, fmt.Sprintf("\t%s string", key))
 	}
 
 	var responseFields []string
