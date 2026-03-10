@@ -21,7 +21,7 @@ type scenarioStep struct {
 }
 
 // generateHurlTests generates smoke.hurl from OpenAPI spec.
-func generateHurlTests(doc *openapi3.T, outDir string) error {
+func generateHurlTests(doc *openapi3.T, outDir, specsDir string) error {
 	if doc == nil || doc.Paths == nil {
 		return nil
 	}
@@ -31,7 +31,7 @@ func generateHurlTests(doc *openapi3.T, outDir string) error {
 		return fmt.Errorf("create tests dir: %w", err)
 	}
 
-	steps := buildScenarioOrder(doc)
+	steps := buildScenarioOrder(doc, specsDir)
 	if len(steps) == 0 {
 		return nil
 	}
@@ -74,7 +74,7 @@ func generateHurlTests(doc *openapi3.T, outDir string) error {
 //   2. For each resource group: POST (create) → GET → PUT (non-delete)
 //   3. Child resource CRUD (recursively)
 //   4. DELETE in reverse depth order (children first, then parents)
-func buildScenarioOrder(doc *openapi3.T) []scenarioStep {
+func buildScenarioOrder(doc *openapi3.T, specsDir string) []scenarioStep {
 	var all []scenarioStep
 
 	for path, pi := range doc.Paths.Map() {
@@ -132,13 +132,9 @@ func buildScenarioOrder(doc *openapi3.T) []scenarioStep {
 	sortByDepthPath(transitionSteps)
 	// Sort updates by depth, then path.
 	sortByDepthPath(updateSteps)
-	// Sort deletes by depth DESC (children first), then path.
-	sort.SliceStable(deleteSteps, func(i, j int) bool {
-		if deleteSteps[i].PathDepth != deleteSteps[j].PathDepth {
-			return deleteSteps[i].PathDepth > deleteSteps[j].PathDepth
-		}
-		return deleteSteps[i].Path < deleteSteps[j].Path
-	})
+	// Sort deletes by FK dependency (children first, then parents).
+	// Skip deletes where child FK tables have no DELETE endpoint.
+	deleteSteps = sortDeletesByFK(deleteSteps, specsDir)
 
 	// Final order: auth → create → transition → read → update → delete
 	var result []scenarioStep
@@ -407,4 +403,173 @@ func hasSecuritySchemes(doc *openapi3.T) bool {
 		return false
 	}
 	return len(doc.Components.SecuritySchemes) > 0
+}
+
+// sortDeletesByFK sorts DELETE steps using DDL FK dependency graph.
+// Children (tables with FK references) are deleted before parents.
+func sortDeletesByFK(steps []scenarioStep, specsDir string) []scenarioStep {
+	if len(steps) <= 1 || specsDir == "" {
+		return steps
+	}
+
+	// Parse DDL to get FK relationships.
+	tables := parseDDLFiles(specsDir)
+
+	// Build dependency graph: table → set of tables it depends on (via FK).
+	// e.g. lessons depends on courses (lessons.course_id → courses)
+	deps := make(map[string]map[string]bool)
+	for _, t := range tables {
+		for _, col := range t.Columns {
+			if col.FKTable != "" {
+				if deps[t.TableName] == nil {
+					deps[t.TableName] = make(map[string]bool)
+				}
+				deps[t.TableName][col.FKTable] = true
+			}
+		}
+	}
+
+	// Topological sort: tables with no dependents first, then their parents.
+	// For DELETE order: children (FK holders) before parents.
+	order := topoSortDelete(deps)
+
+	// Map path → table name for each DELETE step.
+	tableOrder := make(map[string]int)
+	for i, t := range order {
+		tableOrder[t] = i
+	}
+
+	// Collect which tables have DELETE endpoints.
+	deletableTables := make(map[string]bool)
+	for _, s := range steps {
+		t := inferTableFromPath(s.Path)
+		if t != "" {
+			deletableTables[t] = true
+		}
+	}
+
+	// Build reverse deps: parent → children that reference it.
+	reverseDeps := make(map[string][]string)
+	for child, parents := range deps {
+		for parent := range parents {
+			reverseDeps[parent] = append(reverseDeps[parent], child)
+		}
+	}
+
+	// Filter out steps whose table has undeletable children (FK references with no DELETE endpoint).
+	var filteredSteps []scenarioStep
+	for _, s := range steps {
+		t := inferTableFromPath(s.Path)
+		if canDeleteTable(t, deletableTables, reverseDeps) {
+			filteredSteps = append(filteredSteps, s)
+		}
+	}
+	steps = filteredSteps
+
+	// Sort steps by topological order.
+	sort.SliceStable(steps, func(i, j int) bool {
+		ti := inferTableFromPath(steps[i].Path)
+		tj := inferTableFromPath(steps[j].Path)
+		oi, oki := tableOrder[ti]
+		oj, okj := tableOrder[tj]
+		if oki && okj {
+			return oi < oj
+		}
+		// Fallback: depth DESC, then path.
+		if steps[i].PathDepth != steps[j].PathDepth {
+			return steps[i].PathDepth > steps[j].PathDepth
+		}
+		return steps[i].Path < steps[j].Path
+	})
+
+	return steps
+}
+
+// topoSortDelete returns tables in deletion order (children before parents).
+func topoSortDelete(deps map[string]map[string]bool) []string {
+	// Collect all tables.
+	allTables := make(map[string]bool)
+	for t := range deps {
+		allTables[t] = true
+		for dep := range deps[t] {
+			allTables[dep] = true
+		}
+	}
+
+	// Count how many tables depend on each table (in-degree as parent).
+	childCount := make(map[string]int)
+	for _, parents := range deps {
+		for p := range parents {
+			childCount[p]++
+		}
+	}
+
+	// Start with leaf tables (no children depending on them).
+	var queue []string
+	for t := range allTables {
+		if childCount[t] == 0 {
+			queue = append(queue, t)
+		}
+	}
+	sort.Strings(queue)
+
+	var result []string
+	visited := make(map[string]bool)
+
+	for len(queue) > 0 {
+		t := queue[0]
+		queue = queue[1:]
+		if visited[t] {
+			continue
+		}
+		visited[t] = true
+		result = append(result, t)
+
+		// Decrement child count for parents of this table.
+		for parent := range deps[t] {
+			childCount[parent]--
+			if childCount[parent] == 0 {
+				queue = append(queue, parent)
+				sort.Strings(queue)
+			}
+		}
+	}
+
+	// Add any remaining (circular deps — shouldn't happen).
+	for t := range allTables {
+		if !visited[t] {
+			result = append(result, t)
+		}
+	}
+
+	return result
+}
+
+// canDeleteTable returns true if a table can be safely deleted in smoke tests.
+// A table is deletable only if all child tables (that reference it via FK) also have DELETE endpoints.
+func canDeleteTable(table string, deletableTables map[string]bool, reverseDeps map[string][]string) bool {
+	children := reverseDeps[table]
+	for _, child := range children {
+		if !deletableTables[child] {
+			return false
+		}
+		// Recursively check: the child must also be deletable.
+		if !canDeleteTable(child, deletableTables, reverseDeps) {
+			return false
+		}
+	}
+	return true
+}
+
+// inferTableFromPath extracts the plural table name from a URL path.
+// e.g. "/courses/{CourseID}" → "courses", "/lessons/{LessonID}" → "lessons"
+func inferTableFromPath(path string) string {
+	parts := strings.Split(strings.Trim(path, "/"), "/")
+	// Find the first non-parameter segment.
+	for _, p := range parts {
+		if !strings.HasPrefix(p, "{") && !strings.HasPrefix(p, ":") {
+			return p
+		}
+	}
+	return ""
 }
