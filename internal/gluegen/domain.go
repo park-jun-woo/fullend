@@ -117,7 +117,7 @@ func inferClaimGoType(fieldName string) string {
 }
 
 // generateServerStructWithDomains creates per-domain handler.go files and central server.go.
-func generateServerStructWithDomains(intDir string, serviceFuncs []ssacparser.ServiceFunc, modulePath string, doc *openapi3.T) error {
+func generateServerStructWithDomains(intDir string, serviceFuncs []ssacparser.ServiceFunc, modulePath string, doc *openapi3.T, claims map[string]string) error {
 	serviceDir := filepath.Join(intDir, "service")
 	domains := uniqueDomains(serviceFuncs)
 
@@ -129,7 +129,7 @@ func generateServerStructWithDomains(intDir string, serviceFuncs []ssacparser.Se
 	}
 
 	// 2. Generate central server.go.
-	return generateCentralServer(serviceDir, domains, serviceFuncs, modulePath, doc)
+	return generateCentralServer(serviceDir, domains, serviceFuncs, modulePath, doc, claims)
 }
 
 // generateDomainHandler creates service/{domain}/handler.go with the Handler struct.
@@ -199,7 +199,7 @@ func convertPathParamsGin(path string) string {
 }
 
 // generateCentralServer creates service/server.go that composes domain handlers with gin router.
-func generateCentralServer(serviceDir string, domains []string, serviceFuncs []ssacparser.ServiceFunc, modulePath string, doc *openapi3.T) error {
+func generateCentralServer(serviceDir string, domains []string, serviceFuncs []ssacparser.ServiceFunc, modulePath string, doc *openapi3.T, claims map[string]string) error {
 	// Build operationId → domain map.
 	opDomains := make(map[string]string)
 	for _, sf := range serviceFuncs {
@@ -317,7 +317,11 @@ func generateCentralServer(serviceDir string, domains []string, serviceFuncs []s
 	var imports []string
 	imports = append(imports, "\"github.com/gin-gonic/gin\"")
 	if hasBearer {
-		imports = append(imports, "\"github.com/geul-org/fullend/pkg/middleware\"")
+		if len(claims) > 0 {
+			imports = append(imports, fmt.Sprintf("\"%s/internal/middleware\"", modulePath))
+		} else {
+			imports = append(imports, "\"github.com/geul-org/fullend/pkg/middleware\"")
+		}
 	}
 	if len(flatModels) > 0 || hasFlatFuncs {
 		imports = append(imports, fmt.Sprintf("\"%s/internal/model\"", modulePath))

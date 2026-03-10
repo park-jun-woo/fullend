@@ -52,7 +52,12 @@ func Generate(input *GlueInput) error {
 		if err := generateAuthStubWithDomains(intDir, input.ModulePath, input.Claims); err != nil {
 			return fmt.Errorf("auth (domain): %w", err)
 		}
-		if err := generateServerStructWithDomains(intDir, input.ServiceFuncs, input.ModulePath, input.OpenAPIDoc); err != nil {
+		if len(input.Claims) > 0 {
+			if err := generateMiddleware(intDir, input.ModulePath, input.Claims); err != nil {
+				return fmt.Errorf("middleware (domain): %w", err)
+			}
+		}
+		if err := generateServerStructWithDomains(intDir, input.ServiceFuncs, input.ModulePath, input.OpenAPIDoc, input.Claims); err != nil {
 			return fmt.Errorf("server.go (domain): %w", err)
 		}
 		if err := generateMainWithDomains(input.ArtifactsDir, input.ServiceFuncs, input.ModulePath); err != nil {
