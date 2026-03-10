@@ -366,6 +366,12 @@ func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, stmlD
 	// Determine module path from fullend.yaml, fallback to directory-based.
 	modulePath := determineModulePath(specsDir, artifactsDir)
 
+	// Load claims config from fullend.yaml.
+	var claims map[string]string
+	if cfg, err := projectconfig.Load(specsDir); err == nil && cfg.Backend.Auth != nil {
+		claims = cfg.Backend.Auth.Claims
+	}
+
 	input := &gluegen.GlueInput{
 		ArtifactsDir: artifactsDir,
 		SpecsDir:     specsDir,
@@ -373,6 +379,7 @@ func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, stmlD
 		STMLDeps:     stmlDeps,
 		STMLPages:    stmlPages,
 		STMLPageOps:  stmlPageOps,
+		Claims:       claims,
 	}
 
 	// Load OpenAPI doc.

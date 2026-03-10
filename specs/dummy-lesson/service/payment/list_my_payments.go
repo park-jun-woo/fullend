@@ -1,6 +1,6 @@
 package service
 
-// @get []Payment payments = Payment.ListByUser(currentUser.ID)
+// @get []Payment payments = Payment.ListByUser(currentUser.ID, query)
 // @response {
 //   payments: payments
 // }

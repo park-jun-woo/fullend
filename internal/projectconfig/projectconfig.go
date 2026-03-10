@@ -27,6 +27,12 @@ type Backend struct {
 	Framework  string   `yaml:"framework"`
 	Module     string   `yaml:"module"`
 	Middleware []string `yaml:"middleware"`
+	Auth       *Auth    `yaml:"auth"`
+}
+
+type Auth struct {
+	SecretEnv string            `yaml:"secret_env"`
+	Claims    map[string]string `yaml:"claims"` // FieldName → claim key (e.g. "ID" → "user_id")
 }
 
 type Frontend struct {

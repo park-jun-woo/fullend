@@ -58,6 +58,12 @@ func generateStateMachineSource(d *statemachine.StateDiagram, pkgName string) st
 	// Determine the status field type from the diagram.
 	fieldType := inferFieldType(d)
 
+	// Input type — SSaC codegen generates e.g. coursestate.Input{Status: course.Published}.
+	buf.WriteString("// Input holds the state field value for transition checks.\n")
+	buf.WriteString("type Input struct {\n")
+	buf.WriteString("\tStatus interface{}\n")
+	buf.WriteString("}\n\n")
+
 	// transitionKey type.
 	buf.WriteString("type transitionKey struct {\n\tfrom  string\n\tevent string\n}\n\n")
 
@@ -68,14 +74,15 @@ func generateStateMachineSource(d *statemachine.StateDiagram, pkgName string) st
 	}
 	buf.WriteString("}\n\n")
 
-	// CanTransition function — signature depends on field type.
+	// CanTransition function — accepts Input, resolves state internally.
 	switch fieldType {
 	case "bool":
 		buf.WriteString(generateBoolCanTransition(d))
 	default:
 		// String-based status field.
 		buf.WriteString(`// CanTransition checks if the given event is valid from the current state.
-func CanTransition(status string, event string) bool {
+func CanTransition(input Input, event string) bool {
+	status, _ := input.Status.(string)
 	_, ok := transitions[transitionKey{from: status, event: event}]
 	return ok
 }
@@ -94,17 +101,24 @@ func generateBoolCanTransition(d *statemachine.StateDiagram) string {
 
 	var buf strings.Builder
 	buf.WriteString("// CanTransition checks if the given event is valid from the current state.\n")
-	buf.WriteString("func CanTransition(fieldValue bool, event string) bool {\n")
-	buf.WriteString("\tcurrent := stateFromBool(fieldValue)\n")
+	buf.WriteString("func CanTransition(input Input, event string) bool {\n")
+	buf.WriteString("\tcurrent := resolveState(input.Status)\n")
 	buf.WriteString("\t_, ok := transitions[transitionKey{from: current, event: event}]\n")
 	buf.WriteString("\treturn ok\n")
 	buf.WriteString("}\n\n")
 
-	buf.WriteString("func stateFromBool(v bool) string {\n")
-	buf.WriteString("\tif v {\n")
-	buf.WriteString(fmt.Sprintf("\t\treturn %q\n", trueState))
+	buf.WriteString("func resolveState(v interface{}) string {\n")
+	buf.WriteString("\tswitch val := v.(type) {\n")
+	buf.WriteString("\tcase bool:\n")
+	buf.WriteString("\t\tif val {\n")
+	buf.WriteString(fmt.Sprintf("\t\t\treturn %q\n", trueState))
+	buf.WriteString("\t\t}\n")
+	buf.WriteString(fmt.Sprintf("\t\treturn %q\n", falseState))
+	buf.WriteString("\tcase string:\n")
+	buf.WriteString("\t\treturn val\n")
+	buf.WriteString("\tdefault:\n")
+	buf.WriteString("\t\treturn \"\"\n")
 	buf.WriteString("\t}\n")
-	buf.WriteString(fmt.Sprintf("\treturn %q\n", falseState))
 	buf.WriteString("}\n")
 
 	return buf.String()

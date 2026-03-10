@@ -42,6 +42,12 @@ backend:
   module: github.com/org/project    # Go module path (used in go.mod, imports)
   middleware:                        # Middleware list (must match OpenAPI securitySchemes names)
     - bearerAuth
+  auth:                              # Auth config (required if SSaC uses currentUser)
+    secret_env: JWT_SECRET           # Environment variable for JWT secret
+    claims:                          # JWT claims → CurrentUser field mapping
+      ID: user_id                    # CurrentUser.ID ← claim "user_id"
+      Email: email                   # CurrentUser.Email ← claim "email"
+      Role: role                     # CurrentUser.Role ← claim "role"
 
 frontend:
   lang: typescript                  # Frontend language
@@ -63,6 +69,13 @@ deploy:
 | `metadata.name` | Project identifier |
 | `backend.module` | Go module path |
 
+### Optional Fields
+
+| Field | Description |
+|-------|-------------|
+| `backend.auth.secret_env` | JWT secret environment variable name |
+| `backend.auth.claims` | Map of `GoFieldName: claimKey` — defines `CurrentUser` struct |
+
 ### Cross-validation Rules
 
 | Rule | Level |
@@ -70,6 +83,9 @@ deploy:
 | `backend.middleware` names must match OpenAPI `securitySchemes` keys | ERROR |
 | OpenAPI `securitySchemes` keys must exist in `backend.middleware` | ERROR |
 | Endpoint `security` references must exist in `backend.middleware` | ERROR |
+| SSaC uses `currentUser` → `backend.auth.claims` must exist | ERROR |
+| `currentUser.X` field → `X` must exist in `backend.auth.claims` | ERROR |
+| SSaC uses `@auth` → `backend.auth.claims` must exist | ERROR |
 
 ## SSaC — Service Logic Declarations (v2)
 
@@ -86,7 +102,7 @@ deploy:
 // @delete Model.Method(args...)                — Delete (no result, 0-arg = WARNING)
 ```
 
-- `@get`: 0개 arg 허용 (전체 조회 `Course.List()` 등). 페이지네이션은 OpenAPI `x-pagination`이 담당.
+- `@get`: 0개 arg 허용 (전체 조회 `Course.List(query)` 등). 페이지네이션은 `query` arg + OpenAPI `x-pagination`이 함께 담당.
 - `@delete`: 0개 arg 시 WARNING ("전체 삭제 의도가 맞는지 확인"). `@delete!`로 WARNING 억제 가능.
 
 #### Args Format — Dot Notation
@@ -98,7 +114,21 @@ deploy:
 - `config.APIKey` — from environment config (reserved source)
 - `"cancelled"` — string literal
 
-Reserved sources: `request`, `currentUser`, `config` — cannot be used as result variable names.
+Reserved sources: `request`, `currentUser`, `config`, `query` — cannot be used as result variable names.
+
+#### `query` Reserved Source
+
+List methods that need pagination/sort/filter must explicitly include `query` as an argument:
+
+```go
+// @get []Course courses = Course.List(query)                        — with pagination
+// @get []Lesson lessons = Lesson.ListByCourse(request.CourseID)     — without pagination
+```
+
+- `query` → adds `opts QueryOpts` parameter to the model interface method
+- Without `query` → model method returns `([]Type, error)` (simple slice, no total count)
+- With `query` → model method returns `([]Type, int, error)` (slice + total count)
+- Only use `query` when the endpoint has `x-pagination`/`x-sort`/`x-filter` in OpenAPI
 
 #### Guards
 
@@ -382,19 +412,29 @@ func BearerAuth(secret string) gin.HandlerFunc
 
 ### CurrentUser Type
 
+`CurrentUser`는 `fullend.yaml`의 `backend.auth.claims` 설정에서 생성된다.
+
+```yaml
+# fullend.yaml
+backend:
+  auth:
+    claims:
+      ID: user_id
+      Email: email
+      Role: role
+```
+
+생성 결과 (`model/auth.go`):
 ```go
-// pkg/middleware/bearerauth.go
 type CurrentUser struct {
-    UserID int64
-    Email  string
-    Role   string
+    Email string
+    ID    int64
+    Role  string
 }
 ```
 
-생성 프로젝트의 `model/auth.go`에서 타입 앨리어스로 연결:
-```go
-type CurrentUser = middleware.CurrentUser
-```
+- Claims 설정이 있으면 → claims 필드에서 `CurrentUser` struct 직접 생성 (Go 타입은 claim key에서 추론: `*_id` → `int64`, 나머지 → `string`)
+- Claims 설정이 없으면 → `type CurrentUser = middleware.CurrentUser` (fallback alias)
 
 SSaC codegen이 `c.MustGet("currentUser").(*model.CurrentUser)` 생성 → 미들웨어가 세팅한 값을 핸들러에서 사용.
 
@@ -553,8 +593,9 @@ Syntax (single format only):
 
 ### x- Extension Codegen Effects
 
-- SSaC: Operations with x- extensions get `opts QueryOpts` parameter auto-added to model methods
-- SSaC: `:many` + x-pagination -> return type `([]T, int, error)` (includes total count)
+- SSaC: Model methods with `query` arg get `opts QueryOpts` parameter added to interface
+- SSaC: `query` + `:many` -> return type `([]T, int, error)` (includes total count)
+- SSaC: Model methods without `query` returning `[]T` -> return type `([]T, error)` (simple slice)
 - STML: `data-paginate` -> `useState(page, limit)` + prev/next buttons
 - STML: `data-sort` -> `useState(sortBy, sortDir)` + toggle buttons
 - STML: `data-filter` -> `useState(filters)` + filter inputs
@@ -588,7 +629,7 @@ Singularization rules: `ies`->`y`, `sses`->`ss`, `xes`->`x`, otherwise remove tr
 ## model/*.go Rules
 
 - Structs with `// @dto` comment -> skip DDL table matching (for pure DTOs like Token, Refund)
-- `CurrentUser` struct required in `model/` when SSaC specs use `currentUser` source. Fields must match JWT middleware output (e.g., `ID int64`, `Email string`, `Role string`).
+- `CurrentUser` struct is auto-generated in `model/auth.go` from `fullend.yaml` `backend.auth.claims` — do NOT manually create it in `model/`
 
 ## Gherkin Scenario — Cross-Endpoint Test Declarations
 
@@ -703,6 +744,9 @@ After individual tools (ssac validate, stml validate) run their own checks, full
 | Func source var | @call arg source variable defined in prior @result | WARNING |
 | DDL table -> SSaC | DDL table referenced by SSaC (@model or @result) | WARNING |
 | DDL column -> OpenAPI | DDL column exists in OpenAPI schema properties | WARNING |
+| SSaC currentUser -> claims | SSaC uses `currentUser` → `backend.auth.claims` config required | ERROR |
+| SSaC currentUser.X -> claims | `currentUser.X` field must exist in claims config | ERROR |
+| SSaC @auth -> claims | SSaC uses `@auth` → `backend.auth.claims` config required | ERROR |
 
 ## Mermaid stateDiagram — State Transition Declarations
 
@@ -744,13 +788,16 @@ stateDiagram-v2
 
 ```go
 // guard state -> 409 Conflict if transition not allowed
-if !coursestate.CanTransition(course.Published, "PublishCourse") {
-    c.JSON(http.StatusConflict, gin.H{"error": "state transition not allowed"})
+if err := coursestate.CanTransition(coursestate.Input{Status: course.Published}, "PublishCourse"); err != nil {
+    c.JSON(http.StatusConflict, gin.H{"error": "상태 전이 불가"})
     return
 }
 ```
 
 State machine package (`states/<id>state/<id>state.go`) is auto-generated by fullend gen.
+
+- `Input` struct: `type Input struct { Status interface{} }` — accepts bool or string state fields
+- `CanTransition(input Input, event string) error` — returns nil if allowed, error if not
 
 ## OPA Rego — Authorization Policy Declarations
 
@@ -760,7 +807,7 @@ State machine package (`states/<id>state/<id>state.go`) is auto-generated by ful
 
 | Field | Source | Description |
 |---|---|---|
-| `input.user.id` | `CurrentUser.UserID` | Authenticated user ID |
+| `input.user.id` | `CurrentUser.ID` | Authenticated user ID |
 | `input.user.role` | `CurrentUser.Role` | User role |
 | `input.action` | SSaC `@action` | Action to perform |
 | `input.resource` | SSaC `@resource` | Target resource |
@@ -809,6 +856,22 @@ SSaC `authorize` sequence `@action`/`@resource` maps to Rego `allow` rule `input
 
 `authz/authz.go` — OPA Go SDK-based Authorizer implementation (evaluates embedded .rego file)
 `authz/<name>.rego` — Copied from specs (for go:embed)
+
+Generated Authorizer interface (`model/auth.go`):
+```go
+type Authorizer interface {
+    Check(user *CurrentUser, action, resource string, input interface{}) error
+}
+```
+
+Generated `authz.Input` type:
+```go
+type Input struct { ID interface{} }
+```
+
+SSaC codegen calls: `authz.Check(currentUser, "action", "resource", authz.Input{ID: courseID})`
+- `Check` returns `error` (nil = allowed, non-nil = forbidden)
+- `input interface{}` avoids import cycle (authz→model→authz)
 
 ## Runtime Testing (Hurl)
 

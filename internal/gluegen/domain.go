@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -65,27 +66,54 @@ func transformServiceFilesWithDomains(intDir string, serviceFuncs []ssacparser.S
 	return nil
 }
 
-// generateAuthStubWithDomains creates model/auth.go with shared auth types.
-// JWT middleware is provided by github.com/geul-org/fullend/pkg/middleware.
-func generateAuthStubWithDomains(intDir string, modulePath string) error {
+// generateAuthStubWithDomains creates model/auth.go with CurrentUser type and Authorizer interface.
+// CurrentUser fields are derived from fullend.yaml claims config if available.
+func generateAuthStubWithDomains(intDir string, modulePath string, claims map[string]string) error {
 	modelDir := filepath.Join(intDir, "model")
 	if err := os.MkdirAll(modelDir, 0755); err != nil {
 		return err
 	}
 
-	modelAuth := `package model
+	var b strings.Builder
+	b.WriteString("package model\n\n")
 
-import "github.com/geul-org/fullend/pkg/middleware"
+	if claims != nil && len(claims) > 0 {
+		// Generate CurrentUser from claims config — no imports needed.
+		b.WriteString("// CurrentUser is the authenticated user extracted by JWT middleware.\n")
+		b.WriteString("type CurrentUser struct {\n")
+		// Maintain deterministic field order.
+		var fields []string
+		for field := range claims {
+			fields = append(fields, field)
+		}
+		sort.Strings(fields)
+		for _, field := range fields {
+			goType := inferClaimGoType(field)
+			b.WriteString(fmt.Sprintf("\t%s %s\n", field, goType))
+		}
+		b.WriteString("}\n\n")
+	} else {
+		// Fallback: alias to pkg/middleware.CurrentUser.
+		b.WriteString("import \"github.com/geul-org/fullend/pkg/middleware\"\n\n")
+		b.WriteString("// CurrentUser is the authenticated user extracted by JWT middleware.\n")
+		b.WriteString("type CurrentUser = middleware.CurrentUser\n\n")
+	}
 
-// CurrentUser is the authenticated user extracted by JWT middleware.
-type CurrentUser = middleware.CurrentUser
+	b.WriteString("// Authorizer checks permissions.\n")
+	b.WriteString("type Authorizer interface {\n")
+	b.WriteString("\tCheck(user *CurrentUser, action, resource string, input interface{}) error\n")
+	b.WriteString("}\n")
 
-// Authorizer checks permissions.
-type Authorizer interface {
-	Check(user *CurrentUser, action, resource string, id interface{}) (bool, error)
+	return os.WriteFile(filepath.Join(modelDir, "auth.go"), []byte(b.String()), 0644)
 }
-`
-	return os.WriteFile(filepath.Join(modelDir, "auth.go"), []byte(modelAuth), 0644)
+
+// inferClaimGoType infers Go type from claim field name convention.
+func inferClaimGoType(fieldName string) string {
+	lower := strings.ToLower(fieldName)
+	if strings.HasSuffix(lower, "id") {
+		return "int64"
+	}
+	return "string"
 }
 
 // generateServerStructWithDomains creates per-domain handler.go files and central server.go.

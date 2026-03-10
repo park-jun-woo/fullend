@@ -163,8 +163,12 @@ func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTabl
 	dtoTypes := loadDTOTypes(modelDir)
 
 	var middleware []string
+	var claims map[string]string
 	if projConfig != nil {
 		middleware = projConfig.Backend.Middleware
+		if projConfig.Backend.Auth != nil {
+			claims = projConfig.Backend.Auth.Claims
+		}
 	}
 
 	// Parse @archived tags from DDL files.
@@ -182,6 +186,7 @@ func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTabl
 		DTOTypes:         dtoTypes,
 		Middleware:       middleware,
 		Archived:         archived,
+		Claims:           claims,
 	}
 
 	cerrs := crosscheck.Run(input)
@@ -281,10 +286,21 @@ func validateSSaC(root, serviceDir string, st *ssacvalidator.SymbolTable) (repor
 
 	verrs := ssacvalidator.ValidateWithSymbols(funcs, st)
 	if len(verrs) > 0 {
-		step.Status = reporter.Fail
+		hasError := false
 		for _, ve := range verrs {
-			step.Errors = append(step.Errors, fmt.Sprintf("%s:%s seq[%d] %s — %s",
-				ve.FileName, ve.FuncName, ve.SeqIndex, ve.Tag, ve.Message))
+			prefix := ""
+			if ve.Level == "WARNING" {
+				prefix = "[WARN] "
+			} else {
+				hasError = true
+			}
+			step.Errors = append(step.Errors, fmt.Sprintf("%s%s:%s seq[%d] %s — %s",
+				prefix, ve.FileName, ve.FuncName, ve.SeqIndex, ve.Tag, ve.Message))
+		}
+		if hasError {
+			step.Status = reporter.Fail
+		} else {
+			step.Status = reporter.Pass
 		}
 	} else {
 		step.Status = reporter.Pass

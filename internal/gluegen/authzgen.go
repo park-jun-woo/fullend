@@ -66,6 +66,11 @@ import (
 	b.WriteString(fmt.Sprintf("//go:embed %s\n", regoFileName))
 	b.WriteString(`var policyRego string
 
+// Input holds the resource identifier for authorization checks.
+type Input struct {
+	ID interface{}
+}
+
 // OPAAuthorizer implements model.Authorizer using OPA Rego.
 type OPAAuthorizer struct {
 	query rego.PreparedEvalQuery
@@ -84,28 +89,36 @@ func New(db *sql.DB) (*OPAAuthorizer, error) {
 	return &OPAAuthorizer{query: query, db: db}, nil
 }
 
-// Check evaluates the OPA policy.
-func (a *OPAAuthorizer) Check(user *model.CurrentUser, action, resource string, id interface{}) (bool, error) {
-	input := map[string]interface{}{
-		"user":        map[string]interface{}{"id": user.UserID, "role": user.Role},
+// Check evaluates the OPA policy. Returns error if denied or evaluation fails.
+func (a *OPAAuthorizer) Check(user *model.CurrentUser, action, resource string, input interface{}) error {
+	var resourceID interface{}
+	if in, ok := input.(Input); ok {
+		resourceID = in.ID
+	}
+
+	opaInput := map[string]interface{}{
+		"user":        map[string]interface{}{"id": user.ID, "role": user.Role},
 		"action":      action,
 		"resource":    resource,
-		"resource_id": id,
+		"resource_id": resourceID,
 	}
 
-	if ownerID, err := a.lookupOwner(action, resource, id); err == nil {
-		input["resource_owner"] = ownerID
+	if ownerID, err := a.lookupOwner(action, resource, resourceID); err == nil {
+		opaInput["resource_owner"] = ownerID
 	}
 
-	results, err := a.query.Eval(context.Background(), rego.EvalInput(input))
+	results, err := a.query.Eval(context.Background(), rego.EvalInput(opaInput))
 	if err != nil {
-		return false, fmt.Errorf("OPA eval failed: %w", err)
+		return fmt.Errorf("OPA eval failed: %w", err)
 	}
 	if len(results) == 0 {
-		return false, nil
+		return fmt.Errorf("forbidden")
 	}
 	allowed, ok := results[0].Expressions[0].Value.(bool)
-	return ok && allowed, nil
+	if !ok || !allowed {
+		return fmt.Errorf("forbidden")
+	}
+	return nil
 }
 
 `)

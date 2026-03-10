@@ -10,6 +10,12 @@ backend:
   module: github.com/geul-org/dummy-lesson
   middleware:
     - bearerAuth
+  auth:
+    secret_env: JWT_SECRET
+    claims:
+      ID: user_id
+      Email: email
+      Role: role
 
 frontend:
   lang: typescript

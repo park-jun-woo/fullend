@@ -117,7 +117,7 @@ fullend provides built-in gin middleware, automatically wired based on OpenAPI `
 
 | Middleware | Trigger | Description |
 |---|---|---|
-| `JWT(secret)` | `securitySchemes.bearerAuth` (type: http, scheme: bearer) | Extracts JWT → sets `CurrentUser` in gin context |
+| `BearerAuth(secret)` | `securitySchemes.bearerAuth` (type: http, scheme: bearer) | Extracts JWT → sets `CurrentUser` in gin context |
 
 Route grouping is determined by OpenAPI `security` field on each operation:
 - Operations with `security: [{bearerAuth: []}]` → auth group (middleware applied)

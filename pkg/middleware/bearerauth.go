@@ -10,9 +10,9 @@ import (
 
 // CurrentUser represents the authenticated user extracted from JWT.
 type CurrentUser struct {
-	UserID int64
-	Email  string
-	Role   string
+	ID    int64
+	Email string
+	Role  string
 }
 
 // BearerAuth returns a gin middleware that extracts the current user from the Authorization header.
@@ -34,9 +34,9 @@ func BearerAuth(secret string) gin.HandlerFunc {
 			return
 		}
 		c.Set("currentUser", &CurrentUser{
-			UserID: out.UserID,
-			Email:  out.Email,
-			Role:   out.Role,
+			ID:    out.UserID,
+			Email: out.Email,
+			Role:  out.Role,
 		})
 		c.Next()
 	}

@@ -315,8 +315,20 @@ func generateMethodFromIface(b *strings.Builder, implName, modelName string, m i
 	}
 
 	// Determine method pattern from return signature and seq type.
-	isList := isListMethod(m.Name)
+	// A List method with QueryOpts uses dynamic SQL with pagination/sort/filter.
+	// A List method without QueryOpts is a simple query returning a slice.
+	hasQueryOpts := false
+	for _, p := range m.Params {
+		if p.Type == "QueryOpts" {
+			hasQueryOpts = true
+			break
+		}
+	}
+	isList := isListMethod(m.Name) && hasQueryOpts
 	isFind := strings.HasPrefix(m.Name, "Find")
+
+	// Check if return type is a slice (e.g. "[]Lesson" in "([]Lesson, error)").
+	isSliceReturn := strings.Contains(m.ReturnSig, "[]")
 
 	switch {
 	case isList:
@@ -375,6 +387,25 @@ func generateMethodFromIface(b *strings.Builder, implName, modelName string, m i
 			b.WriteString("\t}\n")
 		}
 		b.WriteString("\treturn items, total, nil\n")
+		b.WriteString("}\n")
+
+	case isSliceReturn:
+		// Multi-row query without pagination: ([]Type, error)
+		b.WriteString(fmt.Sprintf("func (m *%s) %s(%s) %s {\n", implName, m.Name, m.ParamSig, m.ReturnSig))
+		b.WriteString(fmt.Sprintf("\trows, err := m.db.QueryContext(context.Background(),\n\t\t%q%s)\n", sqlStr, callArgs))
+		b.WriteString("\tif err != nil {\n")
+		b.WriteString("\t\treturn nil, err\n")
+		b.WriteString("\t}\n")
+		b.WriteString("\tdefer rows.Close()\n")
+		b.WriteString(fmt.Sprintf("\tvar items []%s\n", modelName))
+		b.WriteString("\tfor rows.Next() {\n")
+		b.WriteString(fmt.Sprintf("\t\tv, err := scan%s(rows)\n", modelName))
+		b.WriteString("\t\tif err != nil {\n")
+		b.WriteString("\t\t\treturn nil, err\n")
+		b.WriteString("\t\t}\n")
+		b.WriteString("\t\titems = append(items, *v)\n")
+		b.WriteString("\t}\n")
+		b.WriteString("\treturn items, nil\n")
 		b.WriteString("}\n")
 
 	case isFind || seqType == "get":
@@ -443,6 +474,10 @@ func collectSeqTypes(funcs []ssacparser.ServiceFunc) map[string]map[string]strin
 
 	for _, fn := range funcs {
 		for _, seq := range fn.Sequences {
+			// Skip @call — package-level funcs are not models.
+			if seq.Type == "call" {
+				continue
+			}
 			if seq.Model == "" {
 				continue
 			}

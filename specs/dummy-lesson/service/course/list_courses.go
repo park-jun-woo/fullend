@@ -1,6 +1,6 @@
 package service
 
-// @get []Course courses = Course.List()
+// @get []Course courses = Course.List(query)
 // @response {
 //   courses: courses
 // }

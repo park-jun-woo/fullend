@@ -1,6 +1,6 @@
 package service
 
-// @get []Review reviews = Review.ListByCourse(request.CourseID)
+// @get []Review reviews = Review.ListByCourse(request.CourseID, query)
 // @response {
 //   reviews: reviews
 // }

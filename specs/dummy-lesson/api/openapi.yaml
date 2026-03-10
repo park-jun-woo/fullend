@@ -355,7 +355,7 @@ paths:
         default: created_at
         direction: desc
       x-filter:
-        allowed: [status, method]
+        allowed: [status, payment_method]
       responses:
         "200":
           description: 결제 내역
@@ -672,7 +672,7 @@ components:
           format: int64
         Amount:
           type: integer
-        Method:
+        PaymentMethod:
           type: string
         Status:
           type: string

@@ -1,6 +1,6 @@
 package service
 
-// @get []Enrollment enrollments = Enrollment.ListByUser(currentUser.ID)
+// @get []Enrollment enrollments = Enrollment.ListByUser(currentUser.ID, query)
 // @response {
 //   enrollments: enrollments
 // }
