@@ -1,22 +1,8 @@
 package service
 
-import "net/http"
-
-// @sequence authorize
-// @action create
-// @resource course
-// @id new
-//
-// @sequence post
-// @model Course.Create
-// @param UserID currentUser
-// @param Title request
-// @param Description request
-// @param Category request
-// @param Level request
-// @param Price request
-// @result course Course
-//
-// @sequence response json
-// @var course
-func CreateCourse(w http.ResponseWriter, r *http.Request) {}
+// @auth "create" "course" {} "권한 없음"
+// @post Course course = Course.Create(currentUser.ID, request.Title, request.Description, request.Category, request.Level, request.Price)
+// @response {
+//   course: course
+// }
+func CreateCourse() {}

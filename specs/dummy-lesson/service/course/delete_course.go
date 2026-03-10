@@ -1,26 +1,10 @@
 package service
 
-import "net/http"
-
-// @sequence authorize
-// @action delete
-// @resource course
-// @id CourseID
-//
-// @sequence get
-// @model Course.FindByID
-// @param CourseID request
-// @result course Course
-//
-// @sequence guard nil course
-// @message "강의를 찾을 수 없습니다"
-//
-// @sequence guard state course
-// @param course.Published
-//
-// @sequence delete
-// @model Course.Delete
-// @param CourseID request
-//
-// @sequence response json
-func DeleteCourse(w http.ResponseWriter, r *http.Request) {}
+// @auth "delete" "course" {id: request.CourseID} "권한 없음"
+// @get Course course = Course.FindByID(request.CourseID)
+// @empty course "강의를 찾을 수 없습니다"
+// @state course {status: course.Published} "DeleteCourse" "삭제할 수 없는 상태입니다"
+// @delete Course.Delete(request.CourseID)
+// @response {
+// }
+func DeleteCourse() {}

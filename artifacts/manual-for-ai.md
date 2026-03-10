@@ -71,107 +71,147 @@ deploy:
 | OpenAPI `securitySchemes` keys must exist in `backend.middleware` | ERROR |
 | Endpoint `security` references must exist in `backend.middleware` | ERROR |
 
-## SSaC — Service Logic Declarations
+## SSaC — Service Logic Declarations (v2)
 
-### Syntax
+### Syntax — One Line Per Sequence
+
+10 sequence types. Each is a single comment line (except `@response` which is a multi-line block).
+
+#### CRUD — Model Operations
 
 ```go
-// @sequence <type>        — block start
-// @model <Model.Method>   — resource model.method
-// @param <Name> <source> [-> column]  — source: request | currentUser | varName | "literal". -> column: explicit DDL column mapping
-// @result <var> <Type>    — result binding
-// @message "msg" [STATUS] — custom error message (optional, STATUS default 500)
-// @var <name>             — variable to return in response
-// @action @resource @id   — authorize only (all 3 required)
-// @func <pkg.funcName>    — call only (package-level function reference)
+// @get Type var = Model.Method(args...)        — Query (result required, 0-arg allowed)
+// @post Type var = Model.Method(args...)       — Create (result required, args required)
+// @put Model.Method(args...)                   — Update (no result, args required)
+// @delete Model.Method(args...)                — Delete (no result, 0-arg = WARNING)
+```
+
+- `@get`: 0개 arg 허용 (전체 조회 `Course.List()` 등). 페이지네이션은 OpenAPI `x-pagination`이 담당.
+- `@delete`: 0개 arg 시 WARNING ("전체 삭제 의도가 맞는지 확인"). `@delete!`로 WARNING 억제 가능.
+
+#### Args Format — Dot Notation
+
+`source.Field` or `"literal"`:
+- `request.CourseID` — from HTTP request (reserved source)
+- `course.InstructorID` — from previous result variable
+- `currentUser.ID` — from auth context (reserved source)
+- `config.APIKey` — from environment config (reserved source)
+- `"cancelled"` — string literal
+
+Reserved sources: `request`, `currentUser`, `config` — cannot be used as result variable names.
+
+#### Guards
+
+```go
+// @empty target "message"                      — Fail if nil/zero (404)
+// @exists target "message"                     — Fail if not nil/zero (409)
+```
+
+Target: variable (`course`) or variable.field (`course.InstructorID`)
+
+#### State Transition
+
+```go
+// @state diagramID {key: var.Field, ...} "transition" "message"
+```
+
+#### Auth — OPA Permission Check
+
+```go
+// @auth "action" "resource" {key: var.Field, ...} "message"
+```
+
+#### Call — External Function
+
+```go
+// @call Type var = package.Func(args...)       — With result
+// @call package.Func(args...)                  — Without result (guard-style error)
+```
+
+#### Response — Field Mapping Block
+
+```go
+// @response {
+//   fieldName: variable,
+//   fieldName: variable.Member,
+//   fieldName: "literal"
+// }
+```
+
+### WARNING Suppression (`!` Suffix)
+
+모든 시퀀스 타입에 `!` 접미사를 붙이면 해당 시퀀스의 WARNING을 억제한다. ERROR는 영향 없음.
+
+```go
+// @delete! Room.DeleteAll()              — 0-arg WARNING 억제
+// @response! { room: room }              — stale 데이터 WARNING 억제
 ```
 
 ### 10 Sequence Types
 
-| Type | Purpose | Required Tags |
-|---|---|---|
-| authorize | Permission check | @action, @resource, @id |
-| get | Single/list query | @model, @result |
-| guard nil | Return error if nil | target variable name |
-| guard exists | Return error if not nil | target variable name |
-| guard state | Check state transition validity | target stateDiagramID, @param entity.Field |
-| post | Create | @model, @result |
-| put | Update | @model |
-| delete | Delete | @model |
-| call | External function call | @func |
-| response | JSON response return | (none, @var optional) |
+| Type | Purpose | Format | Args |
+|---|---|---|---|
+| `@get` | Single/list query | `Type var = Model.Method(args...)` | 0개 허용 |
+| `@post` | Create | `Type var = Model.Method(args...)` | 필수 |
+| `@put` | Update | `Model.Method(args...)` | 필수 |
+| `@delete` | Delete | `Model.Method(args...)` | 0개 시 WARNING |
+| `@empty` | Guard: fail if nil/zero | `target "message"` | — |
+| `@exists` | Guard: fail if not nil/zero | `target "message"` | — |
+| `@state` | State transition check | `diagramID {inputs} "transition" "message"` | — |
+| `@auth` | Permission check | `"action" "resource" {inputs} "message"` | — |
+| `@call` | External function call | `[Type var =] package.Func(args...)` | — |
+| `@response` | JSON response return | `{ field: var, ... }` | — |
 
-### @func — Package-Level Function Call
+### @call — Package-Level Function Call
 
-`@func` references a package-level function with a standardized signature: `func(In) (Out, error)`.
+`@call` references a package-level function with a standardized signature: `func(In) (Out, error)`.
 
 ```go
 // Value form — captures result
-// @sequence call
-// @func auth.hashPassword
-// @param Password request
-// @result hashedPassword string
+// @call string hashedPassword = auth.HashPassword(request.Password)
 
-// Guard form — no result, error = rejection
-// @sequence call
-// @func auth.verifyPassword
-// @param user.PasswordHash
-// @param Password request
-// @message "비밀번호가 일치하지 않습니다" 401
+// Guard form — no result, error = rejection (401)
+// @call auth.VerifyPassword(user.PasswordHash, request.Password)
 ```
 
-`@message` on a call sequence:
-- With `@message`: error → responds with that message and status code (guard form)
-- Without `@message`: error → responds with `"funcName 호출 실패" 500` (default)
+- With result: error → responds with 500 (value form)
+- Without result: error → responds with 401 (guard form)
 
 ### Example: All Sequence Types
 
 ```go
-// @sequence authorize
-// @action update
-// @resource course
-// @id CourseID
-//
-// @sequence get
-// @model Course.FindByID
-// @param CourseID request
-// @result course Course
-//
-// @sequence guard nil course
-// @message "Course not found"
-//
-// @sequence call
-// @func auth.verifyPassword
-// @param user.PasswordHash
-// @param Password request
-// @message "Wrong password" 401
-//
-// @sequence post
-// @model Enrollment.Create
-// @param CourseID request
-// @param UserID currentUser
-// @result enrollment Enrollment
-//
-// @sequence put
-// @model Course.IncrementEnrollCount
-// @param CourseID request
-//
-// @sequence response json
-// @var enrollment
-func EnrollCourse(w http.ResponseWriter, r *http.Request) {}
+// @auth "update" "course" {id: request.CourseID} "권한 없음"
+// @get Course course = Course.FindByID(request.CourseID)
+// @empty course "Course not found"
+// @call auth.VerifyPassword(user.PasswordHash, request.Password)
+// @post Enrollment enrollment = Enrollment.Create(request.CourseID, currentUser.ID)
+// @put Course.IncrementEnrollCount(request.CourseID)
+// @response {
+//   enrollment: enrollment
+// }
+func EnrollCourse() {}
 ```
 
-### @param Source Rules
+### Full Example (from SSaC manual)
 
-| Source | Meaning | Codegen |
-|---|---|---|
-| `request` | HTTP request body/query | `r.FormValue("Name")` |
-| `currentUser` | Authenticated user info | `currentUser.Name` |
-| variable name | @result variable from previous sequence | Direct reference |
-| `var.Field` | Field of a previous @result variable | `var.Field` |
-| `"literal"` | Hardcoded string | Used as-is |
+```go
+package service
 
-`-> column` mapping: `@param PaymentMethod request -> method` — explicit DDL column mapping instead of auto snake_case conversion.
+import "myapp/auth"
+
+// @auth "cancel" "reservation" {id: request.ReservationID} "권한 없음"
+// @get Reservation reservation = Reservation.FindByID(request.ReservationID)
+// @empty reservation "예약을 찾을 수 없습니다"
+// @state reservation {status: reservation.Status} "cancel" "취소할 수 없습니다"
+// @call Refund refund = billing.CalculateRefund(reservation.ID, reservation.StartAt, reservation.EndAt)
+// @put Reservation.UpdateStatus(request.ReservationID, "cancelled")
+// @get Reservation reservation = Reservation.FindByID(request.ReservationID)
+// @response {
+//   reservation: reservation,
+//   refund: refund
+// }
+func CancelReservation() {}
+```
 
 ### Function Name = operationId
 
@@ -279,20 +319,17 @@ fullend ships with built-in default implementations in `pkg/`:
 
 ### SSaC Usage
 
-SSaC에서 `@func pkg.funcName` 으로 참조:
+SSaC에서 `@call package.Func(args...)` 으로 참조:
 
 ```go
-// @sequence call
-// @func auth.hashPassword
-// @param Password request
-// @result hashedPassword string
+// @call string hashedPassword = auth.HashPassword(request.Password)
 ```
 
 생성 코드:
 ```go
 out, err := auth.HashPassword(auth.HashPasswordRequest{Password: password})
 if err != nil {
-    c.JSON(http.StatusInternalServerError, gin.H{"error": "hashPassword 호출 실패"})
+    c.JSON(http.StatusInternalServerError, gin.H{"error": "HashPassword 호출 실패"})
     return
 }
 hashedPassword := out.HashedPassword
@@ -551,6 +588,7 @@ Singularization rules: `ies`->`y`, `sses`->`ss`, `xes`->`x`, otherwise remove tr
 ## model/*.go Rules
 
 - Structs with `// @dto` comment -> skip DDL table matching (for pure DTOs like Token, Refund)
+- `CurrentUser` struct required in `model/` when SSaC specs use `currentUser` source. Fields must match JWT middleware output (e.g., `ID int64`, `Email string`, `Role string`).
 
 ## Gherkin Scenario — Cross-Endpoint Test Declarations
 
@@ -623,9 +661,9 @@ Feature: Instructor creates and publishes a course
 | stateDiagram transition event | SSaC funcName / OpenAPI operationId | Identical (PascalCase) |
 | SSaC function name | OpenAPI operationId | Identical (PascalCase) |
 | STML data-fetch/action | OpenAPI operationId | Identical (PascalCase) |
-| SSaC @model Model | DDL table name | PascalCase -> snake_case + plural (`Course` -> `courses`) |
-| SSaC @model .Method | sqlc query `-- name:` | Identical (`FindByID` = `FindByID`) |
-| SSaC @func pkg.name | Func spec @func name | Identical (`hashPassword` = `hashPassword`) |
+| SSaC Model.Method (model) | DDL table name | PascalCase -> snake_case + plural (`Course` -> `courses`) |
+| SSaC Model.Method (method) | sqlc query `-- name:` | Identical (`FindByID` = `FindByID`) |
+| SSaC @call pkg.Func | Func spec @func name | Identical (`HashPassword` = `HashPassword`) |
 | x-sort/filter allowed | DDL column name | Identical snake_case |
 | x-include allowed | DDL FK relation | `FKColumn:RefTable.RefColumn` -> DDL FK mapping |
 
@@ -640,29 +678,31 @@ After individual tools (ssac validate, stml validate) run their own checks, full
 | x-filter <-> DDL | Column exists in table | ERROR |
 | x-include <-> DDL FK | Tables connected by FK relation | WARNING |
 | SSaC @result <-> DDL | Result type has corresponding table | WARNING |
-| SSaC @param <-> DDL | Parameter has corresponding column | WARNING |
+| SSaC args <-> DDL | Arg field has corresponding column | WARNING |
 | SSaC funcName -> operationId | SSaC function has corresponding operationId | ERROR |
 | operationId -> SSaC funcName | operationId has corresponding SSaC function | WARNING |
 | States transition -> SSaC | Transition event has corresponding SSaC function | ERROR |
 | States transition -> OpenAPI | Transition event has corresponding operationId | ERROR |
-| SSaC guard state -> States | Referenced stateDiagram exists | ERROR |
-| States transition -> SSaC guard state | Function with transition has guard state | WARNING |
-| guard state field -> DDL | State field exists as DDL column | ERROR |
-| Policy <-> SSaC authorize | SSaC authorize (action, resource) -> Rego allow rule exists | WARNING |
-| Policy <-> SSaC authorize | Rego allow (action, resource) -> SSaC authorize exists | WARNING |
+| SSaC @state -> States | Referenced stateDiagram exists | ERROR |
+| States transition -> SSaC @state | Function with transition has @state sequence | WARNING |
+| @state field -> DDL | State field exists as DDL column | ERROR |
+| Policy <-> SSaC @auth | SSaC @auth (action, resource) -> Rego allow rule exists | WARNING |
+| Policy <-> SSaC @auth | Rego allow (action, resource) -> SSaC @auth exists | WARNING |
 | Policy @ownership -> DDL | @ownership table.column exists in DDL | ERROR |
 | Policy @ownership via -> DDL | via join table.fk exists in DDL | ERROR |
-| Policy <-> States | Transition event with authorize -> Rego allow rule exists | WARNING |
+| Policy <-> States | Transition event with @auth -> Rego allow rule exists | WARNING |
 | Scenario -> OpenAPI operationId | Scenario step operationId exists in OpenAPI | ERROR |
 | Scenario -> OpenAPI method | Scenario step METHOD matches OpenAPI method | ERROR |
 | Scenario -> OpenAPI fields | Scenario JSON fields exist in request schema | ERROR |
 | Scenario -> States | Scenario step order follows state transitions | WARNING |
-| Func -> SSaC @func | @func reference has matching implementation | ERROR |
+| Func -> SSaC @call | @call reference has matching implementation | ERROR |
 | Func body | Function body is not a TODO stub | WARNING |
-| Func param count | @param count = Request field count | ERROR |
-| Func param type | i-th @param type (DDL/OpenAPI) = i-th Request field type | ERROR |
-| Func result/response | @result exists ↔ Response fields exist | ERROR/WARNING |
-| Func source var | @param source variable defined in prior @result | WARNING |
+| Func arg count | @call arg count = Request field count | ERROR |
+| Func arg type | i-th @call arg type (DDL/OpenAPI) = i-th Request field type | ERROR |
+| Func result/response | @call result exists ↔ Response fields exist | ERROR/WARNING |
+| Func source var | @call arg source variable defined in prior @result | WARNING |
+| DDL table -> SSaC | DDL table referenced by SSaC (@model or @result) | WARNING |
+| DDL column -> OpenAPI | DDL column exists in OpenAPI schema properties | WARNING |
 
 ## Mermaid stateDiagram — State Transition Declarations
 
@@ -692,12 +732,12 @@ stateDiagram-v2
 ### Usage in SSaC
 
 ```go
-// @sequence guard state course
-// @param course.Published
+// @state course {status: course.Status} "PublishCourse" "상태 전이 불가"
 ```
 
 - `course`: stateDiagram ID (`states/course.md`)
-- `course.Published`: State field from previous @result variable
+- `{status: course.Status}`: Input mapping (state field from previous @result variable)
+- `"PublishCourse"`: Transition event name
 - Function name is used as transition event (PublishCourse function -> PublishCourse transition)
 
 ### Codegen Output

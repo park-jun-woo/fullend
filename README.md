@@ -84,7 +84,7 @@ SSOT Status:
 
 ## Default Functions (pkg/)
 
-fullend ships with built-in function implementations that can be used via SSaC `@func`:
+fullend ships with built-in function implementations that can be used via SSaC `@call`:
 
 | Package | Function | Description |
 |---|---|---|
@@ -131,16 +131,16 @@ Individual tools (SSaC, STML) validate within their own layer. fullend catches m
 - **OpenAPI x-sort/x-filter ↔ DDL** — referenced columns exist in tables
 - **OpenAPI x-include ↔ DDL** — referenced resources map to tables
 - **SSaC @result ↔ DDL** — result types match DDL-derived models
-- **SSaC @param ↔ DDL** — parameter names match table columns
+- **SSaC arg ↔ DDL** — arg field names match table columns
 - **States ↔ SSaC** — transition events match SSaC functions, guard state references valid diagrams
 - **States ↔ DDL** — state fields map to existing DDL columns
 - **States ↔ OpenAPI** — transition events match operationIds
-- **Policy ↔ SSaC** — authorize (action, resource) pairs match Rego allow rules
+- **Policy ↔ SSaC** — @auth (action, resource) pairs match Rego allow rules
 - **Policy ↔ DDL** — @ownership table/column references exist in DDL
-- **Policy ↔ States** — state transition events with authorize have matching Rego rules
+- **Policy ↔ States** — state transition events with @auth have matching Rego rules
 - **Scenario ↔ OpenAPI** — operationIds, methods, and request fields match
 - **Scenario ↔ States** — step order follows state transition rules
-- **Func ↔ SSaC** — @func references have matching implementations, param count matches Request fields, positional types match (via DDL/OpenAPI), result/response consistency
+- **Func ↔ SSaC** — @call references have matching implementations, arg count matches Request fields, positional types match (via DDL/OpenAPI), result/response consistency
 - **STML ↔ SSaC** (indirect) — both reference the same OpenAPI operationIds
 
 ## Runtime Testing

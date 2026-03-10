@@ -1,26 +1,10 @@
 package service
 
-import "net/http"
-
-// @sequence authorize
-// @action publish
-// @resource course
-// @id CourseID
-//
-// @sequence get
-// @model Course.FindByID
-// @param CourseID request
-// @result course Course
-//
-// @sequence guard nil course
-// @message "강의를 찾을 수 없습니다"
-//
-// @sequence guard state course
-// @param course.Published
-//
-// @sequence put
-// @model Course.Publish
-// @param CourseID request
-//
-// @sequence response json
-func PublishCourse(w http.ResponseWriter, r *http.Request) {}
+// @auth "publish" "course" {id: request.CourseID} "권한 없음"
+// @get Course course = Course.FindByID(request.CourseID)
+// @empty course "강의를 찾을 수 없습니다"
+// @state course {status: course.Published} "PublishCourse" "출판할 수 없는 상태입니다"
+// @put Course.Publish(request.CourseID)
+// @response {
+// }
+func PublishCourse() {}

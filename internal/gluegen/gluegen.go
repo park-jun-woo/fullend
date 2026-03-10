@@ -113,14 +113,16 @@ func collectModels(funcs []ssacparser.ServiceFunc) []string {
 	return result
 }
 
-// collectFuncs extracts @func references that are NOT package-level (no Package set).
-// Package-level funcs (seq.Package != "") are called directly, not via Handler fields.
+// collectFuncs extracts @call references without a package prefix.
+// Package-level funcs (e.g. "auth.VerifyPassword") are called directly via import, not via Handler fields.
 func collectFuncs(funcs []ssacparser.ServiceFunc) []string {
 	seen := make(map[string]bool)
 	for _, fn := range funcs {
 		for _, seq := range fn.Sequences {
-			if seq.Func != "" && seq.Package == "" {
-				seen[seq.Func] = true
+			if seq.Type == "call" && seq.Model != "" {
+				if !strings.Contains(seq.Model, ".") {
+					seen[seq.Model] = true
+				}
 			}
 		}
 	}
@@ -449,7 +451,7 @@ func collectModelsForDomain(funcs []ssacparser.ServiceFunc, domain string) []str
 	return result
 }
 
-// collectFuncsForDomain extracts @func references (without Package) for a specific domain.
+// collectFuncsForDomain extracts @call references (without package prefix) for a specific domain.
 func collectFuncsForDomain(funcs []ssacparser.ServiceFunc, domain string) []string {
 	seen := make(map[string]bool)
 	for _, fn := range funcs {
@@ -457,8 +459,10 @@ func collectFuncsForDomain(funcs []ssacparser.ServiceFunc, domain string) []stri
 			continue
 		}
 		for _, seq := range fn.Sequences {
-			if seq.Func != "" && seq.Package == "" {
-				seen[seq.Func] = true
+			if seq.Type == "call" && seq.Model != "" {
+				if !strings.Contains(seq.Model, ".") {
+					seen[seq.Model] = true
+				}
 			}
 		}
 	}
@@ -477,12 +481,12 @@ func domainNeedsAuth(funcs []ssacparser.ServiceFunc, domain string) bool {
 			continue
 		}
 		for _, seq := range fn.Sequences {
-			if seq.Type == "authorize" {
+			if seq.Type == "auth" {
 				return true
 			}
-			// Check if any param references currentUser.
-			for _, p := range seq.Params {
-				if p.Source == "currentUser" {
+			// Check if any arg references currentUser.
+			for _, arg := range seq.Args {
+				if arg.Source == "currentUser" {
 					return true
 				}
 			}

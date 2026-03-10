@@ -1,32 +1,12 @@
 package service
 
-import (
-	"net/http"
+import _ "github.com/geul-org/fullend/pkg/auth"
 
-	_ "github.com/geul-org/fullend/pkg/auth"
-)
-
-// @sequence get
-// @model User.FindByEmail
-// @param Email request
-// @result user User
-//
-// @sequence guard nil user
-// @message "사용자를 찾을 수 없습니다"
-//
-// @sequence call
-// @func auth.verifyPassword
-// @param user.PasswordHash
-// @param Password request
-// @message "비밀번호가 일치하지 않습니다"
-//
-// @sequence call
-// @func auth.issueToken
-// @param user.ID -> UserID
-// @param user.Email -> Email
-// @param user.Role -> Role
-// @result token IssueTokenResponse.AccessToken
-//
-// @sequence response json
-// @var token
-func Login(w http.ResponseWriter, r *http.Request) {}
+// @get User user = User.FindByEmail(request.Email)
+// @empty user "사용자를 찾을 수 없습니다"
+// @call auth.VerifyPassword(user.PasswordHash, request.Password)
+// @call IssueTokenResponse token = auth.IssueToken(user.ID, user.Email, user.Role)
+// @response {
+//   token: token.AccessToken
+// }
+func Login() {}

@@ -19,17 +19,16 @@ func TestCheckFuncs_ParamCount(t *testing.T) {
 		HasBody: true,
 	}}
 
-	// 3 params but 2 request fields → ERROR.
+	// 3 args but 2 request fields → ERROR.
 	sfs := []ssacparser.ServiceFunc{{
 		Name: "Login",
 		Sequences: []ssacparser.Sequence{{
-			Type:    "call",
-			Func:    "verifyPassword",
-			Package: "auth",
-			Params: []ssacparser.Param{
-				{Name: "user.PasswordHash", Source: "user"},
-				{Name: "Password", Source: "request"},
-				{Name: "Extra", Source: "request"},
+			Type:  "call",
+			Model: "auth.VerifyPassword",
+			Args: []ssacparser.Arg{
+				{Source: "user", Field: "PasswordHash"},
+				{Source: "request", Field: "Password"},
+				{Source: "request", Field: "Extra"},
 			},
 		}},
 	}}
@@ -60,12 +59,11 @@ func TestCheckFuncs_ParamCountMatch(t *testing.T) {
 	sfs := []ssacparser.ServiceFunc{{
 		Name: "Login",
 		Sequences: []ssacparser.Sequence{{
-			Type:    "call",
-			Func:    "verifyPassword",
-			Package: "auth",
-			Params: []ssacparser.Param{
-				{Name: "user.PasswordHash", Source: "user"},
-				{Name: "Password", Source: "request"},
+			Type:  "call",
+			Model: "auth.VerifyPassword",
+			Args: []ssacparser.Arg{
+				{Source: "user", Field: "PasswordHash"},
+				{Source: "request", Field: "Password"},
 			},
 		}},
 	}}
@@ -90,11 +88,10 @@ func TestCheckFuncs_ResultResponseMismatch(t *testing.T) {
 	sfs := []ssacparser.ServiceFunc{{
 		Name: "Login",
 		Sequences: []ssacparser.Sequence{{
-			Type:    "call",
-			Func:    "issueToken",
-			Package: "auth",
-			Params:  []ssacparser.Param{{Name: "user.ID", Source: "user"}},
-			Result:  &ssacparser.Result{Var: "token", Type: "Token"}, // has result
+			Type:   "call",
+			Model:  "auth.IssueToken",
+			Args:   []ssacparser.Arg{{Source: "user", Field: "ID"}},
+			Result: &ssacparser.Result{Var: "token", Type: "Token"}, // has result
 		}},
 	}}
 
@@ -122,11 +119,10 @@ func TestCheckFuncs_ResponseIgnoredWarning(t *testing.T) {
 	sfs := []ssacparser.ServiceFunc{{
 		Name: "Handler",
 		Sequences: []ssacparser.Sequence{{
-			Type:    "call",
-			Func:    "doSomething",
-			Package: "auth",
-			Params:  nil,
-			Result:  nil, // no result
+			Type:   "call",
+			Model:  "auth.DoSomething",
+			Args:   nil,
+			Result: nil, // no result
 		}},
 	}}
 
@@ -157,12 +153,11 @@ func TestCheckFuncs_SourceVarUndefined(t *testing.T) {
 	sfs := []ssacparser.ServiceFunc{{
 		Name: "Login",
 		Sequences: []ssacparser.Sequence{{
-			Type:    "call",
-			Func:    "verifyPassword",
-			Package: "auth",
-			Params: []ssacparser.Param{
-				{Name: "user.PasswordHash", Source: "user"},
-				{Name: "Password", Source: "request"},
+			Type:  "call",
+			Model: "auth.VerifyPassword",
+			Args: []ssacparser.Arg{
+				{Source: "user", Field: "PasswordHash"},
+				{Source: "request", Field: "Password"},
 			},
 		}},
 	}}
@@ -199,12 +194,11 @@ func TestCheckFuncs_SourceVarDefined(t *testing.T) {
 				Result: &ssacparser.Result{Var: "user", Type: "User"},
 			},
 			{
-				Type:    "call",
-				Func:    "verifyPassword",
-				Package: "auth",
-				Params: []ssacparser.Param{
-					{Name: "user.PasswordHash", Source: "user"},
-					{Name: "Password", Source: "request"},
+				Type:  "call",
+				Model: "auth.VerifyPassword",
+				Args: []ssacparser.Arg{
+					{Source: "user", Field: "PasswordHash"},
+					{Source: "request", Field: "Password"},
 				},
 			},
 		},
@@ -249,12 +243,11 @@ func TestCheckFuncs_PositionalTypeMatch(t *testing.T) {
 				Result: &ssacparser.Result{Var: "user", Type: "User"},
 			},
 			{
-				Type:    "call",
-				Func:    "verifyPassword",
-				Package: "auth",
-				Params: []ssacparser.Param{
-					{Name: "user.PasswordHash", Source: "user"},
-					{Name: "Password", Source: "request"},
+				Type:  "call",
+				Model: "auth.VerifyPassword",
+				Args: []ssacparser.Arg{
+					{Source: "user", Field: "PasswordHash"},
+					{Source: "request", Field: "Password"},
 				},
 			},
 		},
@@ -298,12 +291,11 @@ func TestCheckFuncs_PositionalTypeMismatch(t *testing.T) {
 				Result: &ssacparser.Result{Var: "user", Type: "User"},
 			},
 			{
-				Type:    "call",
-				Func:    "issueToken",
-				Package: "auth",
-				Params: []ssacparser.Param{
-					{Name: "user.ID", Source: "user"},     // DDL: int64
-					{Name: "user.Email", Source: "user"},  // DDL: string
+				Type:  "call",
+				Model: "auth.IssueToken",
+				Args: []ssacparser.Arg{
+					{Source: "user", Field: "ID"},    // DDL: int64
+					{Source: "user", Field: "Email"}, // DDL: string
 				},
 				Result: &ssacparser.Result{Var: "token", Type: "Token"},
 			},

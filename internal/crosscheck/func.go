@@ -43,25 +43,33 @@ func CheckFuncs(
 				definedVars[seq.Result.Var] = seq.Result.Type
 			}
 
-			if seq.Type != "call" || seq.Func == "" {
+			if seq.Type != "call" || seq.Model == "" {
 				continue
 			}
 
-			pkg := seq.Package
-			funcName := seq.Func
-			key := pkg + "." + funcName
-			if pkg == "" {
-				key = funcName
+			// v2: seq.Model = "auth.VerifyPassword" or "billing.CalculateRefund"
+			callParts := strings.SplitN(seq.Model, ".", 2)
+			pkg := ""
+			funcName := seq.Model
+			if len(callParts) == 2 {
+				pkg = callParts[0]
+				funcName = callParts[1]
 			}
-			ctx := fmt.Sprintf("%s seq[%d] @func %s", sf.Name, seqIdx, key)
+			// Func spec uses camelCase name (e.g. "verifyPassword"), v2 Model has PascalCase.
+			camelName := strings.ToLower(funcName[:1]) + funcName[1:]
+			key := pkg + "." + camelName
+			if pkg == "" {
+				key = camelName
+			}
+			ctx := fmt.Sprintf("%s seq[%d] @call %s", sf.Name, seqIdx, key)
 
 			spec, found := specMap[key]
 			if !found {
-				skeleton := generateSkeleton(pkg, funcName, seq)
+				skeleton := generateSkeleton(pkg, camelName, seq)
 				errs = append(errs, CrossError{
 					Rule:       "Func ↔ SSaC",
 					Context:    ctx,
-					Message:    fmt.Sprintf("@func %s — 구현 없음", key),
+					Message:    fmt.Sprintf("@call %s — 구현 없음", key),
 					Level:      "ERROR",
 					Suggestion: skeleton,
 				})
@@ -78,8 +86,8 @@ func CheckFuncs(
 				})
 			}
 
-			// Rule 1: Param count = Request field count.
-			paramCount := countNonLiteralParams(seq.Params)
+			// Rule 1: Arg count = Request field count.
+			paramCount := countNonLiteralArgs(seq.Args)
 			reqFieldCount := len(spec.RequestFields)
 			if paramCount != reqFieldCount {
 				errs = append(errs, CrossError{
@@ -113,19 +121,18 @@ func CheckFuncs(
 			}
 
 			// Rule 4: Source variable defined in prior sequences.
-			for _, p := range seq.Params {
-				if p.Source == "request" || strings.HasPrefix(p.Name, "\"") || p.Source == "" {
+			for _, arg := range seq.Args {
+				if arg.Source == "request" || arg.Source == "currentUser" || arg.Source == "config" || arg.Literal != "" {
 					continue
 				}
-				source := p.Source
-				if strings.Contains(p.Name, ".") {
-					source = strings.SplitN(p.Name, ".", 2)[0]
+				if arg.Source == "" {
+					continue
 				}
-				if _, ok := definedVars[source]; !ok {
+				if _, ok := definedVars[arg.Source]; !ok {
 					errs = append(errs, CrossError{
 						Rule:    "Func ↔ SSaC",
 						Context: ctx,
-						Message: fmt.Sprintf("@param source %q 미정의", source),
+						Message: fmt.Sprintf("arg source %q 미정의", arg.Source),
 						Level:   "WARNING",
 					})
 				}
@@ -136,11 +143,11 @@ func CheckFuncs(
 	return errs
 }
 
-// countNonLiteralParams counts params excluding string literals.
-func countNonLiteralParams(params []ssacparser.Param) int {
+// countNonLiteralArgs counts args excluding string literals.
+func countNonLiteralArgs(args []ssacparser.Arg) int {
 	count := 0
-	for _, p := range params {
-		if !strings.HasPrefix(p.Name, "\"") {
+	for _, a := range args {
+		if a.Literal == "" {
 			count++
 		}
 	}
@@ -159,22 +166,22 @@ func checkPositionalTypes(
 ) []CrossError {
 	var errs []CrossError
 	fieldIdx := 0
-	for _, p := range seq.Params {
-		if strings.HasPrefix(p.Name, "\"") {
+	for _, arg := range seq.Args {
+		if arg.Literal != "" {
 			continue // skip literals
 		}
 		if fieldIdx >= len(spec.RequestFields) {
 			break
 		}
 
-		paramType := resolveParamType(p, symbolTable, openAPIDoc, funcName, definedVars)
+		paramType := resolveArgType(arg, symbolTable, openAPIDoc, funcName, definedVars)
 		reqFieldType := spec.RequestFields[fieldIdx].Type
 
 		if paramType != "" && !typesCompatible(paramType, reqFieldType) {
 			errs = append(errs, CrossError{
 				Rule:    "Func ↔ SSaC",
 				Context: ctx,
-				Message: fmt.Sprintf("%d번째 param(%s) ≠ Request 필드 %s(%s) 타입 불일치",
+				Message: fmt.Sprintf("%d번째 arg(%s) ≠ Request 필드 %s(%s) 타입 불일치",
 					fieldIdx+1, paramType, spec.RequestFields[fieldIdx].Name, reqFieldType),
 				Level: "ERROR",
 			})
@@ -184,27 +191,23 @@ func checkPositionalTypes(
 	return errs
 }
 
-// resolveParamType resolves the Go type of an SSaC @param from DDL or OpenAPI.
-func resolveParamType(p ssacparser.Param, st *ssacvalidator.SymbolTable, doc *openapi3.T, funcName string, definedVars map[string]string) string {
-	// @param Name request → OpenAPI request schema
-	if p.Source == "request" && doc != nil {
-		return resolveOpenAPIFieldType(doc, funcName, p.Name)
+// resolveArgType resolves the Go type of an SSaC arg from DDL or OpenAPI.
+func resolveArgType(arg ssacparser.Arg, st *ssacvalidator.SymbolTable, doc *openapi3.T, funcName string, definedVars map[string]string) string {
+	// request.Field → OpenAPI request schema
+	if arg.Source == "request" && doc != nil {
+		return resolveOpenAPIFieldType(doc, funcName, arg.Field)
 	}
 
-	// @param variable.Field → DDL column type via SymbolTable
-	if strings.Contains(p.Name, ".") && st != nil {
-		parts := strings.SplitN(p.Name, ".", 2)
-		varName := parts[0]
-		fieldName := parts[1]
-
+	// variable.Field → DDL column type via SymbolTable
+	if arg.Source != "" && arg.Source != "request" && arg.Source != "currentUser" && arg.Source != "config" && st != nil {
 		// Look up the variable's type from definedVars.
-		typeName, ok := definedVars[varName]
+		typeName, ok := definedVars[arg.Source]
 		if !ok {
 			return ""
 		}
 
 		// Look up column type from SymbolTable.
-		return resolveDDLColumnType(st, typeName, fieldName)
+		return resolveDDLColumnType(st, typeName, arg.Field)
 	}
 
 	return ""
@@ -327,17 +330,11 @@ func generateSkeleton(pkg, funcName string, seq ssacparser.Sequence) string {
 	}
 
 	var requestFields []string
-	for _, p := range seq.Params {
-		name := p.Name
-		if strings.HasPrefix(name, "\"") {
+	for _, arg := range seq.Args {
+		if arg.Literal != "" {
 			continue // literal
 		}
-		if p.Source == "request" {
-			requestFields = append(requestFields, fmt.Sprintf("\t%s string", name))
-		} else if strings.Contains(name, ".") {
-			parts := strings.SplitN(name, ".", 2)
-			requestFields = append(requestFields, fmt.Sprintf("\t%s string", parts[1]))
-		}
+		requestFields = append(requestFields, fmt.Sprintf("\t%s string", arg.Field))
 	}
 
 	var responseFields []string

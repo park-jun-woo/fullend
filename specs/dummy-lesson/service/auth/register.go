@@ -1,32 +1,12 @@
 package service
 
-import (
-	"net/http"
+import _ "github.com/geul-org/fullend/pkg/auth"
 
-	_ "github.com/geul-org/fullend/pkg/auth"
-)
-
-// @sequence get
-// @model User.FindByEmail
-// @param Email request
-// @result existing User
-//
-// @sequence guard exists existing
-// @message "이미 가입된 이메일입니다"
-//
-// @sequence call
-// @func auth.hashPassword
-// @param Password request
-// @result hashedPassword HashPasswordResponse.HashedPassword
-//
-// @sequence post
-// @model User.Create
-// @param Email request
-// @param hashedPassword
-// @param Name request
-// @param "student"
-// @result user User
-//
-// @sequence response json
-// @var user
-func Register(w http.ResponseWriter, r *http.Request) {}
+// @get User existing = User.FindByEmail(request.Email)
+// @exists existing "이미 가입된 이메일입니다"
+// @call HashPasswordResponse hashResult = auth.HashPassword(request.Password)
+// @post User user = User.Create(request.Email, hashResult.HashedPassword, request.Name, "student")
+// @response {
+//   user: user
+// }
+func Register() {}

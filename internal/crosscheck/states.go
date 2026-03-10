@@ -59,15 +59,15 @@ func CheckStates(diagrams []*statemachine.StateDiagram, funcs []ssacparser.Servi
 	// 2. SSaC guard state → diagram exists.
 	for _, fn := range funcs {
 		for _, seq := range fn.Sequences {
-			if seq.Type != "guard state" {
+			if seq.Type != "state" {
 				continue
 			}
-			diagramID := seq.Target
+			diagramID := seq.DiagramID
 			if _, ok := diagramByID[diagramID]; !ok {
 				errs = append(errs, CrossError{
 					Rule:       "States ↔ SSaC",
 					Context:    fn.Name,
-					Message:    fmt.Sprintf("guard state references diagram %q which does not exist", diagramID),
+					Message:    fmt.Sprintf("@state references diagram %q which does not exist", diagramID),
 					Level:      "ERROR",
 					Suggestion: fmt.Sprintf("Create states/%s.md with a Mermaid stateDiagram", diagramID),
 				})
@@ -93,7 +93,7 @@ func CheckStates(diagrams []*statemachine.StateDiagram, funcs []ssacparser.Servi
 	guardStateFuncs := make(map[string]bool)
 	for _, fn := range funcs {
 		for _, seq := range fn.Sequences {
-			if seq.Type == "guard state" {
+			if seq.Type == "state" {
 				guardStateFuncs[fn.Name] = true
 			}
 		}
@@ -104,9 +104,9 @@ func CheckStates(diagrams []*statemachine.StateDiagram, funcs []ssacparser.Servi
 				errs = append(errs, CrossError{
 					Rule:       "States ↔ SSaC",
 					Context:    event,
-					Message:    fmt.Sprintf("function %q has a state transition in %s but no guard state sequence", event, d.ID),
+					Message:    fmt.Sprintf("function %q has a state transition in %s but no @state sequence", event, d.ID),
 					Level:      "WARNING",
-					Suggestion: fmt.Sprintf("Add @sequence guard state %s to %s", d.ID, event),
+					Suggestion: fmt.Sprintf("Add @state %s sequence to %s", d.ID, event),
 				})
 			}
 		}
@@ -129,30 +129,32 @@ func CheckStates(diagrams []*statemachine.StateDiagram, funcs []ssacparser.Servi
 		}
 	}
 
-	// 5. guard state @param StatusField → DDL column exists.
+	// 5. @state Inputs field → DDL column exists.
 	if st != nil {
 		for _, fn := range funcs {
 			for _, seq := range fn.Sequences {
-				if seq.Type != "guard state" {
+				if seq.Type != "state" {
 					continue
 				}
-				diagramID := seq.Target
+				diagramID := seq.DiagramID
 				d, ok := diagramByID[diagramID]
 				if !ok {
 					continue // already reported above
 				}
 
-				// Find the @param entity.Field.
-				if len(seq.Params) == 0 {
+				// Extract status field from Inputs map.
+				// v2: @state reservation {status: reservation.Status} "cancel" "msg"
+				// Inputs = {"status": "reservation.Status"}
+				if len(seq.Inputs) == 0 {
 					continue
 				}
-				param := seq.Params[0]
-				// SSaC stores "course.Published" in param.Name.
-				// Split by dot to get entity and field.
-				paramParts := strings.SplitN(param.Name, ".", 2)
 				statusField := ""
-				if len(paramParts) == 2 {
-					statusField = paramParts[1]
+				for _, v := range seq.Inputs {
+					parts := strings.SplitN(v, ".", 2)
+					if len(parts) == 2 {
+						statusField = parts[1]
+					}
+					break // use first input
 				}
 				tableName := diagramIDToTable(diagramID)
 				colName := pascalToSnakeState(statusField)

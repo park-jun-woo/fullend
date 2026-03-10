@@ -33,7 +33,7 @@ func CheckPolicy(policies []*policy.Policy, funcs []ssacparser.ServiceFunc, st *
 	ssacPairs := make(map[[2]string]bool)
 	for _, fn := range funcs {
 		for _, seq := range fn.Sequences {
-			if seq.Type == "authorize" {
+			if seq.Type == "auth" {
 				ssacPairs[[2]string{seq.Action, seq.Resource}] = true
 			}
 		}
@@ -62,7 +62,7 @@ func CheckPolicy(policies []*policy.Policy, funcs []ssacparser.ServiceFunc, st *
 				Context:    fmt.Sprintf("action=%s resource=%s", pair[0], pair[1]),
 				Message:    fmt.Sprintf("Rego allow rule (%s, %s) has no matching SSaC authorize sequence", pair[0], pair[1]),
 				Level:      "WARNING",
-				Suggestion: fmt.Sprintf("Add @sequence authorize with @action %s @resource %s to SSaC", pair[0], pair[1]),
+				Suggestion: fmt.Sprintf("Add @auth \"%s\" \"%s\" sequence to SSaC", pair[0], pair[1]),
 			})
 		}
 	}
@@ -139,7 +139,7 @@ func CheckPolicy(policies []*policy.Policy, funcs []ssacparser.ServiceFunc, st *
 		eventToAction := make(map[string]string)
 		for _, fn := range funcs {
 			for _, seq := range fn.Sequences {
-				if seq.Type == "authorize" {
+				if seq.Type == "auth" {
 					eventToAction[fn.Name] = seq.Action
 				}
 			}
