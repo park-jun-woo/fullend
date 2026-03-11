@@ -33,12 +33,12 @@ func TestCheckDDLCoverage_PackageModelSkipped(t *testing.T) {
 	errs := CheckDDLCoverage(st, funcs, nil, nil)
 	found := false
 	for _, e := range errs {
-		if e.Rule == "DDL → SSaC" && e.Level == "WARNING" {
+		if e.Rule == "DDL → SSaC" && e.Level == "ERROR" {
 			found = true
 		}
 	}
 	if !found {
-		t.Errorf("expected DDL table unreferenced WARNING, got: %+v", errs)
+		t.Errorf("expected DDL table unreferenced ERROR, got: %+v", errs)
 	}
 }
 

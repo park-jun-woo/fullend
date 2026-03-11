@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/geul-org/fullend/internal/genmodel"
 	"github.com/geul-org/fullend/internal/orchestrator"
 	"github.com/geul-org/fullend/internal/reporter"
 )
@@ -12,9 +13,10 @@ import (
 const usage = `Usage: fullend <command> [arguments]
 
 Commands:
-  validate [--skip kind,...] <specs-dir>                 Validate SSOT specs
-  gen      [--skip kind,...] <specs-dir> <artifacts-dir> Generate code from specs
-  status   <specs-dir>                                   Show SSOT status summary
+  validate   [--skip kind,...] <specs-dir>                 Validate SSOT specs
+  gen        [--skip kind,...] <specs-dir> <artifacts-dir> Generate code from specs
+  gen-model  <openapi-source> <output-dir>                 Generate Go model from external OpenAPI
+  status     <specs-dir>                                   Show SSOT status summary
 
 Skip kinds: openapi, ddl, ssac, model, stml, states, policy, scenario, func, terraform
 `
@@ -40,6 +42,15 @@ func main() {
 			os.Exit(2)
 		}
 		runGen(args[0], args[1], skipKinds)
+	case "gen-model":
+		if len(os.Args) < 4 {
+			fmt.Fprintln(os.Stderr, "Usage: fullend gen-model <openapi-source> <output-dir>")
+			os.Exit(2)
+		}
+		if err := genmodel.Generate(os.Args[2], os.Args[3]); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
 	case "status":
 		if len(os.Args) < 3 {
 			fmt.Fprintln(os.Stderr, "Usage: fullend status <specs-dir>")
