@@ -427,6 +427,14 @@ func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, stmlD
 		}
 	}
 
+	// Load OPA policies for hurl role detection.
+	if d, ok := has[KindPolicy]; ok {
+		policies, err := policy.ParseDir(d.Path)
+		if err == nil {
+			input.Policies = policies
+		}
+	}
+
 	if err := gluegen.Generate(input); err != nil {
 		step.Status = reporter.Fail
 		step.Errors = append(step.Errors, fmt.Sprintf("glue-gen error: %v", err))

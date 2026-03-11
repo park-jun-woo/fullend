@@ -16,7 +16,7 @@ var (
 	reAction   = regexp.MustCompile(`input\.action\s*(?:==\s*"(\w+)"|in\s*\{([^}]+)\})`)
 	reResource = regexp.MustCompile(`input\.resource\s*==\s*"(\w+)"`)
 	reOwnerRef = regexp.MustCompile(`input\.resource_owner`)
-	reRoleRef  = regexp.MustCompile(`input\.user\.role\s*==\s*"(\w+)"`)
+	reRoleRef = regexp.MustCompile(`input\.(?:user|claims)\.role\s*==\s*"(\w+)"`)
 )
 
 // ParseFile parses a single .rego file and extracts policy information.

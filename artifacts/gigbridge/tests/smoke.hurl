@@ -3,11 +3,11 @@
 
 # ===== Auth =====
 
-# Register
+# Register (client)
 POST {{host}}/auth/register
 Content-Type: application/json
 {
-  "email": "test_string",
+  "email": "client@test.com",
   "name": "test_string",
   "password": "Password1234!",
   "role": "client"
@@ -17,17 +17,45 @@ HTTP 200
 [Asserts]
 jsonpath "$.user" exists
 
-# Login
+# Login (client)
 POST {{host}}/auth/login
 Content-Type: application/json
 {
-  "email": "test_string",
+  "email": "client@test.com",
   "password": "Password1234!"
 }
 
 HTTP 200
 [Captures]
-token: jsonpath "$.token"
+token_client: jsonpath "$.token"
+[Asserts]
+jsonpath "$.token" exists
+
+# Register (freelancer)
+POST {{host}}/auth/register
+Content-Type: application/json
+{
+  "email": "freelancer@test.com",
+  "name": "test_string",
+  "password": "Password1234!",
+  "role": "freelancer"
+}
+
+HTTP 200
+[Asserts]
+jsonpath "$.user" exists
+
+# Login (freelancer)
+POST {{host}}/auth/login
+Content-Type: application/json
+{
+  "email": "freelancer@test.com",
+  "password": "Password1234!"
+}
+
+HTTP 200
+[Captures]
+token_freelancer: jsonpath "$.token"
 [Asserts]
 jsonpath "$.token" exists
 
@@ -36,7 +64,7 @@ jsonpath "$.token" exists
 
 # CreateGig
 POST {{host}}/gigs
-Authorization: Bearer {{token}}
+Authorization: Bearer {{token_client}}
 Content-Type: application/json
 {
   "budget": 1,
@@ -52,7 +80,7 @@ jsonpath "$.gig" exists
 
 # PublishGig
 PUT {{host}}/gigs/{{gig_id}}/publish
-Authorization: Bearer {{token}}
+Authorization: Bearer {{token_client}}
 
 HTTP 200
 [Asserts]
@@ -60,7 +88,7 @@ jsonpath "$.gig" exists
 
 # SubmitProposal
 POST {{host}}/gigs/{{gig_id}}/proposals
-Authorization: Bearer {{token}}
+Authorization: Bearer {{token_freelancer}}
 Content-Type: application/json
 {
   "bid_amount": 10000
@@ -77,7 +105,7 @@ jsonpath "$.proposal" exists
 
 # AcceptProposal
 POST {{host}}/proposals/{{proposal_id}}/accept
-Authorization: Bearer {{token}}
+Authorization: Bearer {{token_client}}
 
 HTTP 200
 [Asserts]
@@ -89,7 +117,7 @@ jsonpath "$.proposal" exists
 
 # SubmitWork
 POST {{host}}/gigs/{{gig_id}}/submit-work
-Authorization: Bearer {{token}}
+Authorization: Bearer {{token_freelancer}}
 
 HTTP 200
 [Asserts]
@@ -97,33 +125,11 @@ jsonpath "$.gig" exists
 
 # ApproveWork
 POST {{host}}/gigs/{{gig_id}}/approve
-Authorization: Bearer {{token}}
+Authorization: Bearer {{token_client}}
 
 HTTP 200
 [Asserts]
 jsonpath "$.gig" exists
-
-# RaiseDispute
-POST {{host}}/gigs/{{gig_id}}/dispute
-Authorization: Bearer {{token}}
-
-HTTP 200
-[Asserts]
-jsonpath "$.gig" exists
-
-
-# ===== Proposals =====
-
-# RejectProposal
-POST {{host}}/proposals/{{proposal_id}}/reject
-Authorization: Bearer {{token}}
-
-HTTP 200
-[Asserts]
-jsonpath "$.proposal" exists
-
-
-# ===== Gigs =====
 
 # ListGigs
 GET {{host}}/gigs?limit=2&sort=created_at&direction=desc&status=test_string

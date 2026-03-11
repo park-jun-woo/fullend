@@ -10,6 +10,7 @@ import (
 	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 
+	"github.com/geul-org/fullend/internal/policy"
 	"github.com/geul-org/fullend/internal/statemachine"
 	ssacparser "github.com/geul-org/ssac/parser"
 	ssacvalidator "github.com/geul-org/ssac/validator"
@@ -30,6 +31,7 @@ type GlueInput struct {
 	Claims          map[string]string // from fullend.yaml backend.auth.claims
 	QueueBackend    string            // "postgres", "memory", "" (no queue)
 	AuthzPackage    string            // custom authz package, "" = default pkg/authz
+	Policies        []*policy.Policy  // parsed OPA Rego policies (for hurl role detection)
 }
 
 // internalDir returns the backend/internal/ base path.
@@ -101,7 +103,7 @@ func Generate(input *GlueInput) error {
 	}
 
 	// Hurl smoke test generation.
-	if err := generateHurlTests(input.OpenAPIDoc, input.ArtifactsDir, input.SpecsDir, input.StateDiagrams, input.ServiceFuncs); err != nil {
+	if err := generateHurlTests(input.OpenAPIDoc, input.ArtifactsDir, input.SpecsDir, input.StateDiagrams, input.ServiceFuncs, input.Policies); err != nil {
 		return fmt.Errorf("hurl-gen: %w", err)
 	}
 
