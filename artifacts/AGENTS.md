@@ -2,7 +2,7 @@
 
 ## 1. Read the SSOT Manual First
 
-Before starting, read `artifacts/manual-for-ai.md` in full.
+Before starting, read `manual-for-ai.md` in full.
 This manual is the single source of truth for SSOT authoring. Do not reference other projects' specs.
 
 ## 2. Write SSOTs
