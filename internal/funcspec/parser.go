@@ -12,12 +12,13 @@ import (
 
 // FuncSpec holds a parsed func spec file.
 type FuncSpec struct {
-	Package        string  // "auth"
-	Name           string  // "hashPassword"
-	Description    string  // @description value
-	RequestFields  []Field // FuncNameRequest struct fields
-	ResponseFields []Field // FuncNameResponse struct fields
-	HasBody        bool    // true if function body is not just "// TODO: implement"
+	Package        string   // "auth"
+	Name           string   // "hashPassword"
+	Description    string   // @description value
+	RequestFields  []Field  // FuncNameRequest struct fields
+	ResponseFields []Field  // FuncNameResponse struct fields
+	HasBody        bool     // true if function body is not just "// TODO: implement"
+	Imports        []string // import paths (e.g. "database/sql", "net/http")
 }
 
 // Field represents a struct field.
@@ -79,6 +80,12 @@ func ParseFile(path string) (*FuncSpec, error) {
 
 	if spec.Name == "" {
 		return nil, nil // Not a func spec file.
+	}
+
+	// Extract imports.
+	for _, imp := range f.Imports {
+		path := strings.Trim(imp.Path.Value, `"`)
+		spec.Imports = append(spec.Imports, path)
 	}
 
 	// Extract Request/Response structs and function body.

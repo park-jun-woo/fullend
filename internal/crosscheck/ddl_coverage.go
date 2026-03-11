@@ -94,6 +94,10 @@ func buildReferencedTables(funcs []ssacparser.ServiceFunc) map[string]bool {
 	tables := make(map[string]bool)
 	for _, fn := range funcs {
 		for _, seq := range fn.Sequences {
+			// 패키지 접두사 모델은 DDL 체크 스킵.
+			if seq.Package != "" {
+				continue
+			}
 			// @model "Course.FindByID" → "courses"
 			if seq.Model != "" {
 				parts := strings.SplitN(seq.Model, ".", 2)

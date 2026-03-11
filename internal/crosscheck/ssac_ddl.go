@@ -30,6 +30,11 @@ func CheckSSaCDDL(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable,
 				continue
 			}
 
+			// 패키지 접두사 모델은 DDL 체크 스킵 (interface 검증은 ssac validate가 담당).
+			if seq.Package != "" {
+				continue
+			}
+
 			// Rule 4: @result Type ↔ DDL table
 			if seq.Result != nil && seq.Result.Type != "" {
 				errs = append(errs, checkResultType(seq, st, ctx, i, dtoTypes)...)

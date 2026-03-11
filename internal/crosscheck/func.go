@@ -82,8 +82,20 @@ func CheckFuncs(
 					Rule:    "Func ↔ SSaC",
 					Context: ctx,
 					Message: "본체 미구현 (TODO)",
-					Level:   "WARNING",
+					Level:   "ERROR",
 				})
+			}
+
+			// Check Func purity: I/O imports are forbidden in @call func.
+			if ioImports := checkForbiddenImports(spec.Imports); len(ioImports) > 0 {
+				for _, imp := range ioImports {
+					errs = append(errs, CrossError{
+						Rule:    "Func ↔ SSaC",
+						Context: ctx,
+						Message: fmt.Sprintf("@call func에서 I/O 패키지 %q import 금지. @call func은 순수 계산/판단 로직만 허용됩니다. DB, 네트워크, 파일 등 I/O가 필요하면 @model을 활용하세요.", imp),
+						Level:   "ERROR",
+					})
+				}
 			}
 
 			// Rule 1: Input field count = Request field count.
@@ -349,6 +361,37 @@ func generateSkeleton(pkg, funcName string, seq ssacparser.Sequence) string {
 	b.WriteString("}\n")
 
 	return b.String()
+}
+
+// forbiddenImportPrefixes are I/O packages that @call func must not import.
+var forbiddenImportPrefixes = []string{
+	// DB
+	"database/sql",
+	"github.com/lib/pq",
+	"github.com/jackc/pgx",
+	// Network
+	"net/http",
+	"net/rpc",
+	"google.golang.org/grpc",
+	// File I/O
+	"os",
+	"io",
+	"io/ioutil",
+	"bufio",
+}
+
+// checkForbiddenImports returns any forbidden I/O imports found in the list.
+func checkForbiddenImports(imports []string) []string {
+	var found []string
+	for _, imp := range imports {
+		for _, forbidden := range forbiddenImportPrefixes {
+			if imp == forbidden || strings.HasPrefix(imp, forbidden+"/") {
+				found = append(found, imp)
+				break
+			}
+		}
+	}
+	return found
 }
 
 // toSnakeCase converts camelCase to snake_case.
