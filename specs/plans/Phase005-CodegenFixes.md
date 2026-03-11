@@ -1,4 +1,4 @@
-# Phase 005: 코드젠 빌드 에러 수정 (authz·state·claims·gluegen)
+# ✅ Phase 005: 코드젠 빌드 에러 수정 (authz·state·claims·gluegen)
 
 ## 목표
 

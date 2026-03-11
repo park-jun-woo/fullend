@@ -1,4 +1,4 @@
-# Phase 003: dummy 프로젝트 SSaC v2 스펙 재작성 + 스모크 테스트
+# ✅ Phase 003: dummy 프로젝트 SSaC v2 스펙 재작성 + 스모크 테스트
 
 ## 목표
 

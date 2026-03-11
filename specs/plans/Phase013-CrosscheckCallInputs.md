@@ -1,4 +1,4 @@
-# Phase 013: Func ↔ SSaC crosscheck — @call Inputs 대응
+# ✅ Phase 013: Func ↔ SSaC crosscheck — @call Inputs 대응
 
 ## 배경
 

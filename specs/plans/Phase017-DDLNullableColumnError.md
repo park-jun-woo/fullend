@@ -1,4 +1,4 @@
-# Phase 017: DDL nullable 컬럼 검증
+# ✅ Phase 017: DDL nullable 컬럼 검증
 
 ## 배경
 

@@ -1,4 +1,4 @@
-# Phase 018: smoke test 상태 전이 순서 정렬
+# ✅ Phase 018: smoke test 상태 전이 순서 정렬
 
 ## 배경
 

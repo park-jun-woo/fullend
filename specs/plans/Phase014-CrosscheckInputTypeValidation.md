@@ -1,4 +1,4 @@
-# Phase 014: crosscheck seq.Args → seq.Inputs 전환 + @call Input 타입 검증
+# ✅ Phase 014: crosscheck seq.Args → seq.Inputs 전환 + @call Input 타입 검증
 
 ## 배경
 

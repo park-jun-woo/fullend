@@ -1,4 +1,4 @@
-# Phase 015: OpenAPI path param 이름 충돌 검증
+# ✅ Phase 015: OpenAPI path param 이름 충돌 검증
 
 ## 배경
 

@@ -1,4 +1,4 @@
-# Phase 004: dummy-lesson 스모크 테스트 (validate → gen → build)
+# ✅ Phase 004: dummy-lesson 스모크 테스트 (validate → gen → build)
 
 ## 목표
 
