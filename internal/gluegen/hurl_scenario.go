@@ -159,9 +159,17 @@ func writeActionHurlV2(buf *strings.Builder, step scenario.Step, statusCode stri
 	url := buildScenarioURL(info.Path, json, captures)
 	buf.WriteString(fmt.Sprintf("%s {{host}}%s\n", info.Method, url))
 
-	// Auth header if token captured and endpoint needs auth.
-	if *hasToken && needsAuth(info.Op) {
-		buf.WriteString(fmt.Sprintf("Authorization: Bearer {{%s}}\n", *currentToken))
+	// Auth header: use explicit token from step, otherwise fall back to currentToken.
+	if needsAuth(info.Op) {
+		tokenToUse := ""
+		if step.Token != "" {
+			tokenToUse = step.Token
+		} else if *hasToken {
+			tokenToUse = *currentToken
+		}
+		if tokenToUse != "" {
+			buf.WriteString(fmt.Sprintf("Authorization: Bearer {{%s}}\n", tokenToUse))
+		}
 	}
 
 	// Request body: render JSON with variable substitution.
@@ -370,13 +378,14 @@ func substituteVarRefs(value string) string {
 	return value
 }
 
-// varRefToHurl converts var.Field to var_field (snake_case).
+// varRefToHurl converts dotted var.Field.Sub references to underscore-separated hurl variable names.
+// e.g. "gigResult.gig.id" → "gigResult_gig_id"
+// hurl treats "." as a field accessor, so variable names must not contain dots.
 func varRefToHurl(ref string) string {
-	parts := strings.SplitN(ref, ".", 2)
-	if len(parts) != 2 {
+	if !strings.Contains(ref, ".") {
 		return pascalToSnakeHurl(ref)
 	}
-	return parts[0] + "_" + strings.ToLower(parts[1])
+	return strings.ReplaceAll(ref, ".", "_")
 }
 
 // resolveVarRef converts a value reference to Hurl variable syntax.
@@ -446,10 +455,10 @@ func inferScenarioCaptureNamed(captureName string, respSchema *openapi3.Schema) 
 		}
 		if prop.Properties != nil {
 			if _, hasID := prop.Properties["id"]; hasID {
-				return captureName + "_" + name + ".id", "$." + name + ".id"
+				return captureName + "_" + name + "_id", "$." + name + ".id"
 			}
 			if _, hasID := prop.Properties["ID"]; hasID {
-				return captureName + "_" + name + ".ID", "$." + name + ".ID"
+				return captureName + "_" + name + "_ID", "$." + name + ".ID"
 			}
 		}
 	}

@@ -24,6 +24,7 @@ type Step struct {
 	Method      string // GET, POST, PUT, DELETE
 	OperationID string // PascalCase operationId
 	JSON        string // raw JSON body (may contain var refs)
+	Token       string // explicit token name (e.g. clientToken) — must contain "token" (case-insensitive)
 	Capture     string // variable name after →
 
 	// Assertion fields (IsAction == false)

@@ -436,7 +436,12 @@ func checkTokenRoles(file, scenarioName string, steps []scenario.Step, opRoles m
 				continue
 			}
 
-			tokenRole := tokenRoles[currentToken]
+			// Use explicit token from step if specified, otherwise currentToken.
+			activeToken := currentToken
+			if step.Token != "" {
+				activeToken = step.Token
+			}
+			tokenRole := tokenRoles[activeToken]
 			if tokenRole == "" {
 				continue
 			}
@@ -452,9 +457,9 @@ func checkTokenRoles(file, scenarioName string, steps []scenario.Step, opRoles m
 			if !roleAllowed {
 				errs = append(errs, CrossError{
 					Rule:    "Scenario ↔ Policy",
-					Context: fmt.Sprintf("%s: %s → %s (token=%s, role=%s)", file, scenarioName, step.OperationID, currentToken, tokenRole),
+					Context: fmt.Sprintf("%s: %s → %s (token=%s, role=%s)", file, scenarioName, step.OperationID, activeToken, tokenRole),
 					Message: fmt.Sprintf("token %q has role %q but %s requires one of %v",
-						currentToken, tokenRole, step.OperationID, allowedRoles),
+						activeToken, tokenRole, step.OperationID, allowedRoles),
 					Level:      "WARNING",
 					Suggestion: fmt.Sprintf("Use a token with role %v or add role %q to policy for %s", allowedRoles, tokenRole, step.OperationID),
 				})

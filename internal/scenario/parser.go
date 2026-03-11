@@ -9,12 +9,13 @@ import (
 )
 
 var (
-	// reActionStep matches: KEYWORD METHOD operationId [{JSON}] [→/-> capture]
+	// reActionStep matches: KEYWORD METHOD operationId [{JSON}] [tokenName] [→/-> capture]
 	reActionStep = regexp.MustCompile(
 		`^(Given|When|Then|And|But)\s+` +
 			`(GET|POST|PUT|DELETE)\s+` +
 			`(\w+)` +
 			`(?:\s+(\{.*\}))?` +
+			`(?:\s+(\w*[Tt]oken\w*))?` +
 			`(?:\s+(?:→|->)\s+(\w+))?$`,
 	)
 
@@ -126,7 +127,8 @@ func parseStep(line string) (*Step, error) {
 			Method:      m[2],
 			OperationID: m[3],
 			JSON:        m[4],
-			Capture:     m[5],
+			Token:       m[5],
+			Capture:     m[6],
 		}, nil
 	}
 
