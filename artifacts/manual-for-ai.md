@@ -104,8 +104,8 @@ package service
 
 import "github.com/geul-org/fullend/pkg/auth"
 
-// @call auth.HashPasswordResponse hp = auth.HashPassword({Password: request.Password})
-// @post User user = User.Create({Email: request.Email, PasswordHash: hp.HashedPassword})
+// @call auth.HashPasswordResponse hp = auth.HashPassword({Password: request.password})
+// @post User user = User.Create({Email: request.email, PasswordHash: hp.HashedPassword})
 // @response { user: user }
 func Register() {}
 ```
@@ -128,27 +128,50 @@ func Register() {}
 
 ### @subscribe Trigger
 
-Queue 이벤트 수신 시 함수를 실행한다. HTTP 트리거와 별도.
+Executes a function when a queue event is received. Separate from HTTP triggers.
 
 ```go
 // @subscribe "topic"
 func OnEvent(message MessageType) {}
 ```
 
-- 함수 파라미터에 메시지 타입 명시 (변수명은 반드시 `message`)
-- 메시지 struct는 같은 .ssac 파일에 Go struct로 선언
-- `@response` 사용 불가, `request` 사용 불가
+- Specify message type in function parameter (variable name must be `message`)
+- Message struct must be declared as a Go struct in the same .ssac file
+- Cannot use `@response` or `request`
 
 Append `!` to suppress WARNINGs: `@delete!`, `@response!`
 
 ### Args Format
 
 `source.Field` or `"literal"`:
-- `request.CourseID`, `course.InstructorID`, `currentUser.ID`, `"cancelled"`
+- `request.course_id`, `course.InstructorID`, `currentUser.ID`, `"cancelled"`
 
 Reserved sources: `request`, `currentUser`, `query`, `message` (subscribe only)
 
-> **`config.*` 금지**: 환경 변수는 SSaC에서 전달하지 않는다. func 내부에서 직접 `os.Getenv()`로 읽는다.
+#### request.* Field Case Rule
+
+`request.*` field names must **exactly match the OpenAPI request schema property names**.
+If OpenAPI uses snake_case, SSaC must use snake_case. If OpenAPI uses camelCase, SSaC must use camelCase.
+
+```yaml
+# OpenAPI schema
+properties:
+  bid_amount:
+    type: integer
+  email:
+    type: string
+```
+
+```go
+// SSaC — request.* uses the exact OpenAPI property name
+// @post Proposal p = Proposal.Create({BidAmount: request.bid_amount})
+// @call auth.HashPassword({Password: request.password})
+```
+
+**Note:** Sources other than `request.*` (model variables, currentUser, etc.) use Go PascalCase as-is.
+- `request.email` (OpenAPI field name) vs `user.Email` (Go struct field name)
+
+> **`config.*` forbidden**: Environment variables must not be passed via SSaC. Funcs read their own config via `os.Getenv()`.
 
 ### Pagination
 
@@ -170,7 +193,7 @@ Reserved sources: `request`, `currentUser`, `query`, `message` (subscribe only)
 
 ```go
 // DDL model (no prefix) — DDL table is SSOT
-// @get User user = User.FindByID({ID: request.ID})
+// @get User user = User.FindByID({ID: request.id})
 
 // Package model (with prefix) — Go interface is SSOT
 // @get Session s = session.Session.Get({key: request.Token})
@@ -195,6 +218,31 @@ STML:    data-action="EnrollCourse"
 
 `func/<pkg>/*.go`. Fixed signature: `func FuncName(req FuncNameRequest) (FuncNameResponse, error)`
 
+### @func Annotation
+
+Place `// @func camelCaseName` comment above the function. The camelCase name must match the SSaC `@call` reference.
+
+```go
+// @func holdEscrow
+// @description Simulates locking funds in escrow
+
+type HoldEscrowRequest struct {
+    GigID    int64
+    Amount   int64
+    ClientID int64
+}
+
+type HoldEscrowResponse struct {
+    TransactionID int64
+}
+
+func HoldEscrow(req HoldEscrowRequest) (HoldEscrowResponse, error) {
+    return HoldEscrowResponse{TransactionID: req.GigID}, nil
+}
+```
+
+SSaC reference: `// @call billing.HoldEscrowResponse r = billing.HoldEscrow({GigID: gig.ID, Amount: gig.Budget, ClientID: gig.ClientID})`
+
 ### Purity Rule
 
 `@call func` allows only computation/judgment logic. Forbidden imports: `database/sql`, `net/http`, `io`, `bufio`, etc. Use `@model` for DB/file I/O.
@@ -210,14 +258,14 @@ STML:    data-action="EnrollCourse"
 
 #### auth
 
-| Function | Description |
-|---|---|
-| `hashPassword` | bcrypt hashing |
-| `verifyPassword` | bcrypt verification (error = mismatch) |
-| `issueToken` | JWT access token (24h) |
-| `verifyToken` | JWT verification → claims |
-| `refreshToken` | Refresh token (7 days) |
-| `generateResetToken` | Random hex token for password reset |
+| Function | Request Fields | Response Fields |
+|---|---|---|
+| `hashPassword` | `Password` | `HashedPassword` |
+| `verifyPassword` | `PasswordHash`, `Password` | (none) |
+| `issueToken` | `UserID`, `Email`, `Role` | `AccessToken` |
+| `verifyToken` | `Token`, `Secret` | `UserID`, `Email`, `Role` |
+| `refreshToken` | `UserID`, `Email`, `Role` | `RefreshToken` |
+| `generateResetToken` | (none) | `Token` |
 
 #### crypto
 
@@ -236,10 +284,10 @@ STML:    data-action="EnrollCourse"
 
 #### mail
 
-| Function | Description |
-|---|---|
-| `sendEmail` | SMTP plain text |
-| `sendTemplateEmail` | Go template HTML |
+| Function | Request Fields | Response Fields |
+|---|---|---|
+| `sendEmail` | `Host`, `Port`, `Username`, `Password`, `From`, `To`, `Subject`, `Body` | (none) |
+| `sendTemplateEmail` | `To`, `Subject`, `TemplateName` | (none) |
 
 #### text
 
@@ -340,7 +388,7 @@ type OnOrderCompletedMessage struct {
 
 // @subscribe "order.completed"
 // @get Order order = Order.FindByID({ID: message.OrderID})
-// @call mail.SendEmail({To: message.Email, Subject: "주문 완료"})
+// @call mail.SendEmail({To: message.Email, Subject: "Order completed"})
 func OnOrderCompleted(message OnOrderCompletedMessage) {}
 ```
 
@@ -413,6 +461,42 @@ When `data-bind` references a field not in the OpenAPI response schema, exportin
 
 Model name from filename: `courses.sql` → `Course` (singular: `ies`→`y`, `sses`→`ss`, `xes`→`x`, else remove `s`)
 
+### sqlc Query Names and ModelPrefix
+
+sqlc uses a **global namespace**, so `-- name:` values must be unique across all query files.
+When multiple models have the same method name (Create, FindByID, etc.), **add a ModelPrefix** to disambiguate.
+
+```sql
+-- db/queries/users.sql
+-- name: UserCreate :one
+-- name: UserFindByID :one
+-- name: UserFindByEmail :one
+
+-- db/queries/gigs.sql
+-- name: GigCreate :one
+-- name: GigFindByID :one
+-- name: GigList :many
+-- name: GigUpdateStatus :exec
+```
+
+**In SSaC, the prefix is automatically stripped.** The `stripModelPrefix()` function removes the model name prefix from query names before registering them as methods.
+
+| sqlc `-- name:` | Query file | Model | SSaC method name |
+|---|---|---|---|
+| `UserCreate` | `users.sql` | `User` | `Create` |
+| `UserFindByID` | `users.sql` | `User` | `FindByID` |
+| `GigCreate` | `gigs.sql` | `Gig` | `Create` |
+| `GigUpdateStatus` | `gigs.sql` | `Gig` | `UpdateStatus` |
+
+```go
+// SSaC — call without prefix
+// @post User user = User.Create({...})            ← sqlc: UserCreate
+// @get Gig gig = Gig.FindByID({ID: request.id})   ← sqlc: GigFindByID
+```
+
+**Rule:** The ModelPrefix must exactly match the model name, and the character immediately after must be uppercase for stripping to occur.
+`UserCreate` → `Create` (stripped), `Usercreate` → `Usercreate` (NOT stripped — next char is lowercase)
+
 ## model/*.go
 
 - `// @dto` → Skip DDL table matching (pure DTOs: Token, Refund, etc.)
@@ -457,6 +541,39 @@ SSaC `@auth "action" "resource" {inputs} "message"` maps to Rego `input.action`/
 @auth generates `authz.Check(authz.CheckRequest{...})` package function call (not a method on Handler).
 Default authz package: `pkg/authz` (OPA Rego-based). Custom package via `fullend.yaml` `authz.package`.
 
+### Writing allow Rules
+
+**Every allow rule must specify both `input.action` and `input.resource`.**
+Crosscheck validates that SSaC `@auth "action" "resource"` pairs match Rego allow rule `input.action`/`input.resource` pairs.
+Omitting `input.resource` causes the crosscheck to determine there is no matching rule for that action, resulting in an ERROR.
+
+```rego
+# Correct — both action and resource specified
+allow {
+    input.action == "PublishCourse"
+    input.resource == "course"
+    input.claims.role == "instructor"
+    data.owners.course[input.resource_id] == input.claims.user_id
+}
+
+# Wrong — input.resource missing → crosscheck ERROR
+allow {
+    input.action == "PublishCourse"
+    input.claims.role == "instructor"
+    data.owners.course[input.resource_id] == input.claims.user_id
+}
+```
+
+5 allow patterns:
+
+| Pattern | Conditions |
+|---|---|
+| unconditional | `input.action` + `input.resource` only |
+| role-based | + `input.claims.role` |
+| owner-based | + `data.owners.resource[input.resource_id] == input.claims.user_id` |
+| role+owner | both role + owner |
+| multiple actions | multiple actions in same rule using `{...}` set |
+
 ## Gherkin Scenario
 
 `scenario/*.feature`. Tags: `@scenario` (business), `@invariant` (invariant verification).
@@ -491,7 +608,7 @@ response.array count > N
 | STML data-fetch/action ↔ OpenAPI operationId | Identical |
 | stateDiagram transition ↔ SSaC funcName | Identical |
 | SSaC Model (no prefix) ↔ DDL table | PascalCase → snake_case plural |
-| SSaC Model.Method ↔ sqlc `-- name:` | Identical |
+| SSaC Model.Method ↔ sqlc `-- name:` | Identical (after ModelPrefix stripping) |
 | SSaC @call pkg.Func ↔ Func spec | Identical |
 | x-sort/filter allowed ↔ DDL column | Identical snake_case |
 
@@ -533,27 +650,27 @@ response.array count > N
 | `@subscribe` message fields → `@publish` payload fields | WARNING |
 | `@publish`/`@subscribe` used → `queue.backend` required | ERROR |
 | `@auth` inputs → authz CheckRequest fields | ERROR |
-| FK + `DEFAULT 0` → 대상 테이블에 id=0 센티널 필요 | WARNING |
+| FK + `DEFAULT 0` → sentinel record required in target table | WARNING |
 
-## DDL 작성 가이드
+## DDL Authoring Guide
 
-### FK DEFAULT 0 패턴 (센티널 레코드)
+### FK DEFAULT 0 Pattern (Sentinel Record)
 
-nullable FK를 피하고 `NOT NULL DEFAULT 0`을 사용할 경우, 참조 대상 테이블에 **id=0 센티널 레코드**를 반드시 삽입해야 한다. 그렇지 않으면 FK 제약 위반으로 INSERT가 실패한다.
+To avoid nullable FKs, use `NOT NULL DEFAULT 0`. In this case, the referenced table **must have an id=0 sentinel record**. Otherwise, FK constraint violations will cause INSERT failures.
 
 ```sql
--- gigs.freelancer_id: 생성 시점에 미배정 → DEFAULT 0
+-- gigs.freelancer_id: unassigned at creation → DEFAULT 0
 freelancer_id BIGINT NOT NULL DEFAULT 0 REFERENCES users(id)
 ```
 
-이 패턴을 쓸 때 참조 대상 DDL에 센티널을 추가한다:
+When using this pattern, add a sentinel to the referenced table's DDL:
 
 ```sql
--- users.sql 끝에 추가
+-- Append to users.sql
 INSERT INTO users (id, email, password_hash, role, name)
 VALUES (0, 'nobody@system', '', 'system', 'Nobody')
 ON CONFLICT DO NOTHING;
 ```
 
-**장점:** Go struct가 `int64` 유지, `*int64`/`sql.NullInt64` 불필요, nil 체크 코드 없음.
-**주의:** 센티널 레코드 누락 시 FK 위반 에러 발생. fullend validate가 이 패턴을 감지하여 WARNING을 표시한다.
+**Advantage:** Go struct stays `int64` — no `*int64`/`sql.NullInt64` needed, no nil checks.
+**Caution:** Missing sentinel record causes FK violation errors. `fullend validate` detects this pattern and shows a WARNING.

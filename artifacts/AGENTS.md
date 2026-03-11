@@ -94,8 +94,13 @@ for f in <tables in dependency order>; do
   psql -h localhost -p <port> -U postgres -d <dbname> -f specs/<project>/db/$f.sql
 done
 
+# Start dummy SMTP for @call mail.* (accepts all, discards)
+python3 ~/.clari/repos/fullend/artifacts/scripts/dummy-smtp.py &
+
 # Start server (DISABLE flags for smoke testing)
-DISABLE_AUTHZ=1 DISABLE_STATE_CHECK=1 JWT_SECRET=test-secret-key ./server -dsn "postgres://..." &
+DISABLE_AUTHZ=1 DISABLE_STATE_CHECK=1 JWT_SECRET=test-secret-key \
+  SMTP_HOST=127.0.0.1 SMTP_PORT=2525 SMTP_USERNAME=test SMTP_PASSWORD=test SMTP_FROM=test@test.com \
+  ./server -dsn "postgres://..." &
 ```
 
 ## 8. Run Hurl Tests
