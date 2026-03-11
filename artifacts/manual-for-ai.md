@@ -106,7 +106,7 @@ import "github.com/geul-org/fullend/pkg/auth"
 func Register() {}
 ```
 
-### 10 Sequence Types
+### 11 Sequence Types
 
 | Type | Purpose | Format | Args |
 |---|---|---|---|
@@ -119,7 +119,21 @@ func Register() {}
 | `@state` | State transition | `diagramID {inputs} "transition" "message"` | — |
 | `@auth` | Permission check | `"action" "resource" {inputs} "message"` | — |
 | `@call` | Function call | `[Type var =] package.Func(args...)` | — |
+| `@publish` | Queue publish | `"topic" {payload} [{options}]` | — |
 | `@response` | JSON response | `varName` or `{ field: var, ... }` | — |
+
+### @subscribe Trigger
+
+Queue 이벤트 수신 시 함수를 실행한다. HTTP 트리거와 별도.
+
+```go
+// @subscribe "topic"
+func OnEvent(message MessageType) {}
+```
+
+- 함수 파라미터에 메시지 타입 명시 (변수명은 반드시 `message`)
+- 메시지 struct는 같은 .ssac 파일에 Go struct로 선언
+- `@response` 사용 불가, `request` 사용 불가
 
 Append `!` to suppress WARNINGs: `@delete!`, `@response!`
 
@@ -128,7 +142,7 @@ Append `!` to suppress WARNINGs: `@delete!`, `@response!`
 `source.Field` or `"literal"`:
 - `request.CourseID`, `course.InstructorID`, `currentUser.ID`, `config.APIKey`, `"cancelled"`
 
-Reserved sources: `request`, `currentUser`, `config`, `query`
+Reserved sources: `request`, `currentUser`, `config`, `query`, `message` (subscribe only)
 
 ### Pagination
 
