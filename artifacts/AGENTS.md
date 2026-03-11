@@ -117,7 +117,7 @@ Pass criteria:
 | validate | Fix SSOTs → re-validate |
 | gen | Codegen bug → report immediately, no workarounds |
 | go build (authz) | `@auth` generates `authz.Check()` package function. Ensure `authz.Init(conn)` is in main.go (auto-generated). Set `DISABLE_AUTHZ=1` to bypass. |
-| go build (config) | `config.Key` → `config.Get("KEY")`. Ensure env vars are set at runtime. |
+| go build (config) | `config.*` is NOT supported in SSaC inputs. Func reads its own config via `os.Getenv()`. |
 | go build | SSOT or codegen bug → never edit generated code |
 | hurl --test | Classify cause (SSOT vs codegen) → report |
 

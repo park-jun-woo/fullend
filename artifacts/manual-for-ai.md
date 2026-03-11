@@ -144,9 +144,11 @@ Append `!` to suppress WARNINGs: `@delete!`, `@response!`
 ### Args Format
 
 `source.Field` or `"literal"`:
-- `request.CourseID`, `course.InstructorID`, `currentUser.ID`, `config.APIKey`, `"cancelled"`
+- `request.CourseID`, `course.InstructorID`, `currentUser.ID`, `"cancelled"`
 
-Reserved sources: `request`, `currentUser`, `config` (→ `config.Get("KEY")`), `query`, `message` (subscribe only)
+Reserved sources: `request`, `currentUser`, `query`, `message` (subscribe only)
+
+> **`config.*` 금지**: 환경 변수는 SSaC에서 전달하지 않는다. func 내부에서 직접 `os.Getenv()`로 읽는다.
 
 ### Pagination
 
@@ -193,9 +195,10 @@ STML:    data-action="EnrollCourse"
 
 `func/<pkg>/*.go`. Fixed signature: `func FuncName(req FuncNameRequest) (FuncNameResponse, error)`
 
-### Purity Rule (No I/O)
+### Purity Rule
 
-`@call func` allows only pure logic. Forbidden imports: `database/sql`, `net/http`, `os`, `io`, `bufio`, etc. Use `@model` for I/O.
+`@call func` allows only computation/judgment logic. Forbidden imports: `database/sql`, `net/http`, `io`, `bufio`, etc. Use `@model` for DB/file I/O.
+`os` is allowed (for `os.Getenv()` — func reads its own config).
 
 ### Fallback Chain
 
@@ -304,17 +307,6 @@ type CheckRequest struct {
 - `authz.Init(conn)` is auto-generated in `main.go` when `@auth` is used
 - Set `DISABLE_AUTHZ=1` to bypass checks
 - Custom authz package: set `authz.package` in `fullend.yaml`
-
-#### config — Environment Variables
-
-Singleton package-level API. No configuration needed in `fullend.yaml`.
-
-```go
-func Get(key string) string
-func MustGet(key string) string   // panics if empty
-```
-
-SSaC `config.SMTPHost` → codegen generates `config.Get("SMTP_HOST")` (PascalCase → UPPER_SNAKE_CASE).
 
 #### queue — Queue Pub/Sub
 
@@ -530,7 +522,7 @@ response.array count > N
 | Scenario JSON fields → request schema | ERROR |
 | Scenario step order → States transitions | WARNING |
 | Func → SSaC @call matching | ERROR |
-| Func purity (I/O import forbidden) | ERROR |
+| Func purity (I/O import forbidden, `os` allowed) | ERROR |
 | Func body TODO stub | ERROR |
 | Func arg count ↔ Request fields | ERROR |
 | Func arg type ↔ Request field type | ERROR |
