@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/geul-org/fullend/internal/statemachine"
@@ -208,21 +209,5 @@ func diagramIDToTable(id string) string {
 
 // pascalToSnakeState converts PascalCase to snake_case.
 func pascalToSnakeState(s string) string {
-	var result []byte
-	for i, c := range s {
-		if c >= 'A' && c <= 'Z' {
-			if i > 0 {
-				prev := s[i-1]
-				if prev >= 'a' && prev <= 'z' {
-					result = append(result, '_')
-				} else if prev >= 'A' && prev <= 'Z' && i+1 < len(s) && s[i+1] >= 'a' && s[i+1] <= 'z' {
-					result = append(result, '_')
-				}
-			}
-			result = append(result, byte(c-'A'+'a'))
-		} else {
-			result = append(result, byte(c))
-		}
-	}
-	return string(result)
+	return strcase.ToSnake(s)
 }

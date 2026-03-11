@@ -45,11 +45,13 @@ Content-Type: application/json
 }
 
 HTTP 200
+[Captures]
+gig_id: jsonpath "$.gig.id"
 [Asserts]
 jsonpath "$.gig" exists
 
 # PublishGig
-PUT {{host}}/gigs/{{id}}/publish
+PUT {{host}}/gigs/{{gig_id}}/publish
 Authorization: Bearer {{token}}
 
 HTTP 200
@@ -57,7 +59,7 @@ HTTP 200
 jsonpath "$.gig" exists
 
 # SubmitProposal
-POST {{host}}/gigs/{{id}}/proposals
+POST {{host}}/gigs/{{gig_id}}/proposals
 Authorization: Bearer {{token}}
 Content-Type: application/json
 {
@@ -65,6 +67,8 @@ Content-Type: application/json
 }
 
 HTTP 200
+[Captures]
+proposal_id: jsonpath "$.proposal.id"
 [Asserts]
 jsonpath "$.proposal" exists
 
@@ -72,7 +76,7 @@ jsonpath "$.proposal" exists
 # ===== Proposals =====
 
 # AcceptProposal
-POST {{host}}/proposals/{{id}}/accept
+POST {{host}}/proposals/{{proposal_id}}/accept
 Authorization: Bearer {{token}}
 
 HTTP 200
@@ -84,7 +88,7 @@ jsonpath "$.proposal" exists
 # ===== Gigs =====
 
 # SubmitWork
-POST {{host}}/gigs/{{id}}/submit-work
+POST {{host}}/gigs/{{gig_id}}/submit-work
 Authorization: Bearer {{token}}
 
 HTTP 200
@@ -92,7 +96,7 @@ HTTP 200
 jsonpath "$.gig" exists
 
 # ApproveWork
-POST {{host}}/gigs/{{id}}/approve
+POST {{host}}/gigs/{{gig_id}}/approve
 Authorization: Bearer {{token}}
 
 HTTP 200
@@ -100,7 +104,7 @@ HTTP 200
 jsonpath "$.gig" exists
 
 # RaiseDispute
-POST {{host}}/gigs/{{id}}/dispute
+POST {{host}}/gigs/{{gig_id}}/dispute
 Authorization: Bearer {{token}}
 
 HTTP 200
@@ -111,7 +115,7 @@ jsonpath "$.gig" exists
 # ===== Proposals =====
 
 # RejectProposal
-POST {{host}}/proposals/{{id}}/reject
+POST {{host}}/proposals/{{proposal_id}}/reject
 Authorization: Bearer {{token}}
 
 HTTP 200
@@ -130,7 +134,7 @@ jsonpath "$.items" isCollection
 jsonpath "$.total" exists
 
 # GetGig
-GET {{host}}/gigs/{{id}}
+GET {{host}}/gigs/{{gig_id}}
 
 HTTP 200
 [Asserts]

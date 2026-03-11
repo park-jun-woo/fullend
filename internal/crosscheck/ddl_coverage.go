@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 
 	ssacparser "github.com/geul-org/ssac/parser"
@@ -153,29 +154,7 @@ func tableToModel(table string) string {
 	return snakeToPascal(name)
 }
 
-// commonAcronyms are Go-style uppercase acronyms.
-var commonAcronyms = map[string]string{
-	"id": "ID", "url": "URL", "uri": "URI", "api": "API",
-	"ip": "IP", "http": "HTTP", "https": "HTTPS",
-	"json": "JSON", "xml": "XML", "sql": "SQL",
-	"html": "HTML", "css": "CSS", "jwt": "JWT",
-	"uuid": "UUID", "ssh": "SSH", "tls": "TLS",
-}
-
 // snakeToPascal converts snake_case to PascalCase with Go acronym handling.
-// "instructor_id" → "InstructorID", "video_url" → "VideoURL"
 func snakeToPascal(s string) string {
-	parts := strings.Split(s, "_")
-	var result strings.Builder
-	for _, p := range parts {
-		if p == "" {
-			continue
-		}
-		if acronym, ok := commonAcronyms[strings.ToLower(p)]; ok {
-			result.WriteString(acronym)
-		} else {
-			result.WriteString(strings.ToUpper(p[:1]) + p[1:])
-		}
-	}
-	return result.String()
+	return strcase.ToGoPascal(s)
 }

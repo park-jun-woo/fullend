@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/geul-org/fullend/internal/statemachine"
@@ -62,7 +63,7 @@ func generateHurlTests(doc *openapi3.T, outDir, specsDir string, diagrams []*sta
 		resource := inferResource(step.Path)
 		if resource != currentResource {
 			currentResource = resource
-			buf.WriteString(fmt.Sprintf("\n# ===== %s =====\n\n", ucFirst(resource)))
+			buf.WriteString(fmt.Sprintf("\n# ===== %s =====\n\n", strcase.ToGoPascal(resource)))
 		}
 
 		writeStep(&buf, step, captures, doc)
@@ -472,23 +473,7 @@ func substitutePathParams(path string, captures map[string]bool) string {
 
 // pascalToSnakeHurl converts PascalCase to snake_case for Hurl variable names.
 func pascalToSnakeHurl(s string) string {
-	var result []byte
-	for i, c := range s {
-		if c >= 'A' && c <= 'Z' {
-			if i > 0 {
-				prev := s[i-1]
-				if prev >= 'a' && prev <= 'z' {
-					result = append(result, '_')
-				} else if prev >= 'A' && prev <= 'Z' && i+1 < len(s) && s[i+1] >= 'a' && s[i+1] <= 'z' {
-					result = append(result, '_')
-				}
-			}
-			result = append(result, byte(c-'A'+'a'))
-		} else {
-			result = append(result, byte(c))
-		}
-	}
-	return string(result)
+	return strcase.ToSnake(s)
 }
 
 // Helper functions for scenario ordering.

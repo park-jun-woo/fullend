@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
@@ -270,14 +271,7 @@ func writeAppTSX(srcDir string, doc *openapi3.T, stmlPages []string, stmlPageOps
 
 // fileNameToComponent converts "course-list-page" → "CourseListPage"
 func fileNameToComponent(fileName string) string {
-	parts := strings.Split(fileName, "-")
-	var result strings.Builder
-	for _, p := range parts {
-		if len(p) > 0 {
-			result.WriteString(strings.ToUpper(p[:1]) + p[1:])
-		}
-	}
-	return result.String()
+	return strcase.ToGoPascal(fileName)
 }
 
 // writeAPIClient generates api.ts with fetch wrappers using object parameters.

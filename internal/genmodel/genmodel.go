@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
@@ -214,7 +215,7 @@ func (m methodInfo) implementation(receiverType string) string {
 			if i > 0 {
 				buf.WriteString(", ")
 			}
-			fmt.Fprintf(&buf, "%q: %s", toJSONKey(p.Name), p.Name)
+			fmt.Fprintf(&buf, "%q: %s", p.Name, p.Name)
 		}
 		buf.WriteString("}\n")
 	}
@@ -250,7 +251,7 @@ func (m methodInfo) buildPathExpr() string {
 	path := m.Path
 	var args []string
 	for _, p := range pathParams {
-		placeholder := "{" + toJSONKey(p.Name) + "}"
+		placeholder := "{" + p.Name + "}"
 		if strings.Contains(path, placeholder) {
 			path = strings.Replace(path, placeholder, "%v", 1)
 			args = append(args, p.Name)
@@ -501,51 +502,15 @@ func doHelper(receiverType string) string {
 // --- String helpers ---
 
 func toPascalCase(s string) string {
-	// Split by non-alphanumeric
-	var parts []string
-	current := strings.Builder{}
-	for _, r := range s {
-		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') {
-			current.WriteRune(r)
-		} else {
-			if current.Len() > 0 {
-				parts = append(parts, current.String())
-				current.Reset()
-			}
-		}
-	}
-	if current.Len() > 0 {
-		parts = append(parts, current.String())
-	}
-
-	var result strings.Builder
-	for _, p := range parts {
-		if len(p) == 0 {
-			continue
-		}
-		result.WriteString(strings.ToUpper(p[:1]) + p[1:])
-	}
-	return result.String()
+	return strcase.ToGoPascal(s)
 }
 
 func toCamelCase(s string) string {
-	p := toPascalCase(s)
-	if len(p) == 0 {
-		return p
-	}
-	return strings.ToLower(p[:1]) + p[1:]
+	return strcase.ToGoCamel(s)
 }
 
 func lcFirst(s string) string {
-	if len(s) == 0 {
-		return s
-	}
-	return strings.ToLower(s[:1]) + s[1:]
-}
-
-func toJSONKey(s string) string {
-	// camelCase → camelCase (already)
-	return s
+	return strcase.ToGoCamel(s)
 }
 
 func sortedKeys(m openapi3.Schemas) []string {

@@ -28,7 +28,12 @@ var globalEval *rego.PreparedEvalQuery
 var globalDB *sql.DB
 
 // Init initializes the global authz evaluator with the embedded Rego policy.
+// Skips OPA initialization when DISABLE_AUTHZ=1.
 func Init(db *sql.DB) error {
+	if os.Getenv("DISABLE_AUTHZ") == "1" {
+		globalDB = db
+		return nil
+	}
 	query, err := rego.New(
 		rego.Query("data.authz.allow"),
 		rego.Module("policy.rego", policyRego),

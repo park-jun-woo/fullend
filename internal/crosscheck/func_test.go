@@ -405,7 +405,7 @@ func TestCheckFuncs_StubIsError(t *testing.T) {
 func TestCheckFuncs_ForbiddenImport(t *testing.T) {
 	specs := []funcspec.FuncSpec{{
 		Package: "bad",
-		Name:    "doIO",
+		Name:    "doQuery",
 		RequestFields: []funcspec.Field{
 			{Name: "Key", Type: "string"},
 		},
@@ -417,7 +417,7 @@ func TestCheckFuncs_ForbiddenImport(t *testing.T) {
 		Name: "Handler",
 		Sequences: []ssacparser.Sequence{{
 			Type:  "call",
-			Model: "bad.DoIO",
+			Model: "bad.DoQuery",
 			Inputs: map[string]string{
 				"Key": "request.Key",
 			},

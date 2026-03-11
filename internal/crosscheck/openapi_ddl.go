@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"unicode"
 
+	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 
 	ssacparser "github.com/geul-org/ssac/parser"
@@ -314,19 +314,6 @@ func columnExistsInAnyTable(snake string, st *ssacvalidator.SymbolTable) bool {
 }
 
 // pascalToSnake converts PascalCase to snake_case.
-// e.g. "RoomID" → "room_id", "StartAt" → "start_at", "CreatedAt" → "created_at"
 func pascalToSnake(s string) string {
-	var result []rune
-	for i, r := range s {
-		if unicode.IsUpper(r) && i > 0 {
-			prev := rune(s[i-1])
-			if unicode.IsLower(prev) {
-				result = append(result, '_')
-			} else if unicode.IsUpper(prev) && i+1 < len(s) && unicode.IsLower(rune(s[i+1])) {
-				result = append(result, '_')
-			}
-		}
-		result = append(result, unicode.ToLower(r))
-	}
-	return string(result)
+	return strcase.ToSnake(s)
 }

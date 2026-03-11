@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ettle/strcase"
 	ssacparser "github.com/geul-org/ssac/parser"
 )
 
@@ -290,7 +291,7 @@ func generateModelFile(modelDir string, modelName string, methods []ifaceMethod,
 
 // generateScanFunc generates a scan helper function for a model.
 func generateScanFunc(b *strings.Builder, modelName string, table *ddlTable) {
-	lowerName := strings.ToLower(modelName[:1]) + modelName[1:]
+	lowerName := strcase.ToGoCamel(modelName)
 	varName := string(lowerName[0])
 
 	b.WriteString(fmt.Sprintf("func scan%s(s interface{ Scan(...interface{}) error }) (*%s, error) {\n", modelName, modelName))
@@ -428,7 +429,7 @@ func generateMethodFromIface(b *strings.Builder, implName, modelName string, m i
 		b.WriteString("\t}\n")
 		// Include loading — always applied (x-include is codegen metadata, not runtime option).
 		for _, inc := range includes {
-			helperName := "include" + strings.ToUpper(inc.IncludeName[:1]) + inc.IncludeName[1:]
+			helperName := "include" + strcase.ToGoPascal(inc.IncludeName)
 			b.WriteString(fmt.Sprintf("\tif err := m.%s(items); err != nil {\n", helperName))
 			b.WriteString("\t\treturn nil, err\n")
 			b.WriteString("\t}\n")
@@ -755,50 +756,17 @@ func singularize(name string) string {
 	if len(singular) == 0 {
 		return name
 	}
-	return strings.ToUpper(singular[:1]) + singular[1:]
+	return strcase.ToGoPascal(singular)
 }
 
 // snakeToGo converts a snake_case column name to a Go PascalCase field name.
 func snakeToGo(s string) string {
-	parts := strings.Split(s, "_")
-	var b strings.Builder
-	for _, p := range parts {
-		if p == "" {
-			continue
-		}
-		// Special case: "id" -> "ID"
-		if strings.ToLower(p) == "id" {
-			b.WriteString("ID")
-		} else {
-			b.WriteString(strings.ToUpper(p[:1]) + p[1:])
-		}
-	}
-	return b.String()
+	return strcase.ToGoPascal(s)
 }
 
 // goToSnake converts a Go camelCase/PascalCase name to snake_case.
-// Handles consecutive uppercase (e.g. clientID → client_id, freelancerID → freelancer_id).
 func goToSnake(s string) string {
-	runes := []rune(s)
-	var b strings.Builder
-	for i, r := range runes {
-		if r >= 'A' && r <= 'Z' {
-			if i > 0 {
-				prev := runes[i-1]
-				// Insert underscore before uppercase if previous is lowercase,
-				// or if previous is uppercase and next is lowercase (e.g. "ID" at end is kept together).
-				if prev >= 'a' && prev <= 'z' {
-					b.WriteByte('_')
-				} else if prev >= 'A' && prev <= 'Z' && i+1 < len(runes) && runes[i+1] >= 'a' && runes[i+1] <= 'z' {
-					b.WriteByte('_')
-				}
-			}
-			b.WriteRune(r + ('a' - 'A'))
-		} else {
-			b.WriteRune(r)
-		}
-	}
-	return b.String()
+	return strcase.ToSnake(s)
 }
 
 // sqlTypeToGo maps a SQL type to a Go type.
@@ -896,7 +864,7 @@ func resolveIncludes(modelName string, includeSpecs []string, tables map[string]
 
 // generateIncludeHelper generates a forward FK include helper method for a model.
 func generateIncludeHelper(b *strings.Builder, implName, modelName string, inc includeMapping) {
-	helperName := "include" + strings.ToUpper(inc.IncludeName[:1]) + inc.IncludeName[1:]
+	helperName := "include" + strcase.ToGoPascal(inc.IncludeName)
 	fkGoName := snakeToGo(inc.FKColumn)
 
 	b.WriteString(fmt.Sprintf("func (m *%s) %s(items []%s) error {\n", implName, helperName, modelName))

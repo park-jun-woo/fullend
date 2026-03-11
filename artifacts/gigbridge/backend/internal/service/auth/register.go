@@ -8,19 +8,19 @@ import (
 
 func (h *Handler) Register(c *gin.Context) {
 	var req struct {
-		email    string `json:"email"`
-		password string `json:"password"`
-		name     string `json:"name"`
-		role     string `json:"role"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+		Role     string `json:"role"`
+		Name     string `json:"name"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
-	email := req.email
-	password := req.password
-	name := req.name
-	role := req.role
+	email := req.Email
+	password := req.Password
+	role := req.Role
+	name := req.Name
 
 	existingUser, err := h.UserModel.FindByEmail(email)
 	if err != nil {

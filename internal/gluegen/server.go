@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
@@ -160,9 +161,7 @@ func convertPathParams(path string) string {
 	return path
 }
 
+// ucFirst converts to Go PascalCase (uppercases the first character with Go initialism handling).
 func ucFirst(s string) string {
-	if len(s) == 0 {
-		return s
-	}
-	return strings.ToUpper(s[:1]) + s[1:]
+	return strcase.ToGoPascal(s)
 }

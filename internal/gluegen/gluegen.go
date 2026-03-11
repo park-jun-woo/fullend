@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/geul-org/fullend/internal/statemachine"
@@ -544,12 +545,9 @@ func domainNeedsAuth(funcs []ssacparser.ServiceFunc, domain string) bool {
 	return false
 }
 
-// lcFirst lowercases the first character.
+// lcFirst converts to camelCase (lowercases the first character with Go initialism handling).
 func lcFirst(s string) string {
-	if len(s) == 0 {
-		return s
-	}
-	return strings.ToLower(s[:1]) + s[1:]
+	return strcase.ToGoCamel(s)
 }
 
 // collectModelIncludes extracts per-model x-include specs from OpenAPI operations.

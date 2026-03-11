@@ -8,6 +8,8 @@ import (
 	"io/fs"
 	"path/filepath"
 	"strings"
+
+	"github.com/ettle/strcase"
 )
 
 // FuncSpec holds a parsed func spec file.
@@ -168,9 +170,7 @@ func isStubBody(fset *token.FileSet, body *ast.BlockStmt) bool {
 	return isReturn
 }
 
+// ucFirst converts to Go PascalCase (uppercases the first character with Go initialism handling).
 func ucFirst(s string) string {
-	if len(s) == 0 {
-		return s
-	}
-	return strings.ToUpper(s[:1]) + s[1:]
+	return strcase.ToGoPascal(s)
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/geul-org/fullend/internal/funcspec"
@@ -56,7 +57,7 @@ func CheckFuncs(
 				funcName = callParts[1]
 			}
 			// Func spec uses camelCase name (e.g. "verifyPassword"), v2 Model has PascalCase.
-			camelName := strings.ToLower(funcName[:1]) + funcName[1:]
+			camelName := strcase.ToGoCamel(funcName)
 			key := pkg + "." + camelName
 			if pkg == "" {
 				key = camelName
@@ -123,7 +124,7 @@ func CheckFuncs(
 						errs = append(errs, CrossError{
 							Rule:    "Func ↔ SSaC",
 							Context: ctx,
-							Message: fmt.Sprintf("@call Input 필드 %q가 %sRequest에 없음", inputKey, strings.ToUpper(funcName[:1])+funcName[1:]),
+							Message: fmt.Sprintf("@call Input 필드 %q가 %sRequest에 없음", inputKey, strcase.ToGoPascal(funcName)),
 							Level:   "ERROR",
 						})
 						continue
@@ -264,8 +265,8 @@ func resolveOpenAPIFieldType(doc *openapi3.T, operationID, fieldName string) str
 				}
 				propRef, ok := mt.Schema.Value.Properties[fieldName]
 				if !ok {
-					// Try camelCase → lowercase first letter.
-					propRef, ok = mt.Schema.Value.Properties[strings.ToLower(fieldName[:1])+fieldName[1:]]
+					// Try camelCase lookup.
+					propRef, ok = mt.Schema.Value.Properties[strcase.ToGoCamel(fieldName)]
 					if !ok {
 						continue
 					}
@@ -316,7 +317,7 @@ func typesCompatible(a, b string) bool {
 
 // generateSkeleton creates a skeleton code hint for a missing func.
 func generateSkeleton(pkg, funcName string, seq ssacparser.Sequence) string {
-	uc := strings.ToUpper(funcName[:1]) + funcName[1:]
+	uc := strcase.ToGoPascal(funcName)
 	if pkg == "" {
 		pkg = "custom"
 	}
@@ -332,7 +333,7 @@ func generateSkeleton(pkg, funcName string, seq ssacparser.Sequence) string {
 		if seq.Result.Type != "" {
 			typeName = seq.Result.Type
 		}
-		responseFields = append(responseFields, fmt.Sprintf("\t%s %s", strings.ToUpper(seq.Result.Var[:1])+seq.Result.Var[1:], typeName))
+		responseFields = append(responseFields, fmt.Sprintf("\t%s %s", strcase.ToGoPascal(seq.Result.Var), typeName))
 	}
 
 	var b strings.Builder
@@ -388,18 +389,7 @@ func checkForbiddenImports(imports []string) []string {
 	return found
 }
 
-// toSnakeCase converts camelCase to snake_case.
+// toSnakeCase converts camelCase/PascalCase to snake_case.
 func toSnakeCase(s string) string {
-	var result []byte
-	for i, c := range s {
-		if c >= 'A' && c <= 'Z' {
-			if i > 0 {
-				result = append(result, '_')
-			}
-			result = append(result, byte(c-'A'+'a'))
-		} else {
-			result = append(result, byte(c))
-		}
-	}
-	return string(result)
+	return strcase.ToSnake(s)
 }

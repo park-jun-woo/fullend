@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 )
 
@@ -170,8 +171,8 @@ func needsAuth(op *openapi3.Operation) bool {
 }
 
 // inferCaptureField finds the response field that contains an ID to capture.
-// e.g. response has "course" object with "ID" → capture "course_id" from "$.course.id"
-// Uses snake_case field names to match sqlc-generated JSON tags.
+// e.g. response has "gig" object with "id" → capture "gig_id" from "$.gig.id"
+// Checks both "id" (OpenAPI convention) and "ID" (Go convention) property names.
 func inferCaptureField(respSchema *openapi3.Schema) (varName, jsonPath string) {
 	if respSchema == nil {
 		return "", ""
@@ -181,10 +182,13 @@ func inferCaptureField(respSchema *openapi3.Schema) (varName, jsonPath string) {
 		if prop.Type.Slice()[0] != "object" {
 			continue
 		}
-		// Check if this object has an ID field.
+		// Check if this object has an id/ID field.
 		if prop.Properties != nil {
+			if _, hasID := prop.Properties["id"]; hasID {
+				return strcase.ToSnake(name) + "_id", "$." + name + ".id"
+			}
 			if _, hasID := prop.Properties["ID"]; hasID {
-				return strings.ToLower(name) + "_id", "$." + name + ".id"
+				return strcase.ToSnake(name) + "_id", "$." + name + ".ID"
 			}
 		}
 	}

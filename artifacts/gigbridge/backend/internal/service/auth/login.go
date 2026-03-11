@@ -8,15 +8,15 @@ import (
 
 func (h *Handler) Login(c *gin.Context) {
 	var req struct {
-		email    string `json:"email"`
-		password string `json:"password"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
-	email := req.email
-	password := req.password
+	email := req.Email
+	password := req.Password
 
 	user, err := h.UserModel.FindByEmail(email)
 	if err != nil {

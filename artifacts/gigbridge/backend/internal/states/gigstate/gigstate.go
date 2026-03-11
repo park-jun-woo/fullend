@@ -11,9 +11,9 @@ const (
 	StateCompleted = "completed"
 	StateDisputed = "disputed"
 	StateDraft = "draft"
-	StateIn_progress = "in_progress"
+	StateInProgress = "in_progress"
 	StateOpen = "open"
-	StateUnder_review = "under_review"
+	StateUnderReview = "under_review"
 )
 
 // Input holds the state field value for transition checks.

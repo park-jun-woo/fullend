@@ -442,8 +442,11 @@ func inferScenarioCapture(captureName string, op *openapi3.Operation) (string, s
 				return "", ""
 			}
 			if prop.Properties != nil {
-				if _, hasID := prop.Properties["ID"]; hasID {
+				if _, hasID := prop.Properties["id"]; hasID {
 					return captureName + "_id", "$." + name + ".id"
+				}
+				if _, hasID := prop.Properties["ID"]; hasID {
+					return captureName + "_id", "$." + name + ".ID"
 				}
 			}
 		}

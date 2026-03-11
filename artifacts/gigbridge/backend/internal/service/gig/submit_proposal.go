@@ -19,13 +19,13 @@ func (h *Handler) SubmitProposal(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(*model.CurrentUser)
 
 	var req struct {
-		bid_amount int64 `json:"bid_amount"`
+		BidAmount int64 `json:"bid_amount"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
-	bid_amount := req.bid_amount
+	bidAmount := req.BidAmount
 
 	gig, err := h.GigModel.FindByID(id)
 	if err != nil {
@@ -43,7 +43,7 @@ func (h *Handler) SubmitProposal(c *gin.Context) {
 		return
 	}
 
-	proposal, err := h.ProposalModel.Create(bid_amount, currentUser.ID, gig.ID, "pending")
+	proposal, err := h.ProposalModel.Create(bidAmount, currentUser.ID, gig.ID, "pending")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Proposal 생성 실패"})
 		return
