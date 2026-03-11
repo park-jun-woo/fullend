@@ -33,7 +33,18 @@ Create 10 SSOTs in `specs/<project>/`:
 - Gherkin step operationId, METHOD, and JSON fields must match OpenAPI.
 - x-sort/x-filter allowed columns must exist in DDL, preferably indexed.
 
-## 3. Validate
+## 3. Generate External Models (Optional)
+
+If the project consumes external APIs, generate Go models from their OpenAPI docs:
+
+```bash
+fullend gen-model <openapi-source> <output-dir>
+fullend gen-model https://api.stripe.com/openapi.yaml specs/<project>/external/
+```
+
+This generates a `.go` file with interface + types + HTTP client. Place it wherever the project's SSaC imports reference.
+
+## 4. Validate
 
 ```bash
 cd ~/.clari/repos/fullend
@@ -45,7 +56,7 @@ go build ./cmd/fullend/
 - Review WARNINGs — fix if unintended.
 - Do not run gen until validation passes.
 
-## 4. Generate
+## 5. Generate
 
 ```bash
 ./fullend gen specs/<project> artifacts/<project>
@@ -56,7 +67,7 @@ Output:
 - `artifacts/<project>/frontend/` — React frontend
 - `artifacts/<project>/tests/` — Hurl tests (smoke + scenario + invariant)
 
-## 5. Build Backend
+## 6. Build Backend
 
 ```bash
 cd artifacts/<project>/backend
@@ -65,7 +76,7 @@ go build -o server ./cmd/
 
 If build fails, suspect SSOT or codegen bug. Never edit generated code directly.
 
-## 6. DB Setup + Server Start
+## 7. DB Setup + Server Start
 
 ```bash
 # Apply DDL (table order: respect FK dependencies)
@@ -77,7 +88,7 @@ done
 DISABLE_AUTHZ=1 DISABLE_STATE_CHECK=1 JWT_SECRET=test-secret-key ./server -dsn "postgres://..." &
 ```
 
-## 7. Run Hurl Tests
+## 8. Run Hurl Tests
 
 ```bash
 cd artifacts/<project>

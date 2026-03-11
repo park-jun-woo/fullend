@@ -62,6 +62,16 @@ fullend gen <specs-dir> <artifacts-dir>
 fullend gen --skip terraform <specs-dir> <artifacts-dir>
 ```
 
+### gen-model
+
+Generates a Go model file (interface + types + HTTP client) from an external OpenAPI document. Accepts a local file path or URL.
+
+```bash
+fullend gen-model <openapi-source> <output-dir>
+fullend gen-model https://api.stripe.com/openapi.yaml ./external/
+fullend gen-model specs/my-project/external/escrow.openapi.yaml specs/my-project/external/
+```
+
 ### status
 
 Shows a summary of detected SSOTs and their stats.
