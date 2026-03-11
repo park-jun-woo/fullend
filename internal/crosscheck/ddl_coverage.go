@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/ettle/strcase"
-	"github.com/getkin/kin-openapi/openapi3"
 
 	ssacparser "github.com/geul-org/ssac/parser"
 	ssacvalidator "github.com/geul-org/ssac/validator"
@@ -15,7 +14,6 @@ import (
 func CheckDDLCoverage(
 	st *ssacvalidator.SymbolTable,
 	funcs []ssacparser.ServiceFunc,
-	doc *openapi3.T,
 	archived *ArchivedInfo,
 ) []CrossError {
 	var errs []CrossError
@@ -34,9 +32,6 @@ func CheckDDLCoverage(
 	// Build set of tables referenced by SSaC (@model and @result).
 	referencedTables := buildReferencedTables(funcs)
 
-	// Build set of OpenAPI schema properties per model name.
-	schemaProps := buildSchemaProps(doc)
-
 	// Rule 1: DDL table → SSaC reference.
 	for tableName := range st.DDLTables {
 		if archived.Tables[tableName] {
@@ -48,42 +43,8 @@ func CheckDDLCoverage(
 				Context:    tableName,
 				Message:    fmt.Sprintf("DDL 테이블 %q가 SSaC에서 참조되지 않습니다", tableName),
 				Level:      "ERROR",
-				Suggestion: fmt.Sprintf("더 이상 사용하지 않는 테이블이면 DDL에 -- @archived를 추가하세요"),
+				Suggestion: "더 이상 사용하지 않는 테이블이면 DDL에 -- @archived를 추가하세요",
 			})
-		}
-	}
-
-	// Rule 2: DDL column → OpenAPI schema property.
-	for tableName, table := range st.DDLTables {
-		if archived.Tables[tableName] {
-			continue
-		}
-		if !referencedTables[tableName] {
-			continue // already warned at table level
-		}
-
-		modelName := tableToModel(tableName)
-		props, ok := schemaProps[modelName]
-		if !ok {
-			continue // no OpenAPI schema for this model
-		}
-
-		archivedCols := archived.Columns[tableName]
-
-		for _, colName := range table.ColumnOrder {
-			if archivedCols != nil && archivedCols[colName] {
-				continue
-			}
-			pascalCol := snakeToPascal(colName)
-			if !props[pascalCol] {
-				errs = append(errs, CrossError{
-					Rule:       "DDL → OpenAPI",
-					Context:    fmt.Sprintf("%s.%s", tableName, colName),
-					Message:    fmt.Sprintf("DDL 컬럼 %q가 OpenAPI %s 스키마에 없습니다", colName, modelName),
-					Level:      "WARNING",
-					Suggestion: "더 이상 사용하지 않는 컬럼이면 DDL에 -- @archived를 추가하세요",
-				})
-			}
 		}
 	}
 
@@ -117,25 +78,6 @@ func buildReferencedTables(funcs []ssacparser.ServiceFunc) map[string]bool {
 		}
 	}
 	return tables
-}
-
-// buildSchemaProps collects OpenAPI schema properties per schema name.
-func buildSchemaProps(doc *openapi3.T) map[string]map[string]bool {
-	props := make(map[string]map[string]bool)
-	if doc == nil || doc.Components == nil || doc.Components.Schemas == nil {
-		return props
-	}
-	for name, ref := range doc.Components.Schemas {
-		if ref.Value == nil {
-			continue
-		}
-		m := make(map[string]bool)
-		for propName := range ref.Value.Properties {
-			m[propName] = true
-		}
-		props[name] = m
-	}
-	return props
 }
 
 // tableToModel converts a DDL table name to a model name.

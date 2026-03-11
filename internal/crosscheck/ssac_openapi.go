@@ -2,13 +2,17 @@ package crosscheck
 
 import (
 	"fmt"
+	"sort"
+
+	"github.com/getkin/kin-openapi/openapi3"
 
 	ssacparser "github.com/geul-org/ssac/parser"
 	ssacvalidator "github.com/geul-org/ssac/validator"
 )
 
-// CheckSSaCOpenAPI validates SSaC function names match OpenAPI operationIds and vice versa.
-func CheckSSaCOpenAPI(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable) []CrossError {
+// CheckSSaCOpenAPI validates SSaC function names match OpenAPI operationIds and vice versa,
+// and SSaC @response fields match OpenAPI response schema properties.
+func CheckSSaCOpenAPI(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable, doc *openapi3.T) []CrossError {
 	var errs []CrossError
 
 	funcNames := make(map[string]string) // funcName → fileName
@@ -41,5 +45,148 @@ func CheckSSaCOpenAPI(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTa
 		}
 	}
 
+	// Rule 5 & 6: SSaC @response fields ↔ OpenAPI response schema properties.
+	errs = append(errs, checkResponseFields(funcs, st, doc)...)
+
 	return errs
+}
+
+// checkResponseFields validates that SSaC @response field keys match OpenAPI response schema properties.
+func checkResponseFields(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable, doc *openapi3.T) []CrossError {
+	var errs []CrossError
+
+	// Build OpenAPI response properties per operationId.
+	opResponseProps := buildOperationResponseProps(doc)
+
+	for _, fn := range funcs {
+		// Find @response sequence with explicit fields.
+		responseFields := extractResponseFieldKeys(fn)
+		if responseFields == nil {
+			continue // shorthand (@response varName) or no @response — skip
+		}
+
+		opProps, hasOp := opResponseProps[fn.Name]
+		if !hasOp {
+			continue // no OpenAPI operation — already caught by Rule 3
+		}
+
+		// Rule 5: SSaC @response field → OpenAPI response property (ERROR).
+		for _, field := range responseFields {
+			if !opProps[field] {
+				errs = append(errs, CrossError{
+					Rule:       "SSaC @response → OpenAPI",
+					Context:    fmt.Sprintf("%s:%s", fn.FileName, fn.Name),
+					Message:    fmt.Sprintf("SSaC @response 필드 %q가 OpenAPI %s 응답 스키마에 없습니다", field, fn.Name),
+					Suggestion: fmt.Sprintf("OpenAPI %s 응답 스키마에 %q property를 추가하세요", fn.Name, field),
+				})
+			}
+		}
+
+		// Rule 6: OpenAPI response property → SSaC @response field (WARNING).
+		responseFieldSet := make(map[string]bool, len(responseFields))
+		for _, f := range responseFields {
+			responseFieldSet[f] = true
+		}
+		for prop := range opProps {
+			if !responseFieldSet[prop] {
+				errs = append(errs, CrossError{
+					Rule:       "OpenAPI → SSaC @response",
+					Context:    fmt.Sprintf("%s:%s", fn.FileName, fn.Name),
+					Message:    fmt.Sprintf("OpenAPI %s 응답 필드 %q가 SSaC @response에 없습니다", fn.Name, prop),
+					Level:      "WARNING",
+					Suggestion: fmt.Sprintf("SSaC @response에 %q 필드를 추가하거나 OpenAPI에서 제거하세요", prop),
+				})
+			}
+		}
+	}
+
+	return errs
+}
+
+// extractResponseFieldKeys returns the @response field keys for a function,
+// or nil if the function uses shorthand (@response varName) or has no @response.
+func extractResponseFieldKeys(fn ssacparser.ServiceFunc) []string {
+	for _, seq := range fn.Sequences {
+		if seq.Type != "response" {
+			continue
+		}
+		// Shorthand: @response varName — no individual field keys.
+		if seq.Target != "" {
+			return nil
+		}
+		if len(seq.Fields) == 0 {
+			return nil
+		}
+		keys := make([]string, 0, len(seq.Fields))
+		for k := range seq.Fields {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		return keys
+	}
+	return nil
+}
+
+// buildOperationResponseProps collects response schema property names per operationId from the OpenAPI doc.
+func buildOperationResponseProps(doc *openapi3.T) map[string]map[string]bool {
+	result := make(map[string]map[string]bool)
+	if doc == nil || doc.Paths == nil {
+		return result
+	}
+
+	for _, pathItem := range doc.Paths.Map() {
+		for _, op := range []*openapi3.Operation{
+			pathItem.Get, pathItem.Post, pathItem.Put,
+			pathItem.Delete, pathItem.Patch,
+		} {
+			if op == nil || op.OperationID == "" || op.Responses == nil {
+				continue
+			}
+
+			props := make(map[string]bool)
+
+			// Check 200 and 201 responses.
+			for _, code := range []string{"200", "201"} {
+				resp := op.Responses.Status(codeToInt(code))
+				if resp == nil || resp.Value == nil || resp.Value.Content == nil {
+					continue
+				}
+				ct := resp.Value.Content.Get("application/json")
+				if ct == nil || ct.Schema == nil {
+					continue
+				}
+				schema := resolveSchemaRef(ct.Schema)
+				if schema == nil {
+					continue
+				}
+				for propName := range schema.Properties {
+					props[propName] = true
+				}
+			}
+
+			if len(props) > 0 {
+				result[op.OperationID] = props
+			}
+		}
+	}
+
+	return result
+}
+
+func resolveSchemaRef(ref *openapi3.SchemaRef) *openapi3.Schema {
+	if ref == nil {
+		return nil
+	}
+	return ref.Value
+}
+
+func codeToInt(code string) int {
+	switch code {
+	case "200":
+		return 200
+	case "201":
+		return 201
+	default:
+		return 0
+	}
 }

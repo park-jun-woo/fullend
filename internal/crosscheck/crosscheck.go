@@ -43,9 +43,9 @@ func Run(input *CrossValidateInput) []CrossError {
 		errs = append(errs, CheckSSaCDDL(input.ServiceFuncs, input.SymbolTable, input.DTOTypes)...)
 	}
 
-	// SSaC ↔ OpenAPI (function name ↔ operationId)
+	// SSaC ↔ OpenAPI (function name ↔ operationId + @response fields ↔ response schema)
 	if input.ServiceFuncs != nil && input.SymbolTable != nil {
-		errs = append(errs, CheckSSaCOpenAPI(input.ServiceFuncs, input.SymbolTable)...)
+		errs = append(errs, CheckSSaCOpenAPI(input.ServiceFuncs, input.SymbolTable, input.OpenAPIDoc)...)
 	}
 
 	// States ↔ SSaC/DDL/OpenAPI
@@ -78,9 +78,9 @@ func Run(input *CrossValidateInput) []CrossError {
 		errs = append(errs, CheckClaims(input.ServiceFuncs, input.Claims)...)
 	}
 
-	// DDL → SSaC/OpenAPI coverage
+	// DDL → SSaC coverage
 	if input.SymbolTable != nil && input.ServiceFuncs != nil {
-		errs = append(errs, CheckDDLCoverage(input.SymbolTable, input.ServiceFuncs, input.OpenAPIDoc, input.Archived)...)
+		errs = append(errs, CheckDDLCoverage(input.SymbolTable, input.ServiceFuncs, input.Archived)...)
 	}
 
 	// Queue: publish ↔ subscribe

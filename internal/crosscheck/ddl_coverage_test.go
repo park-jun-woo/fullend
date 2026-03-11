@@ -30,7 +30,7 @@ func TestCheckDDLCoverage_PackageModelSkipped(t *testing.T) {
 		}},
 	}}
 
-	errs := CheckDDLCoverage(st, funcs, nil, nil)
+	errs := CheckDDLCoverage(st, funcs, nil)
 	found := false
 	for _, e := range errs {
 		if e.Rule == "DDL → SSaC" && e.Level == "ERROR" {
@@ -62,7 +62,7 @@ func TestCheckDDLCoverage_DBModelReferenced(t *testing.T) {
 		}},
 	}}
 
-	errs := CheckDDLCoverage(st, funcs, nil, nil)
+	errs := CheckDDLCoverage(st, funcs, nil)
 	for _, e := range errs {
 		if e.Rule == "DDL → SSaC" && e.Level == "WARNING" && contains(e.Message, "users") {
 			t.Errorf("unexpected unreferenced WARNING for users table: %+v", e)
