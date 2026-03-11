@@ -25,6 +25,11 @@ func CheckSSaCDDL(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable,
 		ctx := fmt.Sprintf("%s:%s", fn.FileName, fn.Name)
 
 		for i, seq := range fn.Sequences {
+			// @call = 순수 로직, DDL 무관 — @result ↔ DDL 체크 스킵.
+			if seq.Type == "call" {
+				continue
+			}
+
 			// Rule 4: @result Type ↔ DDL table
 			if seq.Result != nil && seq.Result.Type != "" {
 				errs = append(errs, checkResultType(seq, st, ctx, i, dtoTypes)...)

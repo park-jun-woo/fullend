@@ -2,7 +2,6 @@ package crosscheck
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/geul-org/fullend/internal/policy"
 	"github.com/geul-org/fullend/internal/statemachine"
@@ -133,39 +132,7 @@ func CheckPolicy(policies []*policy.Policy, funcs []ssacparser.ServiceFunc, st *
 		}
 	}
 
-	// --- Policy ↔ States ---
-	if len(diagrams) > 0 && funcs != nil {
-		// Build map: transition event → SSaC authorize action (if exists).
-		eventToAction := make(map[string]string)
-		for _, fn := range funcs {
-			for _, seq := range fn.Sequences {
-				if seq.Type == "auth" {
-					eventToAction[fn.Name] = seq.Action
-				}
-			}
-		}
-
-		for _, d := range diagrams {
-			for _, event := range d.Events() {
-				action, hasAuthorize := eventToAction[event]
-				if !hasAuthorize {
-					continue // States ↔ SSaC crosscheck handles this
-				}
-				// Determine resource from diagram ID.
-				resource := strings.ToLower(d.ID)
-				pair := [2]string{action, resource}
-				if !allPairs[pair] {
-					errs = append(errs, CrossError{
-						Rule:       "Policy ↔ States",
-						Context:    fmt.Sprintf("%s.%s", d.ID, event),
-						Message:    fmt.Sprintf("state transition %q has authorize (action=%s) but no matching Rego allow rule", event, action),
-						Level:      "WARNING",
-						Suggestion: fmt.Sprintf("Add allow rule for action=%q resource=%q in policy/*.rego", action, resource),
-					})
-				}
-			}
-		}
-	}
+	// Policy ↔ States 제거: States ↔ SSaC + Policy ↔ SSaC가 전이적으로 커버.
 
 	return errs
 }

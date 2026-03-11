@@ -168,11 +168,11 @@ func isPathParam(op *openapi3.Operation, name string) bool {
 func checkScenarioStates(features []*scenario.Feature, diagrams []*statemachine.StateDiagram, opMap map[string]opInfo) []CrossError {
 	var errs []CrossError
 
-	// Build event → diagram lookup.
-	eventDiagram := make(map[string]*statemachine.StateDiagram)
+	// Build event → diagrams lookup (1:N — one event can appear in multiple diagrams).
+	eventDiagrams := make(map[string][]*statemachine.StateDiagram)
 	for _, d := range diagrams {
 		for _, ev := range d.Events() {
-			eventDiagram[ev] = d
+			eventDiagrams[ev] = append(eventDiagrams[ev], d)
 		}
 	}
 
@@ -195,37 +195,39 @@ func checkScenarioStates(features []*scenario.Feature, diagrams []*statemachine.
 				if !step.IsAction {
 					continue
 				}
-				d, ok := eventDiagram[step.OperationID]
+				ds, ok := eventDiagrams[step.OperationID]
 				if !ok {
 					continue
 				}
 
-				state := currentState[d.ID]
-				validFroms := d.ValidFromStates(step.OperationID)
-				isValid := false
-				for _, vs := range validFroms {
-					if vs == state {
-						isValid = true
-						break
+				for _, d := range ds {
+					state := currentState[d.ID]
+					validFroms := d.ValidFromStates(step.OperationID)
+					isValid := false
+					for _, vs := range validFroms {
+						if vs == state {
+							isValid = true
+							break
+						}
 					}
-				}
 
-				if !isValid && state != "" {
-					errs = append(errs, CrossError{
-						Rule:    "Scenario ↔ States",
-						Context: fmt.Sprintf("%s: %s → %s (current state: %s)", f.File, sc.Name, step.OperationID, state),
-						Message: fmt.Sprintf("event %q is not valid from state %q in %s diagram", step.OperationID, state, d.ID),
-						Level:   "WARNING",
-						Suggestion: fmt.Sprintf("Ensure scenario follows %s state transitions: valid from states %v",
-							d.ID, validFroms),
-					})
-				}
+					if !isValid && state != "" {
+						errs = append(errs, CrossError{
+							Rule:    "Scenario ↔ States",
+							Context: fmt.Sprintf("%s: %s → %s (current state: %s)", f.File, sc.Name, step.OperationID, state),
+							Message: fmt.Sprintf("event %q is not valid from state %q in %s diagram", step.OperationID, state, d.ID),
+							Level:   "WARNING",
+							Suggestion: fmt.Sprintf("Ensure scenario follows %s state transitions: valid from states %v",
+								d.ID, validFroms),
+						})
+					}
 
-				// Advance state.
-				for _, tr := range d.Transitions {
-					if tr.Event == step.OperationID && tr.From == state {
-						currentState[d.ID] = tr.To
-						break
+					// Advance state.
+					for _, tr := range d.Transitions {
+						if tr.Event == step.OperationID && tr.From == state {
+							currentState[d.ID] = tr.To
+							break
+						}
 					}
 				}
 			}
