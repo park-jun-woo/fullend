@@ -1,52 +1,4 @@
-package gluegen
-
-import (
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
-
-	"github.com/geul-org/fullend/internal/policy"
-)
-
-// GenerateAuthzPackage generates the OPA-based authz package.
-// If authzPackage is empty, generates default pkg/authz-style code.
-// If authzPackage is set (custom), only copies .rego files (user provides Go code).
-func GenerateAuthzPackage(policies []*policy.Policy, artifactsDir, modulePath, authzPackage string) error {
-	authzDir := filepath.Join(artifactsDir, "backend", "internal", "authz")
-	if err := os.MkdirAll(authzDir, 0755); err != nil {
-		return fmt.Errorf("create authz dir: %w", err)
-	}
-
-	// 1. Copy .rego file(s) for embedding.
-	regoFileName := "authz.rego"
-	for _, p := range policies {
-		data, err := os.ReadFile(p.File)
-		if err != nil {
-			return fmt.Errorf("read rego file: %w", err)
-		}
-		dest := filepath.Join(authzDir, filepath.Base(p.File))
-		if err := os.WriteFile(dest, data, 0644); err != nil {
-			return fmt.Errorf("copy rego file: %w", err)
-		}
-		regoFileName = filepath.Base(p.File)
-	}
-
-	// 2. If custom authz package, skip Go code generation (user provides it).
-	if authzPackage != "" {
-		return nil
-	}
-
-	// 3. Generate default authz.go (pkg/authz pattern: CheckRequest + Check function).
-	src := generateDefaultAuthzSource(regoFileName)
-	path := filepath.Join(authzDir, "authz.go")
-	return os.WriteFile(path, []byte(src), 0644)
-}
-
-func generateDefaultAuthzSource(regoFileName string) string {
-	var b strings.Builder
-
-	b.WriteString(`package authz
+package authz
 
 import (
 	"context"
@@ -58,9 +10,8 @@ import (
 	"github.com/open-policy-agent/opa/v1/rego"
 )
 
-`)
-	b.WriteString(fmt.Sprintf("//go:embed %s\n", regoFileName))
-	b.WriteString(`var policyRego string
+//go:embed authz.rego
+var policyRego string
 
 // CheckRequest holds the inputs for an authorization check.
 type CheckRequest struct {
@@ -119,8 +70,4 @@ func Check(req CheckRequest) (CheckResponse, error) {
 		return CheckResponse{}, fmt.Errorf("forbidden")
 	}
 	return CheckResponse{}, nil
-}
-`)
-
-	return b.String()
 }

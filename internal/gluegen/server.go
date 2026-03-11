@@ -35,20 +35,11 @@ func generateServerStruct(intDir string, models, funcs []string, modulePath stri
 		fieldName := ucFirst(f)
 		fields = append(fields, fmt.Sprintf("\t%s func(args ...interface{}) (interface{}, error)", fieldName))
 	}
-	// Auth.
-	fields = append(fields, "\tAuthz Authorizer")
-
 	b.WriteString("// Server implements api.ServerInterface.\n")
 	b.WriteString("type Server struct {\n")
 	for _, f := range fields {
 		b.WriteString(f + "\n")
 	}
-	b.WriteString("}\n\n")
-
-	// Authorizer interface.
-	b.WriteString("// Authorizer checks permissions.\n")
-	b.WriteString("type Authorizer interface {\n")
-	b.WriteString("\tCheck(user *CurrentUser, action, resource string, id interface{}) (bool, error)\n")
 	b.WriteString("}\n\n")
 
 	// Handler function.

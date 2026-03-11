@@ -24,6 +24,16 @@ Create 10 SSOTs in `specs/<project>/`:
 | 11 | Terraform | `terraform/*.tf` | HCL infrastructure |
 | Optional | Func Spec | `func/<pkg>/*.go` | @func, Request/Response struct |
 
+### fullend.yaml Optional Config
+
+| Config | Purpose | Default |
+|---|---|---|
+| `session.backend` | Session storage | (none) |
+| `cache.backend` | Cache storage | (none) |
+| `file.backend` | File storage | (none) |
+| `queue.backend` | Queue pub/sub | (none) |
+| `authz.package` | Custom authz package | `pkg/authz` (OPA Rego) |
+
 ### Authoring Principles
 
 - operationId is the key that connects all SSOTs. Names must match exactly across OpenAPI, SSaC, STML, States, and Scenario.
@@ -106,6 +116,8 @@ Pass criteria:
 |---|---|
 | validate | Fix SSOTs → re-validate |
 | gen | Codegen bug → report immediately, no workarounds |
+| go build (authz) | `@auth` generates `authz.Check()` package function. Ensure `authz.Init(conn)` is in main.go (auto-generated). Set `DISABLE_AUTHZ=1` to bypass. |
+| go build (config) | `config.Key` → `config.Get("KEY")`. Ensure env vars are set at runtime. |
 | go build | SSOT or codegen bug → never edit generated code |
 | hurl --test | Classify cause (SSOT vs codegen) → report |
 

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GigBridge - Gig Detail</title>
+</head>
+<body>
+    <h1>Gig Detail</h1>
+
+    <section data-fetch="GetGig" data-param-id="route.id">
+        <h2 data-bind="gig.title"></h2>
+        <p data-bind="gig.description"></p>
+        <span data-bind="gig.budget"></span>
+        <span data-bind="gig.status"></span>
+
+        <button data-action="PublishGig" data-param-id="route.id" data-state="gig.status === 'draft'">Publish</button>
+        <button data-action="SubmitWork" data-param-id="route.id" data-state="gig.status === 'in_progress'">Submit Work</button>
+        <button data-action="ApproveWork" data-param-id="route.id" data-state="gig.status === 'under_review'">Approve Work</button>
+
+        <section>
+            <h3>Submit Proposal</h3>
+            <form data-action="SubmitProposal" data-param-id="route.id">
+                <input type="number" data-field="bid_amount" placeholder="Bid Amount" />
+                <button type="submit" data-state="gig.status === 'open'">Submit Proposal</button>
+            </form>
+        </section>
+    </section>
+</body>
+</html>

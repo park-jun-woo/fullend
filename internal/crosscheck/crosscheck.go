@@ -26,6 +26,7 @@ type CrossValidateInput struct {
 	Archived         *ArchivedInfo     // @archived tables/columns from DDL
 	Claims           map[string]string // from fullend.yaml backend.auth.claims (FieldName → claim key)
 	QueueBackend     string            // from fullend.yaml queue.backend ("postgres", "memory", "")
+	AuthzPackage     string            // from fullend.yaml authz.package ("" = default pkg/authz)
 }
 
 // Run executes all cross-validation rules and returns collected errors.
@@ -85,6 +86,11 @@ func Run(input *CrossValidateInput) []CrossError {
 	// Queue: publish ↔ subscribe
 	if input.ServiceFuncs != nil {
 		errs = append(errs, CheckQueue(input.ServiceFuncs, input.QueueBackend)...)
+	}
+
+	// Authz: @auth inputs ↔ CheckRequest fields
+	if input.ServiceFuncs != nil {
+		errs = append(errs, CheckAuthz(input.ServiceFuncs, input.AuthzPackage)...)
 	}
 
 	return errs

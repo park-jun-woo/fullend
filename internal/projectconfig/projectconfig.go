@@ -20,6 +20,12 @@ type ProjectConfig struct {
 	Cache      *BuiltinBackend `yaml:"cache"`
 	File       *FileBackend    `yaml:"file"`
 	Queue      *QueueBackend   `yaml:"queue"`
+	Authz      *AuthzConfig    `yaml:"authz"`
+}
+
+// AuthzConfig configures the authorization package.
+type AuthzConfig struct {
+	Package string `yaml:"package"` // custom authz package path, default: github.com/geul-org/fullend/pkg/authz
 }
 
 type Metadata struct {

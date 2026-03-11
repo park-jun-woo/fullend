@@ -1,0 +1,17 @@
+package service
+
+import "github.com/gigbridge/api/internal/billing"
+import "github.com/geul-org/fullend/pkg/mail"
+
+// @get Gig gig = Gig.FindByID({ID: request.id})
+// @empty gig "Gig not found"
+// @auth "ApproveWork" "gig" {UserID: currentUser.ID, ResourceID: gig.ClientID} "Not authorized"
+// @state gig {Status: gig.Status} "ApproveWork" "Cannot approve work"
+// @put Gig.UpdateStatus({Status: "completed", ID: gig.ID})
+// @call billing.ReleaseFundsResponse release = billing.ReleaseFunds({GigID: gig.ID, Amount: gig.Budget, FreelancerID: gig.FreelancerID})
+// @post Transaction tx = Transaction.Create({GigID: gig.ID, TxType: "release", Amount: gig.Budget})
+// @get User freelancerUser = User.FindByID({ID: gig.FreelancerID})
+// @call mail.SendTemplateEmail({Host: config.SMTPHost, Port: config.SMTPPort, Username: config.SMTPUsername, Password: config.SMTPPassword, From: config.SMTPFrom, To: freelancerUser.Email, Subject: "Work Approved", TemplateName: "work_approved", Data: config.EmptyMap})
+// @get Gig updatedGig = Gig.FindByID({ID: gig.ID})
+// @response { gig: updatedGig }
+func ApproveWork() {}

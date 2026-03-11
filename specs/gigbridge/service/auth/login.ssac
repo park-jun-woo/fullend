@@ -1,0 +1,10 @@
+package service
+
+import "github.com/geul-org/fullend/pkg/auth"
+
+// @get User user = User.FindByEmail({Email: request.email})
+// @empty user "Invalid email or password"
+// @call auth.VerifyPassword({PasswordHash: user.PasswordHash, Password: request.password})
+// @call auth.IssueTokenResponse tok = auth.IssueToken({UserID: user.ID, Email: user.Email, Role: user.Role})
+// @response { token: tok.AccessToken }
+func Login() {}

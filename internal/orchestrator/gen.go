@@ -132,6 +132,7 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 		report.Steps = append(report.Steps, genAuthz(d.Path, specsDir, artifactsDir))
 	}
 
+
 	// 11. Scenario Hurl generation.
 	if d, ok := has[KindScenario]; ok {
 		report.Steps = append(report.Steps, genScenarioHurl(d.Path, specsDir, artifactsDir))
@@ -139,7 +140,8 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 
 	// 12. Func copy (custom func specs → artifacts).
 	if d, ok := has[KindFunc]; ok {
-		report.Steps = append(report.Steps, genFunc(d.Path, specsDir, artifactsDir))
+		modulePath := determineModulePath(specsDir, artifactsDir)
+		report.Steps = append(report.Steps, genFunc(d.Path, specsDir, artifactsDir, modulePath))
 	}
 
 	// 13. terraform fmt (외부 도구, 선택)
@@ -366,15 +368,19 @@ func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, stmlD
 	// Determine module path from fullend.yaml, fallback to directory-based.
 	modulePath := determineModulePath(specsDir, artifactsDir)
 
-	// Load claims and queue config from fullend.yaml.
+	// Load claims, queue, and authz config from fullend.yaml.
 	var claims map[string]string
 	var queueBackend string
+	var authzPackage string
 	if cfg, err := projectconfig.Load(specsDir); err == nil {
 		if cfg.Backend.Auth != nil {
 			claims = cfg.Backend.Auth.Claims
 		}
 		if cfg.Queue != nil {
 			queueBackend = cfg.Queue.Backend
+		}
+		if cfg.Authz != nil {
+			authzPackage = cfg.Authz.Package
 		}
 	}
 
@@ -387,6 +393,7 @@ func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, stmlD
 		STMLPageOps:  stmlPageOps,
 		Claims:       claims,
 		QueueBackend: queueBackend,
+		AuthzPackage: authzPackage,
 	}
 
 	// Load OpenAPI doc.
@@ -496,7 +503,11 @@ func genAuthz(policyDir, specsDir, artifactsDir string) reporter.StepResult {
 	}
 
 	modulePath := determineModulePath(specsDir, artifactsDir)
-	if err := gluegen.GenerateAuthzPackage(policies, artifactsDir, modulePath); err != nil {
+	var authzPackage string
+	if cfg, err := projectconfig.Load(specsDir); err == nil && cfg.Authz != nil {
+		authzPackage = cfg.Authz.Package
+	}
+	if err := gluegen.GenerateAuthzPackage(policies, artifactsDir, modulePath, authzPackage); err != nil {
 		step.Status = reporter.Fail
 		step.Errors = append(step.Errors, fmt.Sprintf("authz-gen error: %v", err))
 		return step
@@ -554,14 +565,24 @@ func genScenarioHurl(scenarioDir, specsDir, artifactsDir string) reporter.StepRe
 	return step
 }
 
-func genFunc(funcDir, specsDir, artifactsDir string) reporter.StepResult {
+func genFunc(funcDir, specsDir, artifactsDir, modulePath string) reporter.StepResult {
 	step := reporter.StepResult{Name: "func-gen"}
 
-	// Copy custom func files from specs/<project>/func/<pkg>/ → artifacts/<project>/backend/internal/<pkg>/.
+	// Copy custom func files from specs/<project>/func/<pkg>/ → artifacts/<project>/backend/<importSub>/.
+	// The destination is determined by scanning SSaC imports for the func package.
+	// Import path must be under internal/ or pkg/ within the module.
 	entries, err := os.ReadDir(funcDir)
 	if err != nil {
 		step.Status = reporter.Skip
 		step.Summary = "no func/ directory"
+		return step
+	}
+
+	// Scan SSaC files to find import paths for each func package.
+	funcImportPaths, err := scanFuncImports(specsDir, modulePath)
+	if err != nil {
+		step.Status = reporter.Fail
+		step.Errors = append(step.Errors, fmt.Sprintf("failed to scan SSaC imports: %v", err))
 		return step
 	}
 
@@ -572,7 +593,31 @@ func genFunc(funcDir, specsDir, artifactsDir string) reporter.StepResult {
 		}
 		pkg := entry.Name()
 		srcDir := filepath.Join(funcDir, pkg)
-		dstDir := filepath.Join(artifactsDir, "backend", "internal", pkg)
+
+		// Determine destination from SSaC import path.
+		importPath, ok := funcImportPaths[pkg]
+		if !ok {
+			step.Status = reporter.Fail
+			step.Errors = append(step.Errors, fmt.Sprintf("func/%s: SSaC에서 import하는 곳이 없습니다", pkg))
+			return step
+		}
+
+		// Extract relative path within module (e.g., "internal/billing" from "github.com/org/proj/internal/billing").
+		relPath := strings.TrimPrefix(importPath, modulePath+"/")
+		if relPath == importPath {
+			step.Status = reporter.Fail
+			step.Errors = append(step.Errors, fmt.Sprintf("func/%s: import 경로 %q가 모듈 %q에 속하지 않습니다", pkg, importPath, modulePath))
+			return step
+		}
+
+		// Validate: must be under internal/ or pkg/.
+		if !strings.HasPrefix(relPath, "internal/") && !strings.HasPrefix(relPath, "pkg/") {
+			step.Status = reporter.Fail
+			step.Errors = append(step.Errors, fmt.Sprintf("func/%s: import 경로 %q는 internal/ 또는 pkg/ 하위여야 합니다 (현재: %s)", pkg, importPath, relPath))
+			return step
+		}
+
+		dstDir := filepath.Join(artifactsDir, "backend", relPath)
 
 		if err := os.MkdirAll(dstDir, 0755); err != nil {
 			step.Status = reporter.Fail
@@ -601,6 +646,55 @@ func genFunc(funcDir, specsDir, artifactsDir string) reporter.StepResult {
 	step.Status = reporter.Pass
 	step.Summary = fmt.Sprintf("%d func files copied", copied)
 	return step
+}
+
+// scanFuncImports scans SSaC files for import statements that reference func packages.
+// Returns a map of package name → full import path.
+func scanFuncImports(specsDir, modulePath string) (map[string]string, error) {
+	result := make(map[string]string)
+
+	ssacFiles, _ := filepath.Glob(filepath.Join(specsDir, "service", "**", "*.ssac"))
+	if len(ssacFiles) == 0 {
+		ssacFiles, _ = filepath.Glob(filepath.Join(specsDir, "service", "*.ssac"))
+	}
+
+	for _, f := range ssacFiles {
+		data, err := os.ReadFile(f)
+		if err != nil {
+			continue
+		}
+		for _, line := range strings.Split(string(data), "\n") {
+			line = strings.TrimSpace(line)
+			// Match: import "github.com/org/proj/internal/billing"
+			// or:    // import "..."  (commented imports in SSaC are Go comments)
+			if !strings.HasPrefix(line, "import ") {
+				continue
+			}
+			// Extract quoted path.
+			q1 := strings.Index(line, "\"")
+			q2 := strings.LastIndex(line, "\"")
+			if q1 < 0 || q2 <= q1 {
+				continue
+			}
+			importPath := line[q1+1 : q2]
+
+			// Skip fullend built-in packages.
+			if strings.HasPrefix(importPath, "github.com/geul-org/fullend/") {
+				continue
+			}
+
+			// Only consider imports within the project module.
+			if !strings.HasPrefix(importPath, modulePath+"/") {
+				continue
+			}
+
+			// Extract package name (last segment).
+			pkg := filepath.Base(importPath)
+			result[pkg] = importPath
+		}
+	}
+
+	return result, nil
 }
 
 func genTerraform(specsDir string) reporter.StepResult {

@@ -43,6 +43,18 @@ func generateMain(artifactsDir string, models []string, modulePath string, queue
 		initBlock = "\t\t// No models detected"
 	}
 
+	// Authz init block.
+	authzImport := ""
+	authzInitBlock := ""
+	if hasAuthSequence(serviceFuncs) {
+		authzImport = fmt.Sprintf("\n\t\"%s/internal/authz\"", modulePath)
+		authzInitBlock = `
+	if err := authz.Init(conn); err != nil {
+		log.Fatalf("authz init failed: %v", err)
+	}
+`
+	}
+
 	// Queue code blocks.
 	queueImport := ""
 	queueInitBlock := ""
@@ -91,7 +103,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"%s/internal/model"
-	"%s/internal/service"%s
+	"%s/internal/service"%s%s
 )
 
 func main() {
@@ -109,7 +121,7 @@ func main() {
 	if err := conn.Ping(); err != nil {
 		log.Fatalf("database ping failed: %%v", err)
 	}
-%s
+%s%s
 	server := &service.Server{
 %s
 	}
@@ -118,7 +130,7 @@ func main() {
 	log.Printf("server listening on %%s", *addr)
 	log.Fatal(http.ListenAndServe(*addr, handler))
 }
-`, modulePath, modulePath, queueImport, queueInitBlock, initBlock, queueSubscribeBlock)
+`, modulePath, modulePath, authzImport, queueImport, authzInitBlock, queueInitBlock, initBlock, queueSubscribeBlock)
 
 	path := filepath.Join(artifactsDir, "backend", "cmd", "main.go")
 	return os.WriteFile(path, []byte(src), 0644)
@@ -133,6 +145,18 @@ func collectSubscribers(funcs []ssacparser.ServiceFunc) []ssacparser.ServiceFunc
 		}
 	}
 	return subs
+}
+
+// hasAuthSequence returns true if any function uses @auth.
+func hasAuthSequence(funcs []ssacparser.ServiceFunc) bool {
+	for _, fn := range funcs {
+		for _, seq := range fn.Sequences {
+			if seq.Type == "auth" {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // hasPublishSequence returns true if any function uses @publish.

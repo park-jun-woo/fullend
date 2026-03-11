@@ -181,6 +181,11 @@ func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTabl
 		queueBackend = projConfig.Queue.Backend
 	}
 
+	var authzPackage string
+	if projConfig != nil && projConfig.Authz != nil {
+		authzPackage = projConfig.Authz.Package
+	}
+
 	input := &crosscheck.CrossValidateInput{
 		OpenAPIDoc:       doc,
 		SymbolTable:      st,
@@ -195,6 +200,7 @@ func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTabl
 		Archived:         archived,
 		Claims:           claims,
 		QueueBackend:     queueBackend,
+		AuthzPackage:     authzPackage,
 	}
 
 	cerrs := crosscheck.Run(input)

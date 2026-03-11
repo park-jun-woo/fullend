@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GigBridge - Gigs</title>
+</head>
+<body>
+    <h1>Gigs</h1>
+
+    <section data-fetch="ListGigs" data-paginate data-sort="created_at:desc" data-filter="status">
+        <div data-state=".loading">Loading...</div>
+        <div data-state=".error">Failed to load gigs.</div>
+        <div data-state=".empty">No gigs found.</div>
+        <ul>
+            <li data-each="items">
+                <h2 data-bind="title"></h2>
+                <p data-bind="description"></p>
+                <span data-bind="budget"></span>
+                <span data-bind="status"></span>
+                <span data-bind="client.name"></span>
+                <a data-param-id="route.id" href="/gigs/:id">View</a>
+            </li>
+        </ul>
+    </section>
+</body>
+</html>

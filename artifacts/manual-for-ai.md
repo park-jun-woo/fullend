@@ -73,6 +73,9 @@ file:
 
 queue:
   backend: postgres                  # postgres | memory
+
+authz:
+  package: github.com/org/project/internal/authz  # custom authz package (optional)
 ```
 
 ### Required Fields
@@ -88,6 +91,7 @@ queue:
 | `cache.backend` | Cache backend: `postgres` or `memory` |
 | `file.backend` | File storage: `s3` or `local` |
 | `queue.backend` | Queue backend: `postgres` or `memory` |
+| `authz.package` | Custom authz package path (default: `pkg/authz`) |
 
 ## SSaC — Service Logic Declarations
 
@@ -142,7 +146,7 @@ Append `!` to suppress WARNINGs: `@delete!`, `@response!`
 `source.Field` or `"literal"`:
 - `request.CourseID`, `course.InstructorID`, `currentUser.ID`, `config.APIKey`, `"cancelled"`
 
-Reserved sources: `request`, `currentUser`, `config`, `query`, `message` (subscribe only)
+Reserved sources: `request`, `currentUser`, `config` (→ `config.Get("KEY")`), `query`, `message` (subscribe only)
 
 ### Pagination
 
@@ -279,6 +283,38 @@ type FileModel interface {
 }
 ```
 Backends: S3 (`NewS3File`), LocalFile (`NewLocalFile`)
+
+#### authz — Authorization (OPA Rego)
+
+Singleton package-level API. Configured via `fullend.yaml` `authz.package` (default: `pkg/authz`).
+
+```go
+func Init(db *sql.DB) error
+func Check(req CheckRequest) (CheckResponse, error)
+
+type CheckRequest struct {
+    Action     string
+    Resource   string
+    UserID     int64
+    ResourceID int64
+}
+```
+
+- SSaC `@auth` generates `authz.Check(authz.CheckRequest{...})` calls
+- `authz.Init(conn)` is auto-generated in `main.go` when `@auth` is used
+- Set `DISABLE_AUTHZ=1` to bypass checks
+- Custom authz package: set `authz.package` in `fullend.yaml`
+
+#### config — Environment Variables
+
+Singleton package-level API. No configuration needed in `fullend.yaml`.
+
+```go
+func Get(key string) string
+func MustGet(key string) string   // panics if empty
+```
+
+SSaC `config.SMTPHost` → codegen generates `config.Get("SMTP_HOST")` (PascalCase → UPPER_SNAKE_CASE).
 
 #### queue — Queue Pub/Sub
 
@@ -426,6 +462,9 @@ SSaC: `// @state course {status: course.Status} "PublishCourse" "Cannot transiti
 
 SSaC `@auth "action" "resource" {inputs} "message"` maps to Rego `input.action`/`input.resource`.
 
+@auth generates `authz.Check(authz.CheckRequest{...})` package function call (not a method on Handler).
+Default authz package: `pkg/authz` (OPA Rego-based). Custom package via `fullend.yaml` `authz.package`.
+
 ## Gherkin Scenario
 
 `scenario/*.feature`. Tags: `@scenario` (business), `@invariant` (invariant verification).
@@ -501,3 +540,4 @@ response.array count > N
 | `@subscribe` topic → `@publish` exists | WARNING |
 | `@subscribe` message fields → `@publish` payload fields | WARNING |
 | `@publish`/`@subscribe` used → `queue.backend` required | ERROR |
+| `@auth` inputs → authz CheckRequest fields | ERROR |

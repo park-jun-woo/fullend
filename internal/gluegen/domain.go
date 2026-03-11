@@ -141,7 +141,6 @@ func generateDomainHandler(serviceDir, domain string, serviceFuncs []ssacparser.
 
 	models := collectModelsForDomain(serviceFuncs, domain)
 	funcs := collectFuncsForDomain(serviceFuncs, domain)
-	needsAuth := domainNeedsAuth(serviceFuncs, domain)
 
 	var b strings.Builder
 	b.WriteString(fmt.Sprintf("package %s\n\n", domain))
@@ -158,10 +157,6 @@ func generateDomainHandler(serviceDir, domain string, serviceFuncs []ssacparser.
 	for _, f := range funcs {
 		fieldName := ucFirst(f)
 		b.WriteString(fmt.Sprintf("\t%s func(args ...interface{}) (interface{}, error)\n", fieldName))
-	}
-
-	if needsAuth {
-		b.WriteString("\tAuthz model.Authorizer\n")
 	}
 
 	b.WriteString("}\n")
@@ -234,10 +229,6 @@ func generateCentralServer(serviceDir string, domains []string, serviceFuncs []s
 	for _, f := range flatFuncs {
 		fieldName := ucFirst(f)
 		b.WriteString(fmt.Sprintf("\t%s func(args ...interface{}) (interface{}, error)\n", fieldName))
-	}
-
-	if hasFlatFuncs {
-		b.WriteString("\tAuthz model.Authorizer\n")
 	}
 
 	b.WriteString("}\n\n")
@@ -388,10 +379,6 @@ func generateMainWithDomains(artifactsDir string, serviceFuncs []ssacparser.Serv
 			mFieldName := ucFirst(lcFirst(m) + "Model")
 			handlerLines = append(handlerLines, fmt.Sprintf("\t\t\t%s: model.New%sModel(conn),", mFieldName, m))
 		}
-		if domainNeedsAuth(serviceFuncs, domain) {
-			handlerLines = append(handlerLines, "\t\t\tAuthz: az,")
-		}
-
 		initLines = append(initLines, fmt.Sprintf("\t\t%s: &%ssvc.Handler{", fieldName, domain))
 		initLines = append(initLines, handlerLines...)
 		initLines = append(initLines, "\t\t},")
@@ -418,8 +405,7 @@ func generateMainWithDomains(artifactsDir string, serviceFuncs []ssacparser.Serv
 	authzBlock := ""
 	if anyNeedsAuth {
 		authzBlock = `
-	az, err := authz.New(conn)
-	if err != nil {
+	if err := authz.Init(conn); err != nil {
 		log.Fatalf("authz init failed: %v", err)
 	}
 `

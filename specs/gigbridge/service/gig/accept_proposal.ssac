@@ -1,0 +1,20 @@
+package service
+
+import "github.com/gigbridge/api/internal/billing"
+
+// @get Proposal proposal = Proposal.FindByID({ID: request.id})
+// @empty proposal "Proposal not found"
+// @get Gig gig = Gig.FindByID({ID: proposal.GigID})
+// @empty gig "Gig not found"
+// @auth "AcceptProposal" "gig" {UserID: currentUser.ID, ResourceID: gig.ClientID} "Not authorized"
+// @state proposal {Status: proposal.Status} "AcceptProposal" "Cannot accept proposal"
+// @state gig {Status: gig.Status} "AcceptProposal" "Cannot accept proposal for this gig"
+// @put Proposal.UpdateStatus({Status: "accepted", ID: proposal.ID})
+// @put Gig.UpdateStatus({Status: "in_progress", ID: gig.ID})
+// @put Gig.AssignFreelancer({FreelancerID: proposal.FreelancerID, ID: gig.ID})
+// @call billing.HoldEscrowResponse escrow = billing.HoldEscrow({GigID: gig.ID, Amount: gig.Budget, ClientID: gig.ClientID})
+// @post Transaction tx = Transaction.Create({GigID: gig.ID, TxType: "hold", Amount: gig.Budget})
+// @get Proposal updatedProposal = Proposal.FindByID({ID: proposal.ID})
+// @get Gig updatedGig = Gig.FindByID({ID: gig.ID})
+// @response { proposal: updatedProposal, gig: updatedGig }
+func AcceptProposal() {}

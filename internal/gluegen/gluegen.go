@@ -28,6 +28,7 @@ type GlueInput struct {
 	STMLPageOps     map[string]string // page file name → primary operationID
 	Claims          map[string]string // from fullend.yaml backend.auth.claims
 	QueueBackend    string            // "postgres", "memory", "" (no queue)
+	AuthzPackage    string            // custom authz package, "" = default pkg/authz
 }
 
 // internalDir returns the backend/internal/ base path.
@@ -214,13 +215,6 @@ func transformSource(src string, models, funcs []string, modulePath string, xCon
 		src = strings.ReplaceAll(src, f+"(", rcv+"."+fieldName+"(")
 	}
 
-	// Replace authz references — currentUser is extracted by SSaC codegen via c.MustGet("currentUser").
-	if isDomain {
-		src = strings.ReplaceAll(src, "authz.Check(currentUser,", rcv+".Authz.Check(currentUser,")
-	} else {
-		src = strings.ReplaceAll(src, "authz.Check(currentUser,", "s.Authz.Check(currentUser,")
-	}
-
 	// Qualify model package types used in service code.
 	if strings.Contains(src, "QueryOpts{}") {
 		funcName := extractFuncName(src)
@@ -253,6 +247,11 @@ func transformSource(src string, models, funcs []string, modulePath string, xCon
 	// Fix queue import: "queue" → "github.com/geul-org/fullend/pkg/queue"
 	if strings.Contains(src, "\t\"queue\"\n") {
 		src = strings.ReplaceAll(src, "\t\"queue\"\n", "\t\"github.com/geul-org/fullend/pkg/queue\"\n")
+	}
+
+	// Fix config import: "config" → "github.com/geul-org/fullend/pkg/config"
+	if strings.Contains(src, "\t\"config\"\n") {
+		src = strings.ReplaceAll(src, "\t\"config\"\n", "\t\"github.com/geul-org/fullend/pkg/config\"\n")
 	}
 
 	// Remove bare "model" import (already added as full path above)
