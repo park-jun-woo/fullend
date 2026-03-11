@@ -7,9 +7,22 @@
 
 ### @model vs @call 역할 구분 (확정)
 
-- **@model** = I/O 추상화 (CRUD). DB 테이블, 외부 API, 파일 스토리지 등 모든 데이터 접근.
+- **@model** = 모든 I/O 추상화. 서비스 코드에서 I/O가 필요하면 반드시 @model을 통해 접근.
 - **@call func** = 순수 비즈니스 로직. I/O 금지. 계산, 판단, 변환만 허용.
-- 서비스 시퀀스가 @call(계산) → @model(저장) 순서를 조율.
+- 서비스 시퀀스가 @call(계산) → @model(I/O) 순서를 조율.
+
+### 모델 I/O 분류 (6종)
+
+| # | 분류 | 목적 | 예시 |
+|---|---|---|---|
+| 1 | **DB** | 영속 데이터 | PostgreSQL, MySQL, MongoDB, DynamoDB |
+| 2 | **Session** | 사용자 귀속 상태 (로그인, 장바구니 등) | Redis, DB |
+| 3 | **Cache** | 빈번한 요청 효율화 (TTL 기반 임시 저장) | Redis, Memcached, CDN |
+| 4 | **File** | 파일/오브젝트 스토리지 | S3, GCS, 로컬 파일시스템 |
+| 5 | **External** | 외부 서비스 API | Stripe, Twilio, SendGrid |
+| 6 | **Queue** | 비동기 메시지 | Kafka, RabbitMQ, SQS |
+
+Session과 Cache는 기술적으로 같은 인프라(Redis 등)를 쓸 수 있지만, 목적이 다르므로 모델 계층에서는 분리.
 
 ## 현재 모델 흐름
 
@@ -23,12 +36,18 @@ fullend gluegen → *sql.DB 기반 구현체 자동 생성
 
 ## 목표
 
-### A. 모델을 두 종류로 확장
+### A. 모델 I/O 종류별 확장
 
-| 종류 | 데이터 소스 | 정의 SSOT | 코드젠 결과 |
+| 종류 | 정의 SSOT | 코드젠 결과 | 현재 상태 |
 |---|---|---|---|
-| DB 모델 | PostgreSQL 등 | DDL SQL | `*sql.DB` 기반 구현체 (기존) |
-| 외부 모델 | 외부 API | 외부 서비스 스펙 (신규) | `*http.Client` 기반 구현체 (신규) |
+| DB | DDL SQL | `*sql.DB` 기반 구현체 | ✅ 구현 완료 |
+| External | 외부 서비스 OpenAPI | `*http.Client` 기반 구현체 | Phase 021 대상 |
+| Session | 미정 | 미정 | 향후 |
+| Cache | 미정 | 미정 | 향후 |
+| File | 미정 | 미정 | 향후 |
+| Queue | 미정 | 미정 | 향후 |
+
+Phase 021에서는 **External** 모델을 우선 구현. 나머지는 필요 시 후속 Phase에서 추가.
 
 ### B. Func 순수성 강제 + TODO 레벨 수정
 
@@ -43,42 +62,30 @@ Phase 020에서 이관된 항목:
 
 ## 설계
 
-### 1. 외부 서비스 스펙 SSOT (신규)
+### 1. 외부 서비스 스펙 SSOT
 
-`specs/<project>/external/` 디렉토리에 서비스 계약 정의.
-Go 인터페이스 파일 + 어노테이션 형식:
+외부 서비스가 공개하는 **OpenAPI 문서를 그대로 SSOT로 사용**. 새 문법을 발명하지 않음.
+대부분의 SaaS (Stripe, Twilio, SendGrid 등)가 OpenAPI 스펙을 공개 제공하며, fullend는 이미 OpenAPI 파서를 보유.
 
-```go
-// specs/dummy-gigbridge/external/escrow.go
-package external
-
-// @service escrow
-// @base_url ${ESCROW_SERVICE_URL}
-
-// @endpoint POST /api/escrow/hold
-type HoldRequest struct {
-    GigID    int64 `json:"gig_id"`
-    Amount   int64 `json:"amount"`
-    ClientID int64 `json:"client_id"`
-}
-
-type HoldResponse struct {
-    TransactionID int64  `json:"transaction_id"`
-    Status        string `json:"status"`
-}
-
-// @endpoint POST /api/escrow/release
-type ReleaseRequest struct {
-    GigID        int64 `json:"gig_id"`
-    Amount       int64 `json:"amount"`
-    FreelancerID int64 `json:"freelancer_id"`
-}
-
-type ReleaseResponse struct {
-    TransactionID int64  `json:"transaction_id"`
-    Status        string `json:"status"`
-}
 ```
+specs/<project>/
+├── api/openapi.yaml              ← 우리 API (기존)
+├── external/
+│   ├── escrow.openapi.yaml       ← 외부 결제 서비스 OpenAPI
+│   └── notification.openapi.yaml ← 외부 알림 서비스 OpenAPI (예시)
+```
+
+외부 OpenAPI에서 fullend가 추출하는 정보:
+- **operationId** → 모델 메서드명 매핑 (e.g. `createEscrowHold` → `Escrow.CreateHold`)
+- **request schema** → 메서드 파라미터 타입
+- **response schema** → 메서드 리턴 타입
+- **서버 URL** → base URL (환경변수로 오버라이드 가능)
+- **security scheme** → API key, Bearer token 등 인증 방식
+
+장점:
+- 새 문법 발명 불필요 — 기존 OpenAPI 파서 재활용
+- 외부 서비스 업데이트 시 OpenAPI 파일만 교체하면 모델 자동 갱신
+- 교차 검증 시 SSaC @model 파라미터를 외부 OpenAPI request schema와 대조 가능
 
 ### 2. SSaC에서의 사용
 
@@ -143,6 +150,11 @@ funcspec 파서가 이미 Go AST로 파싱하므로 import 목록 추출 가능.
 **허용:**
 - `math`, `strings`, `strconv`, `fmt`, `time`, `crypto/*`, `encoding/*`, `regexp`, `sort`, `errors` 등 순수 패키지
 
+**ERROR 메시지 지침:**
+```
+[ERROR] Func ↔ SSaC: <funcName> — @call func에서 I/O 패키지 %q import 금지. @call func은 순수 계산/판단 로직만 허용됩니다. DB, 네트워크, 파일 등 I/O가 필요하면 @model을 활용하세요.
+```
+
 ### 6. Func TODO 레벨 수정
 
 본체 미구현(`// TODO: implement`만 있는 stub)이 `WARNING`으로 분류됨. 실행 시 빈 값을 반환하므로 `ERROR`가 맞음.
@@ -178,7 +190,7 @@ server.Proposal = &proposalsvc.Handler{
 
 | 파일 | 변경 |
 |---|---|
-| `internal/externalspec/parser.go` | 신규 — 외부 서비스 스펙 파서 (`@service`, `@endpoint` 파싱) |
+| `internal/gluegen/external_model.go` | 신규 — 외부 OpenAPI에서 HTTP client 모델 코드젠 |
 | `internal/gluegen/model_impl.go` | DB/외부 모델 분기, 외부 모델 HTTP client 코드젠 |
 | `internal/gluegen/gluegen.go` | 모델 수집 시 외부 스펙 로드, 분류 로직 |
 | `internal/crosscheck/ddl_coverage.go` | DDL 또는 외부 스펙 존재 확인으로 완화 |
@@ -195,10 +207,10 @@ server.Proposal = &proposalsvc.Handler{
 
 ## 미결 사항
 
-1. **외부 스펙 형식** — Go 어노테이션 vs OpenAPI vs 별도 YAML? 위 제안은 Go 어노테이션 (funcspec과 유사한 패턴)
+1. **외부 스펙 형식** — ✅ 결정: 외부 서비스가 공개하는 OpenAPI 문서를 그대로 사용. 새 문법 발명 불필요. `specs/<project>/external/*.openapi.yaml`에 배치
 2. **인증** — 외부 서비스 호출 시 API key, OAuth 등 인증 정보 어디서 주입?
 3. **에러 처리** — 외부 서비스 타임아웃, 재시도 정책은 어디서 정의?
-4. **SSOT 카운트** — 현재 10개 SSOT, 외부 스펙 추가 시 11개로 늘어남. 기존 SSOT에 통합 가능한가?
+4. **SSOT 카운트** — 외부 OpenAPI는 기존 OpenAPI 파서로 처리하므로 별도 SSOT 종류 추가 없이 external/ 디렉토리 스캔만 추가
 5. **dummy spec 마이그레이션** — billing @call → @model 전환, transactions 테이블 SSaC 참조 추가
 
 ## 검증 방법
