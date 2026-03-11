@@ -58,9 +58,9 @@ func Run(input *CrossValidateInput) []CrossError {
 		errs = append(errs, CheckPolicy(input.Policies, input.ServiceFuncs, input.SymbolTable, input.StateDiagrams)...)
 	}
 
-	// Scenario ↔ OpenAPI/States
+	// Scenario ↔ OpenAPI/States/Policy
 	if len(input.Features) > 0 {
-		errs = append(errs, CheckScenarios(input.Features, input.OpenAPIDoc, input.StateDiagrams)...)
+		errs = append(errs, CheckScenarios(input.Features, input.OpenAPIDoc, input.StateDiagrams, input.Policies, input.ServiceFuncs)...)
 	}
 
 	// Func ↔ SSaC

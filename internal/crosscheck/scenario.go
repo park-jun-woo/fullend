@@ -2,16 +2,25 @@ package crosscheck
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 
+	"github.com/geul-org/fullend/internal/policy"
 	"github.com/geul-org/fullend/internal/scenario"
 	"github.com/geul-org/fullend/internal/statemachine"
+	ssacparser "github.com/geul-org/ssac/parser"
 )
 
-// CheckScenarios validates Scenario ↔ OpenAPI and Scenario ↔ States.
-func CheckScenarios(features []*scenario.Feature, doc *openapi3.T, diagrams []*statemachine.StateDiagram) []CrossError {
+// CheckScenarios validates Scenario ↔ OpenAPI, Scenario ↔ States, and internal consistency.
+func CheckScenarios(
+	features []*scenario.Feature,
+	doc *openapi3.T,
+	diagrams []*statemachine.StateDiagram,
+	policies []*policy.Policy,
+	funcs []ssacparser.ServiceFunc,
+) []CrossError {
 	var errs []CrossError
 
 	if doc == nil || len(features) == 0 {
@@ -21,6 +30,9 @@ func CheckScenarios(features []*scenario.Feature, doc *openapi3.T, diagrams []*s
 	// Build operationId → (method, path) lookup.
 	opMap := buildOpMap(doc)
 
+	// Build operationId → allowed roles lookup (via SSaC auth action → OPA role).
+	opRoles := buildOpRoleMap(funcs, policies)
+
 	for _, f := range features {
 		allScenarios := f.Scenarios
 		if f.Background != nil {
@@ -28,7 +40,14 @@ func CheckScenarios(features []*scenario.Feature, doc *openapi3.T, diagrams []*s
 		}
 
 		for _, sc := range allScenarios {
-			for _, step := range sc.Steps {
+			// Collect all steps (background + scenario).
+			var steps []scenario.Step
+			if f.Background != nil {
+				steps = append(steps, f.Background.Steps...)
+			}
+			steps = append(steps, sc.Steps...)
+
+			for i, step := range steps {
 				if !step.IsAction {
 					continue
 				}
@@ -62,8 +81,16 @@ func CheckScenarios(features []*scenario.Feature, doc *openapi3.T, diagrams []*s
 					errs = append(errs, checkJSONFields(f.File, step, info.op)...)
 				}
 
-				// Rule 5: security check — token capture should precede auth endpoints.
-				// (This is a WARNING-level heuristic checked at feature level, not here.)
+				// Rule 6: status code must be defined in OpenAPI responses.
+				errs = append(errs, checkStatusCode(f.File, steps, i, info.op, step.OperationID)...)
+			}
+
+			// Rule 4: capture reference validity.
+			errs = append(errs, checkCaptureRefs(f.File, sc.Name, steps)...)
+
+			// Rule 5: token role matching.
+			if len(opRoles) > 0 {
+				errs = append(errs, checkTokenRoles(f.File, sc.Name, steps, opRoles)...)
 			}
 		}
 	}
@@ -257,4 +284,251 @@ func expectsClientError(steps []scenario.Step, i int) bool {
 		}
 	}
 	return false
+}
+
+// --- Rule 4: Capture reference validity ---
+
+// reVarDotted matches dotted variable references like "varName.field.sub".
+// Captures the full dotted expression.
+var reVarDotted = regexp.MustCompile(`\b([a-zA-Z_]\w*(?:\.[a-zA-Z_]\w*)+)`)
+
+// checkCaptureRefs verifies that variables referenced in JSON bodies have been captured earlier.
+func checkCaptureRefs(file, scenarioName string, steps []scenario.Step) []CrossError {
+	var errs []CrossError
+	captured := make(map[string]bool)
+
+	for _, step := range steps {
+		if step.IsAction {
+			// Check JSON references against captured variables.
+			if step.JSON != "" {
+				refs := extractVarRefs(step.JSON)
+				for _, ref := range refs {
+					if !captured[ref] {
+						errs = append(errs, CrossError{
+							Rule:       "Scenario (capture)",
+							Context:    fmt.Sprintf("%s: %s → %s", file, scenarioName, step.OperationID),
+							Message:    fmt.Sprintf("variable %q referenced in JSON but not captured in a previous step", ref),
+							Level:      "ERROR",
+							Suggestion: fmt.Sprintf("Add -> %s capture to a prior step, or fix the variable name", ref),
+						})
+					}
+				}
+			}
+			// Record capture.
+			if step.Capture != "" {
+				captured[step.Capture] = true
+			}
+		}
+	}
+	return errs
+}
+
+// extractVarRefs extracts the root variable name from dotted references in JSON values.
+// e.g. {"id": gigResult.gig.id, "bid": 900} → ["gigResult"]
+func extractVarRefs(json string) []string {
+	seen := make(map[string]bool)
+	json = strings.TrimSpace(json)
+	json = strings.TrimPrefix(json, "{")
+	json = strings.TrimSuffix(json, "}")
+
+	parts := strings.Split(json, ",")
+	for _, part := range parts {
+		colonIdx := strings.Index(part, ":")
+		if colonIdx < 0 {
+			continue
+		}
+		val := strings.TrimSpace(part[colonIdx+1:])
+		// Skip quoted string values.
+		if strings.HasPrefix(val, `"`) {
+			continue
+		}
+		// Find dotted references and extract root name.
+		matches := reVarDotted.FindAllStringSubmatch(val, -1)
+		for _, m := range matches {
+			root := strings.SplitN(m[1], ".", 2)[0]
+			if root == "true" || root == "false" || root == "null" {
+				continue
+			}
+			seen[root] = true
+		}
+	}
+
+	var refs []string
+	for name := range seen {
+		refs = append(refs, name)
+	}
+	return refs
+}
+
+// --- Rule 5: Token role matching ---
+
+// buildOpRoleMap builds operationId → allowed roles by chaining:
+// SSaC operationId → auth action → OPA policy role.
+func buildOpRoleMap(funcs []ssacparser.ServiceFunc, policies []*policy.Policy) map[string][]string {
+	if len(funcs) == 0 || len(policies) == 0 {
+		return nil
+	}
+
+	// OPA action → roles.
+	actionRoles := make(map[string][]string)
+	for _, p := range policies {
+		for _, rule := range p.Rules {
+			if rule.UsesRole && rule.RoleValue != "" {
+				for _, action := range rule.Actions {
+					actionRoles[action] = append(actionRoles[action], rule.RoleValue)
+				}
+			}
+		}
+	}
+
+	// SSaC operationId → auth actions → roles.
+	result := make(map[string][]string)
+	for _, fn := range funcs {
+		for _, seq := range fn.Sequences {
+			if seq.Type == ssacparser.SeqAuth && seq.Action != "" {
+				if roles, ok := actionRoles[seq.Action]; ok {
+					result[fn.Name] = append(result[fn.Name], roles...)
+				}
+			}
+		}
+	}
+	return result
+}
+
+// checkTokenRoles verifies that the current token's role matches the operation's allowed roles.
+func checkTokenRoles(file, scenarioName string, steps []scenario.Step, opRoles map[string][]string) []CrossError {
+	var errs []CrossError
+
+	// Track: capture name → role (from Register step preceding Login capture).
+	tokenRoles := make(map[string]string) // capture name → role
+	var pendingRole string                // role from the last Register step
+	var currentToken string               // last captured token name
+
+	for i, step := range steps {
+		if !step.IsAction {
+			continue
+		}
+
+		switch step.OperationID {
+		case "Register":
+			// Extract role from JSON.
+			pendingRole = extractJSONValue(step.JSON, "role")
+
+		case "Login":
+			// If this Login captures a token, associate it with pendingRole.
+			if step.Capture != "" {
+				if pendingRole != "" {
+					tokenRoles[step.Capture] = pendingRole
+				}
+				currentToken = step.Capture
+				pendingRole = ""
+			}
+
+		default:
+			// Check if operation requires specific roles.
+			allowedRoles, ok := opRoles[step.OperationID]
+			if !ok || currentToken == "" {
+				continue
+			}
+
+			// Skip if this is an intentional rejection test.
+			if expectsClientError(steps, i) {
+				continue
+			}
+
+			tokenRole := tokenRoles[currentToken]
+			if tokenRole == "" {
+				continue
+			}
+
+			roleAllowed := false
+			for _, r := range allowedRoles {
+				if r == tokenRole {
+					roleAllowed = true
+					break
+				}
+			}
+
+			if !roleAllowed {
+				errs = append(errs, CrossError{
+					Rule:    "Scenario ↔ Policy",
+					Context: fmt.Sprintf("%s: %s → %s (token=%s, role=%s)", file, scenarioName, step.OperationID, currentToken, tokenRole),
+					Message: fmt.Sprintf("token %q has role %q but %s requires one of %v",
+						currentToken, tokenRole, step.OperationID, allowedRoles),
+					Level:      "WARNING",
+					Suggestion: fmt.Sprintf("Use a token with role %v or add role %q to policy for %s", allowedRoles, tokenRole, step.OperationID),
+				})
+			}
+		}
+	}
+	return errs
+}
+
+// extractJSONValue extracts a simple string value for a key from JSON-like text.
+func extractJSONValue(json, key string) string {
+	json = strings.TrimSpace(json)
+	json = strings.TrimPrefix(json, "{")
+	json = strings.TrimSuffix(json, "}")
+
+	parts := strings.Split(json, ",")
+	for _, part := range parts {
+		colonIdx := strings.Index(part, ":")
+		if colonIdx <= 0 {
+			continue
+		}
+		k := strings.TrimSpace(part[:colonIdx])
+		k = strings.Trim(k, `"`)
+		if k == key {
+			v := strings.TrimSpace(part[colonIdx+1:])
+			v = strings.Trim(v, `"`)
+			return v
+		}
+	}
+	return ""
+}
+
+// --- Rule 6: Status code validity ---
+
+// checkStatusCode verifies that assertion status codes are defined in OpenAPI responses.
+func checkStatusCode(file string, steps []scenario.Step, actionIdx int, op *openapi3.Operation, opID string) []CrossError {
+	var errs []CrossError
+	if op == nil || op.Responses == nil {
+		return nil
+	}
+
+	// Find status assertions following this action step.
+	for j := actionIdx + 1; j < len(steps); j++ {
+		s := steps[j]
+		if s.IsAction {
+			break
+		}
+		if s.Assertion.Kind != "status" {
+			continue
+		}
+
+		code := s.Assertion.Value
+		if code == "" {
+			continue
+		}
+
+		// Check if this status code is defined in OpenAPI responses.
+		found := false
+		for respCode := range op.Responses.Map() {
+			if respCode == code {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			errs = append(errs, CrossError{
+				Rule:       "Scenario ↔ OpenAPI",
+				Context:    fmt.Sprintf("%s: %s status %s", file, opID, code),
+				Message:    fmt.Sprintf("status code %s not defined in OpenAPI responses for %s", code, opID),
+				Level:      "WARNING",
+				Suggestion: fmt.Sprintf("Add %q response to OpenAPI for %s, or verify the expected status", code, opID),
+			})
+		}
+	}
+	return errs
 }
