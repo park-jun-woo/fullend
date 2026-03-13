@@ -155,7 +155,7 @@ func parseHurlFile(path string) []hurlEntry {
 }
 
 // normalizeHurlPath converts a Hurl URL path to normalized segments.
-// {{variable}} → ":param"
+// {{variable}} → ":param", pure numeric literals (e.g. "999999") → ":param"
 func normalizeHurlPath(path string) []string {
 	path = strings.TrimSpace(path)
 	// Remove query string.
@@ -165,11 +165,12 @@ func normalizeHurlPath(path string) []string {
 	parts := strings.Split(strings.Trim(path, "/"), "/")
 	var segs []string
 	reVar := regexp.MustCompile(`\{\{.+?\}\}`)
+	reNumeric := regexp.MustCompile(`^\d+$`)
 	for _, p := range parts {
 		if p == "" {
 			continue
 		}
-		if reVar.MatchString(p) {
+		if reVar.MatchString(p) || reNumeric.MatchString(p) {
 			segs = append(segs, ":param")
 		} else {
 			segs = append(segs, p)

@@ -61,21 +61,39 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 			continue
 		}
 
+		// --skip takes precedence even if detected.
+		if skip[kind] {
+			report.Steps = append(report.Steps, reporter.StepResult{
+				Name:    string(kind),
+				Status:  reporter.Skip,
+				Summary: "skipped (--skip)",
+			})
+			continue
+		}
+
 		d, ok := has[kind]
 		if !ok {
-			if skip[kind] {
-				report.Steps = append(report.Steps, reporter.StepResult{
-					Name:    string(kind),
-					Status:  reporter.Skip,
-					Summary: "skipped (--skip)",
-				})
-			} else if kind == KindFunc {
+			if kind == KindFunc {
 				// Func is optional — no func/ dir is not an error.
 				// SSaC @func references with missing implementations are caught by crosscheck.
 				report.Steps = append(report.Steps, reporter.StepResult{
 					Name:    string(kind),
 					Status:  reporter.Skip,
 					Summary: "no func/ directory",
+				})
+			} else if kind == KindStates {
+				// States is optional — only required if SSaC uses @state.
+				report.Steps = append(report.Steps, reporter.StepResult{
+					Name:    string(kind),
+					Status:  reporter.Skip,
+					Summary: "no states/ directory",
+				})
+			} else if kind == KindPolicy {
+				// Policy is optional — only required if SSaC uses @auth.
+				report.Steps = append(report.Steps, reporter.StepResult{
+					Name:    string(kind),
+					Status:  reporter.Skip,
+					Summary: "no policy/ directory",
 				})
 			} else if kind == KindScenario {
 				// Scenario: warn if missing, user can --skip to suppress.
