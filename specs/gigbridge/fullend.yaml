@@ -16,6 +16,7 @@ backend:
       ID: user_id
       Email: email
       Role: role
+    roles: [client, freelancer]
 
 frontend:
   lang: typescript

@@ -28,6 +28,7 @@ type CrossValidateInput struct {
 	AuthzPackage     string            // from fullend.yaml authz.package ("" = default pkg/authz)
 	SensitiveCols    map[string]map[string]bool // @sensitive columns per table (table → column → true)
 	NoSensitiveCols  map[string]map[string]bool // @nosensitive columns per table (suppress WARNING)
+	Roles            []string                   // from fullend.yaml auth.roles
 }
 
 // Run executes all cross-validation rules and returns collected errors.
@@ -98,6 +99,11 @@ func Run(input *CrossValidateInput) []CrossError {
 	// DDL: sensitive column name pattern without @sensitive annotation
 	if input.SymbolTable != nil {
 		errs = append(errs, CheckSensitiveColumns(input.SymbolTable, input.SensitiveCols, input.NoSensitiveCols)...)
+	}
+
+	// Roles ↔ Policy
+	if len(input.Policies) > 0 && len(input.Roles) > 0 {
+		errs = append(errs, CheckRoles(input.Policies, input.Roles)...)
 	}
 
 	return errs

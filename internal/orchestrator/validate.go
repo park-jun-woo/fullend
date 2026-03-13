@@ -252,10 +252,12 @@ func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTabl
 
 	var middleware []string
 	var claims map[string]string
+	var roles []string
 	if projConfig != nil {
 		middleware = projConfig.Backend.Middleware
 		if projConfig.Backend.Auth != nil {
 			claims = projConfig.Backend.Auth.Claims
+			roles = projConfig.Backend.Auth.Roles
 		}
 	}
 
@@ -292,6 +294,7 @@ func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTabl
 		AuthzPackage:     authzPackage,
 		SensitiveCols:    sensitiveCols,
 		NoSensitiveCols:  noSensitiveCols,
+		Roles:            roles,
 	}
 
 	cerrs := crosscheck.Run(input)

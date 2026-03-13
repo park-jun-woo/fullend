@@ -43,6 +43,7 @@ type Backend struct {
 type Auth struct {
 	SecretEnv string            `yaml:"secret_env"`
 	Claims    map[string]string `yaml:"claims"` // FieldName → claim key (e.g. "ID" → "user_id")
+	Roles     []string          `yaml:"roles"`  // valid role names (e.g. ["client", "freelancer"])
 }
 
 type Frontend struct {
