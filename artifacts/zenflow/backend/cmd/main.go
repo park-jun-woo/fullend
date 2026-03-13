@@ -8,13 +8,13 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/zenflow/zenflow/internal/model"
-	"github.com/zenflow/zenflow/internal/service"
+	"github.com/geul-org/zenflow/internal/model"
+	"github.com/geul-org/zenflow/internal/service"
 	"github.com/geul-org/fullend/pkg/authz"
-	actionsvc "github.com/zenflow/zenflow/internal/service/action"
-	authsvc "github.com/zenflow/zenflow/internal/service/auth"
-	organizationsvc "github.com/zenflow/zenflow/internal/service/organization"
-	workflowsvc "github.com/zenflow/zenflow/internal/service/workflow"
+	actionsvc "github.com/geul-org/zenflow/internal/service/action"
+	authsvc "github.com/geul-org/zenflow/internal/service/auth"
+	organizationsvc "github.com/geul-org/zenflow/internal/service/organization"
+	workflowsvc "github.com/geul-org/zenflow/internal/service/workflow"
 )
 
 func main() {
@@ -40,7 +40,9 @@ func main() {
 
 	os.Setenv("JWT_SECRET", *jwtSecret)
 
-	if err := authz.Init(conn, nil); err != nil {
+	if err := authz.Init(conn, []authz.OwnershipMapping{
+		{Resource: "workflow", Table: "workflows", Column: "org_id"},
+	}); err != nil {
 		log.Fatalf("authz init failed: %v", err)
 	}
 
@@ -48,7 +50,6 @@ func main() {
 		Action: &actionsvc.Handler{
 			DB: conn,
 			ActionModel: model.NewActionModel(conn),
-			UserModel: model.NewUserModel(conn),
 			WorkflowModel: model.NewWorkflowModel(conn),
 		},
 		Auth: &authsvc.Handler{
@@ -62,9 +63,7 @@ func main() {
 		},
 		Workflow: &workflowsvc.Handler{
 			DB: conn,
-			ActionModel: model.NewActionModel(conn),
 			ExecutionModel: model.NewExecutionModel(conn),
-			OrganizationModel: model.NewOrganizationModel(conn),
 			UserModel: model.NewUserModel(conn),
 			WorkflowModel: model.NewWorkflowModel(conn),
 		},

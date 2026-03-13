@@ -41,12 +41,12 @@ func (q *Queries) ActionCreate(ctx context.Context, arg ActionCreateParams) (Act
 	return i, err
 }
 
-const actionListByWorkflow = `-- name: ActionListByWorkflow :many
-SELECT id, workflow_id, action_type, payload_template, sequence_order FROM actions WHERE workflow_id = $1 ORDER BY sequence_order ASC
+const actionListByWorkflowID = `-- name: ActionListByWorkflowID :many
+SELECT id, workflow_id, action_type, payload_template, sequence_order FROM actions WHERE workflow_id = $1 ORDER BY sequence_order
 `
 
-func (q *Queries) ActionListByWorkflow(ctx context.Context, workflowID int64) ([]Action, error) {
-	rows, err := q.db.QueryContext(ctx, actionListByWorkflow, workflowID)
+func (q *Queries) ActionListByWorkflowID(ctx context.Context, workflowID int64) ([]Action, error) {
+	rows, err := q.db.QueryContext(ctx, actionListByWorkflowID, workflowID)
 	if err != nil {
 		return nil, err
 	}

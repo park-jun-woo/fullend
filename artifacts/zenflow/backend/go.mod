@@ -1,4 +1,4 @@
-module github.com/zenflow/zenflow
+module github.com/geul-org/zenflow
 
 go 1.25.0
 

@@ -1,13 +1,11 @@
 package service
 
-// @auth "PauseWorkflow" "workflow" {} "Permission denied" 403
-// @get User user = User.FindByID({ID: currentUser.ID})
-// @empty user "User not found" 404
-// @get Workflow workflow = Workflow.FindByIDAndOrg({ID: request.id, OrgID: user.OrgID})
-// @empty workflow "Workflow not found" 404
-// @state workflow {status: workflow.Status} "PauseWorkflow" "Cannot transition" 409
-// @put Workflow.UpdateStatus({ID: workflow.ID, Status: "paused"})
-// @get Workflow updated = Workflow.FindByID({ID: workflow.ID})
-// @empty updated "Workflow not found" 404
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @auth "ActivateWorkflow" "workflow" {UserID: currentUser.ID, ResourceID: wf.OrgID} "Forbidden"
+// @state workflow {status: wf.Status} "PauseWorkflow" "Cannot transition"
+// @put Workflow.UpdateStatus({Status: "paused", ID: wf.ID})
+// @get Workflow updated = Workflow.FindByID({ID: wf.ID})
+// @empty updated "Workflow not found"
 // @response { workflow: updated }
 func PauseWorkflow() {}

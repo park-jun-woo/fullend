@@ -5,7 +5,7 @@ metadata:
 backend:
   lang: go
   framework: gin
-  module: github.com/zenflow/zenflow
+  module: github.com/geul-org/zenflow
   middleware:
     - bearerAuth
   auth:
@@ -14,7 +14,6 @@ backend:
       ID: user_id
       Email: email
       Role: role
-      OrgID: org_id
 frontend:
   lang: typescript
   framework: react

@@ -4,5 +4,5 @@ CREATE TABLE workflows (
     title TEXT NOT NULL,
     trigger_event TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'draft',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -20,6 +20,11 @@ type Action struct {
 	WorkflowId      *int64                  `json:"workflow_id,omitempty"`
 }
 
+// Error defines model for Error.
+type Error struct {
+	Error *string `json:"error,omitempty"`
+}
+
 // Execution defines model for Execution.
 type Execution struct {
 	CreditsSpent *int       `json:"credits_spent,omitempty"`
@@ -67,12 +72,11 @@ type RegisterJSONBody struct {
 	Email    string `json:"email"`
 	OrgId    int64  `json:"org_id"`
 	Password string `json:"password"`
-	Role     string `json:"role"`
 }
 
 // CreateOrganizationJSONBody defines parameters for CreateOrganization.
 type CreateOrganizationJSONBody struct {
-	CreditsBalance int    `json:"credits_balance"`
+	CreditsBalance *int   `json:"credits_balance,omitempty"`
 	Name           string `json:"name"`
 	PlanType       string `json:"plan_type"`
 }

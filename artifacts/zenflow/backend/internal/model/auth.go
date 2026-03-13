@@ -4,7 +4,6 @@ package model
 type CurrentUser struct {
 	Email string
 	ID int64
-	OrgID int64
 	Role string
 }
 

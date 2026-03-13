@@ -11,7 +11,7 @@ import (
 
 const workflowCreate = `-- name: WorkflowCreate :one
 INSERT INTO workflows (org_id, title, trigger_event, status)
-VALUES ($1, $2, $3, 'draft')
+VALUES ($1, $2, $3, $4)
 RETURNING id, org_id, title, trigger_event, status, created_at
 `
 
@@ -19,10 +19,16 @@ type WorkflowCreateParams struct {
 	OrgID        int64  `json:"org_id"`
 	Title        string `json:"title"`
 	TriggerEvent string `json:"trigger_event"`
+	Status       string `json:"status"`
 }
 
 func (q *Queries) WorkflowCreate(ctx context.Context, arg WorkflowCreateParams) (Workflow, error) {
-	row := q.db.QueryRowContext(ctx, workflowCreate, arg.OrgID, arg.Title, arg.TriggerEvent)
+	row := q.db.QueryRowContext(ctx, workflowCreate,
+		arg.OrgID,
+		arg.Title,
+		arg.TriggerEvent,
+		arg.Status,
+	)
 	var i Workflow
 	err := row.Scan(
 		&i.ID,
@@ -53,35 +59,12 @@ func (q *Queries) WorkflowFindByID(ctx context.Context, id int64) (Workflow, err
 	return i, err
 }
 
-const workflowFindByIDAndOrg = `-- name: WorkflowFindByIDAndOrg :one
-SELECT id, org_id, title, trigger_event, status, created_at FROM workflows WHERE id = $1 AND org_id = $2
-`
-
-type WorkflowFindByIDAndOrgParams struct {
-	ID    int64 `json:"id"`
-	OrgID int64 `json:"org_id"`
-}
-
-func (q *Queries) WorkflowFindByIDAndOrg(ctx context.Context, arg WorkflowFindByIDAndOrgParams) (Workflow, error) {
-	row := q.db.QueryRowContext(ctx, workflowFindByIDAndOrg, arg.ID, arg.OrgID)
-	var i Workflow
-	err := row.Scan(
-		&i.ID,
-		&i.OrgID,
-		&i.Title,
-		&i.TriggerEvent,
-		&i.Status,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
-const workflowList = `-- name: WorkflowList :many
+const workflowListByOrgID = `-- name: WorkflowListByOrgID :many
 SELECT id, org_id, title, trigger_event, status, created_at FROM workflows WHERE org_id = $1
 `
 
-func (q *Queries) WorkflowList(ctx context.Context, orgID int64) ([]Workflow, error) {
-	rows, err := q.db.QueryContext(ctx, workflowList, orgID)
+func (q *Queries) WorkflowListByOrgID(ctx context.Context, orgID int64) ([]Workflow, error) {
+	rows, err := q.db.QueryContext(ctx, workflowListByOrgID, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -111,15 +94,15 @@ func (q *Queries) WorkflowList(ctx context.Context, orgID int64) ([]Workflow, er
 }
 
 const workflowUpdateStatus = `-- name: WorkflowUpdateStatus :exec
-UPDATE workflows SET status = $2 WHERE id = $1
+UPDATE workflows SET status = $1 WHERE id = $2
 `
 
 type WorkflowUpdateStatusParams struct {
-	ID     int64  `json:"id"`
 	Status string `json:"status"`
+	ID     int64  `json:"id"`
 }
 
 func (q *Queries) WorkflowUpdateStatus(ctx context.Context, arg WorkflowUpdateStatusParams) error {
-	_, err := q.db.ExecContext(ctx, workflowUpdateStatus, arg.ID, arg.Status)
+	_, err := q.db.ExecContext(ctx, workflowUpdateStatus, arg.Status, arg.ID)
 	return err
 }

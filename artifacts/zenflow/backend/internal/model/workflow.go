@@ -39,11 +39,11 @@ func (m *workflowModelImpl) WithTx(tx *sql.Tx) WorkflowModel {
 	return &workflowModelImpl{db: m.db, tx: tx}
 }
 
-//fullend:gen ssot=db/workflows.sql contract=14b8a49
-func (m *workflowModelImpl) Create(orgID int64, title string, triggerEvent string) (*Workflow, error) {
+//fullend:gen ssot=db/workflows.sql contract=0c3ed66
+func (m *workflowModelImpl) Create(orgID int64, title string, triggerEvent string, status string) (*Workflow, error) {
 	row := m.conn().QueryRowContext(context.Background(),
-		"INSERT INTO workflows (org_id, title, trigger_event, status)\nVALUES ($1, $2, $3, 'draft')\nRETURNING *;",
-		orgID, title, triggerEvent)
+		"INSERT INTO workflows (org_id, title, trigger_event, status)\nVALUES ($1, $2, $3, $4)\nRETURNING *;",
+		orgID, title, triggerEvent, status)
 	return scanWorkflow(row)
 }
 
@@ -62,23 +62,8 @@ func (m *workflowModelImpl) FindByID(id int64) (*Workflow, error) {
 	return v, nil
 }
 
-//fullend:gen ssot=db/workflows.sql contract=0361abb
-func (m *workflowModelImpl) FindByIDAndOrg(id int64, orgID int64) (*Workflow, error) {
-	row := m.conn().QueryRowContext(context.Background(),
-		"SELECT * FROM workflows WHERE id = $1 AND org_id = $2;",
-		id, orgID)
-	v, err := scanWorkflow(row)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return v, nil
-}
-
-//fullend:gen ssot=db/workflows.sql contract=ceb1cb5
-func (m *workflowModelImpl) List(orgID int64) ([]Workflow, error) {
+//fullend:gen ssot=db/workflows.sql contract=d4de074
+func (m *workflowModelImpl) ListByOrgID(orgID int64) ([]Workflow, error) {
 	rows, err := m.conn().QueryContext(context.Background(),
 		"SELECT * FROM workflows WHERE org_id = $1;",
 		orgID)
@@ -100,10 +85,10 @@ func (m *workflowModelImpl) List(orgID int64) ([]Workflow, error) {
 	return items, nil
 }
 
-//fullend:gen ssot=db/workflows.sql contract=2b9704e
-func (m *workflowModelImpl) UpdateStatus(id int64, status string) error {
+//fullend:gen ssot=db/workflows.sql contract=dddd157
+func (m *workflowModelImpl) UpdateStatus(status string, id int64) error {
 	_, err := m.conn().ExecContext(context.Background(),
-		"UPDATE workflows SET status = $2 WHERE id = $1;",
-		id, status)
+		"UPDATE workflows SET status = $1 WHERE id = $2;",
+		status, id)
 	return err
 }

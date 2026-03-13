@@ -1,4 +1,4 @@
-//fullend:gen ssot=fullend.yaml contract=2933166
+//fullend:gen ssot=fullend.yaml contract=d37c5f0
 package middleware
 
 import (
@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/geul-org/fullend/pkg/auth"
-	"github.com/zenflow/zenflow/internal/model"
+	"github.com/geul-org/zenflow/internal/model"
 )
 
 // BearerAuth returns a gin middleware that validates the Authorization header.
@@ -29,7 +29,6 @@ func BearerAuth(secret string) gin.HandlerFunc {
 		c.Set("currentUser", &model.CurrentUser{
 			Email: out.Email,
 			ID: out.UserID,
-			// OrgID: unknown claim key "org_id"
 			Role: out.Role,
 		})
 		c.Next()

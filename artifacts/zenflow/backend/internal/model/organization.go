@@ -46,26 +46,3 @@ func (m *organizationModelImpl) Create(name string, planType string, creditsBala
 		name, planType, creditsBalance)
 	return scanOrganization(row)
 }
-
-//fullend:gen ssot=db/organizations.sql contract=95083cb
-func (m *organizationModelImpl) FindByID(id int64) (*Organization, error) {
-	row := m.conn().QueryRowContext(context.Background(),
-		"SELECT * FROM organizations WHERE id = $1;",
-		id)
-	v, err := scanOrganization(row)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return v, nil
-}
-
-//fullend:gen ssot=db/organizations.sql contract=1277730
-func (m *organizationModelImpl) UpdateCredits(id int64, creditsBalance int64) error {
-	_, err := m.conn().ExecContext(context.Background(),
-		"UPDATE organizations SET credits_balance = credits_balance - $2 WHERE id = $1;",
-		id, creditsBalance)
-	return err
-}

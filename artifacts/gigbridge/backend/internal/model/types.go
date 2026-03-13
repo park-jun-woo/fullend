@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type Gig struct {
 	ID           int64 `json:"id"`

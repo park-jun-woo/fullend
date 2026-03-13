@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-//fullend:gen ssot=service/auth/login.ssac contract=f655616
+//fullend:gen ssot=service/auth/login.ssac contract=1e99033
 func (h *Handler) Login(c *gin.Context) {
 	var req struct {
 		Email    string `json:"email"`
@@ -26,7 +26,7 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 
 	if user == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
@@ -41,8 +41,6 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"access_token": token.AccessToken,
-	})
+	c.JSON(http.StatusOK, token)
 
 }

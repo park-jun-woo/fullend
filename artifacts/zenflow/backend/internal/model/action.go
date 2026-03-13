@@ -48,10 +48,10 @@ func (m *actionModelImpl) Create(workflowID int64, actionType string, payloadTem
 	return scanAction(row)
 }
 
-//fullend:gen ssot=db/actions.sql contract=05cc25c
-func (m *actionModelImpl) ListByWorkflow(workflowID int64) ([]Action, error) {
+//fullend:gen ssot=db/actions.sql contract=5e529de
+func (m *actionModelImpl) ListByWorkflowID(workflowID int64) ([]Action, error) {
 	rows, err := m.conn().QueryContext(context.Background(),
-		"SELECT * FROM actions WHERE workflow_id = $1 ORDER BY sequence_order ASC;",
+		"SELECT * FROM actions WHERE workflow_id = $1 ORDER BY sequence_order;",
 		workflowID)
 	if err != nil {
 		return nil, err

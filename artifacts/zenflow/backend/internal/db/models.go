@@ -5,6 +5,7 @@
 package db
 
 import (
+	"database/sql"
 	"encoding/json"
 	"time"
 )
@@ -42,10 +43,10 @@ type User struct {
 }
 
 type Workflow struct {
-	ID           int64     `json:"id"`
-	OrgID        int64     `json:"org_id"`
-	Title        string    `json:"title"`
-	TriggerEvent string    `json:"trigger_event"`
-	Status       string    `json:"status"`
-	CreatedAt    time.Time `json:"created_at"`
+	ID           int64        `json:"id"`
+	OrgID        int64        `json:"org_id"`
+	Title        string       `json:"title"`
+	TriggerEvent string       `json:"trigger_event"`
+	Status       string       `json:"status"`
+	CreatedAt    sql.NullTime `json:"created_at"`
 }

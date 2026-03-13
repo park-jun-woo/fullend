@@ -48,17 +48,3 @@ func (q *Queries) OrganizationFindByID(ctx context.Context, id int64) (Organizat
 	)
 	return i, err
 }
-
-const organizationUpdateCredits = `-- name: OrganizationUpdateCredits :exec
-UPDATE organizations SET credits_balance = credits_balance - $2 WHERE id = $1
-`
-
-type OrganizationUpdateCreditsParams struct {
-	ID             int64 `json:"id"`
-	CreditsBalance int32 `json:"credits_balance"`
-}
-
-func (q *Queries) OrganizationUpdateCredits(ctx context.Context, arg OrganizationUpdateCreditsParams) error {
-	_, err := q.db.ExecContext(ctx, organizationUpdateCredits, arg.ID, arg.CreditsBalance)
-	return err
-}

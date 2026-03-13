@@ -1,18 +1,14 @@
 package service
 
-import "github.com/zenflow/zenflow/internal/billing"
+import "github.com/geul-org/zenflow/internal/billing"
 
-// @auth "ActivateWorkflow" "workflow" {} "Permission denied" 403
-// @get User user = User.FindByID({ID: currentUser.ID})
-// @empty user "User not found" 404
-// @get Workflow workflow = Workflow.FindByIDAndOrg({ID: request.id, OrgID: user.OrgID})
-// @empty workflow "Workflow not found" 404
-// @get Organization org = Organization.FindByID({ID: user.OrgID})
-// @empty org "Organization not found" 404
-// @call billing.CheckCredits({Balance: org.CreditsBalance})
-// @state workflow {status: workflow.Status} "ActivateWorkflow" "Cannot transition" 409
-// @put Workflow.UpdateStatus({ID: workflow.ID, Status: "active"})
-// @get Workflow updated = Workflow.FindByID({ID: workflow.ID})
-// @empty updated "Workflow not found" 404
+// @get Workflow wf = Workflow.FindByID({ID: request.id})
+// @empty wf "Workflow not found"
+// @auth "ActivateWorkflow" "workflow" {UserID: currentUser.ID, ResourceID: wf.OrgID} "Forbidden"
+// @call billing.CheckCredits({OrgID: wf.OrgID})
+// @state workflow {status: wf.Status} "ActivateWorkflow" "Cannot transition"
+// @put Workflow.UpdateStatus({Status: "active", ID: wf.ID})
+// @get Workflow updated = Workflow.FindByID({ID: wf.ID})
+// @empty updated "Workflow not found"
 // @response { workflow: updated }
 func ActivateWorkflow() {}

@@ -27,8 +27,7 @@ Content-Type: application/json
 {
   "email": "test@test.com",
   "org_id": {{organization_id}},
-  "password": "Password1234!",
-  "role": "admin"
+  "password": "Password1234!"
 }
 
 HTTP 201

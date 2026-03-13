@@ -3,6 +3,6 @@ package service
 import "github.com/geul-org/fullend/pkg/auth"
 
 // @call auth.HashPasswordResponse hp = auth.HashPassword({Password: request.password})
-// @post User user = User.Create({OrgID: request.org_id, Email: request.email, PasswordHash: hp.HashedPassword, Role: request.role})
+// @post User user = User.Create({OrgID: request.org_id, Email: request.email, PasswordHash: hp.HashedPassword, Role: "member"})
 // @response { user: user }
 func Register() {}

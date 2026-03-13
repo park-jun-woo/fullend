@@ -12,7 +12,6 @@ func (h *Handler) Register(c *gin.Context) {
 		Password string `json:"password"`
 		OrgID    int64  `json:"org_id"`
 		Email    string `json:"email"`
-		Role     string `json:"role"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
@@ -21,7 +20,6 @@ func (h *Handler) Register(c *gin.Context) {
 	password := req.Password
 	orgID := req.OrgID
 	email := req.Email
-	role := req.Role
 
 	tx, err := h.DB.BeginTx(c.Request.Context(), nil)
 	if err != nil {
@@ -36,7 +34,7 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 	}
 
-	user, err := h.UserModel.WithTx(tx).Create(orgID, email, hp.HashedPassword, role)
+	user, err := h.UserModel.WithTx(tx).Create(orgID, email, hp.HashedPassword, "member")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "User 생성 실패"})
 		return

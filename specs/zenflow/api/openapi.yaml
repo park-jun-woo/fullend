@@ -1,8 +1,8 @@
-openapi: 3.0.3
+openapi: "3.0.3"
 info:
   title: ZenFlow API
-  version: 1.0.0
-  description: Multi-tenant workflow automation SaaS
+  version: "1.0.0"
+  description: Multi-tenant Workflow Automation SaaS
 
 servers:
   - url: http://localhost:8080
@@ -15,6 +15,12 @@ components:
       bearerFormat: JWT
 
   schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
     Organization:
       type: object
       properties:
@@ -101,27 +107,28 @@ paths:
   /auth/register:
     post:
       operationId: Register
-      security: []
+      summary: Register a new user
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [org_id, email, password, role]
               properties:
-                org_id:
-                  type: integer
-                  format: int64
                 email:
                   type: string
                 password:
                   type: string
-                role:
-                  type: string
+                org_id:
+                  type: integer
+                  format: int64
+              required:
+                - email
+                - password
+                - org_id
       responses:
-        '201':
-          description: User registered
+        "201":
+          description: User created
           content:
             application/json:
               schema:
@@ -133,22 +140,24 @@ paths:
   /auth/login:
     post:
       operationId: Login
-      security: []
+      summary: Login
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [email, password]
               properties:
                 email:
                   type: string
                 password:
                   type: string
+              required:
+                - email
+                - password
       responses:
-        '200':
-          description: Login successful
+        "200":
+          description: Login success
           content:
             application/json:
               schema:
@@ -156,20 +165,29 @@ paths:
                 properties:
                   access_token:
                     type: string
-        '401':
+        "401":
           description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /organizations:
     post:
       operationId: CreateOrganization
-      security: []
+      summary: Create organization
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [name, plan_type, credits_balance]
               properties:
                 name:
                   type: string
@@ -177,8 +195,11 @@ paths:
                   type: string
                 credits_balance:
                   type: integer
+              required:
+                - name
+                - plan_type
       responses:
-        '201':
+        "201":
           description: Organization created
           content:
             application/json:
@@ -191,6 +212,7 @@ paths:
   /workflows:
     post:
       operationId: CreateWorkflow
+      summary: Create a workflow
       security:
         - bearerAuth: []
       requestBody:
@@ -199,14 +221,16 @@ paths:
           application/json:
             schema:
               type: object
-              required: [title, trigger_event]
               properties:
                 title:
                   type: string
                 trigger_event:
                   type: string
+              required:
+                - title
+                - trigger_event
       responses:
-        '201':
+        "201":
           description: Workflow created
           content:
             application/json:
@@ -215,18 +239,26 @@ paths:
                 properties:
                   workflow:
                     $ref: '#/components/schemas/Workflow'
-        '403':
-          description: Permission denied
-        '404':
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
           description: User not found
-
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     get:
       operationId: ListWorkflows
+      summary: List workflows for current org
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: Workflows listed
+        "200":
+          description: Workflow list
           content:
             application/json:
               schema:
@@ -236,14 +268,23 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Workflow'
-        '403':
-          description: Permission denied
-        '404':
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
           description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /workflows/{id}:
     get:
       operationId: GetWorkflow
+      summary: Get a workflow by ID
       security:
         - bearerAuth: []
       parameters:
@@ -254,7 +295,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Workflow detail
           content:
             application/json:
@@ -263,14 +304,23 @@ paths:
                 properties:
                   workflow:
                     $ref: '#/components/schemas/Workflow'
-        '403':
-          description: Permission denied
-        '404':
-          description: Workflow not found
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /workflows/{id}/activate:
     post:
       operationId: ActivateWorkflow
+      summary: Activate a workflow
       security:
         - bearerAuth: []
       parameters:
@@ -281,7 +331,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Workflow activated
           content:
             application/json:
@@ -290,18 +340,35 @@ paths:
                 properties:
                   workflow:
                     $ref: '#/components/schemas/Workflow'
-        '402':
+        "402":
           description: Insufficient credits
-        '403':
-          description: Permission denied
-        '404':
-          description: Workflow not found
-        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "409":
           description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /workflows/{id}/pause:
     post:
       operationId: PauseWorkflow
+      summary: Pause a workflow
       security:
         - bearerAuth: []
       parameters:
@@ -312,7 +379,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Workflow paused
           content:
             application/json:
@@ -321,16 +388,29 @@ paths:
                 properties:
                   workflow:
                     $ref: '#/components/schemas/Workflow'
-        '403':
-          description: Permission denied
-        '404':
-          description: Workflow not found
-        '409':
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "409":
           description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /workflows/{id}/archive:
     post:
       operationId: ArchiveWorkflow
+      summary: Archive a workflow
       security:
         - bearerAuth: []
       parameters:
@@ -341,7 +421,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Workflow archived
           content:
             application/json:
@@ -350,16 +430,29 @@ paths:
                 properties:
                   workflow:
                     $ref: '#/components/schemas/Workflow'
-        '403':
-          description: Permission denied
-        '404':
-          description: Workflow not found
-        '409':
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "409":
           description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /workflows/{id}/execute:
     post:
       operationId: ExecuteWorkflow
+      summary: Execute a workflow
       security:
         - bearerAuth: []
       parameters:
@@ -370,8 +463,8 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
-          description: Workflow executed
+        "200":
+          description: Execution complete
           content:
             application/json:
               schema:
@@ -379,16 +472,29 @@ paths:
                 properties:
                   execution:
                     $ref: '#/components/schemas/Execution'
-        '403':
-          description: Permission denied
-        '404':
-          description: Workflow not found
-        '409':
-          description: Workflow not active
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "409":
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /workflows/{id}/actions:
     post:
       operationId: CreateAction
+      summary: Add an action to a workflow
       security:
         - bearerAuth: []
       parameters:
@@ -404,7 +510,6 @@ paths:
           application/json:
             schema:
               type: object
-              required: [action_type, sequence_order]
               properties:
                 action_type:
                   type: string
@@ -412,8 +517,11 @@ paths:
                   type: object
                 sequence_order:
                   type: integer
+              required:
+                - action_type
+                - sequence_order
       responses:
-        '201':
+        "201":
           description: Action created
           content:
             application/json:
@@ -422,13 +530,21 @@ paths:
                 properties:
                   action:
                     $ref: '#/components/schemas/Action'
-        '403':
-          description: Permission denied
-        '404':
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
           description: Workflow not found
-
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     get:
       operationId: ListActions
+      summary: List actions for a workflow
       security:
         - bearerAuth: []
       parameters:
@@ -439,8 +555,8 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
-          description: Actions listed
+        "200":
+          description: Action list
           content:
             application/json:
               schema:
@@ -450,7 +566,15 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Action'
-        '403':
-          description: Permission denied
-        '404':
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
           description: Workflow not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

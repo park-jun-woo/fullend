@@ -15,40 +15,40 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-
+	// Login
 	// (POST /auth/login)
 	Login(w http.ResponseWriter, r *http.Request)
-
+	// Register a new user
 	// (POST /auth/register)
 	Register(w http.ResponseWriter, r *http.Request)
-
+	// Create organization
 	// (POST /organizations)
 	CreateOrganization(w http.ResponseWriter, r *http.Request)
-
+	// List workflows for current org
 	// (GET /workflows)
 	ListWorkflows(w http.ResponseWriter, r *http.Request)
-
+	// Create a workflow
 	// (POST /workflows)
 	CreateWorkflow(w http.ResponseWriter, r *http.Request)
-
+	// Get a workflow by ID
 	// (GET /workflows/{id})
 	GetWorkflow(w http.ResponseWriter, r *http.Request, id int64)
-
+	// List actions for a workflow
 	// (GET /workflows/{id}/actions)
 	ListActions(w http.ResponseWriter, r *http.Request, id int64)
-
+	// Add an action to a workflow
 	// (POST /workflows/{id}/actions)
 	CreateAction(w http.ResponseWriter, r *http.Request, id int64)
-
+	// Activate a workflow
 	// (POST /workflows/{id}/activate)
 	ActivateWorkflow(w http.ResponseWriter, r *http.Request, id int64)
-
+	// Archive a workflow
 	// (POST /workflows/{id}/archive)
 	ArchiveWorkflow(w http.ResponseWriter, r *http.Request, id int64)
-
+	// Execute a workflow
 	// (POST /workflows/{id}/execute)
 	ExecuteWorkflow(w http.ResponseWriter, r *http.Request, id int64)
-
+	// Pause a workflow
 	// (POST /workflows/{id}/pause)
 	PauseWorkflow(w http.ResponseWriter, r *http.Request, id int64)
 }
