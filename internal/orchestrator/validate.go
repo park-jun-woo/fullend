@@ -16,7 +16,6 @@ import (
 	"github.com/geul-org/fullend/internal/policy"
 	"github.com/geul-org/fullend/internal/projectconfig"
 	"github.com/geul-org/fullend/internal/reporter"
-	"github.com/geul-org/fullend/internal/scenario"
 	"github.com/geul-org/fullend/internal/statemachine"
 	ssacparser "github.com/geul-org/ssac/parser"
 	ssacvalidator "github.com/geul-org/ssac/validator"
@@ -49,7 +48,7 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 	var serviceFuncs []ssacparser.ServiceFunc
 	var stateDiagrams []*statemachine.StateDiagram
 	var parsedPolicies []*policy.Policy
-	var parsedFeatures []*scenario.Feature
+	var hurlFiles []string
 	var projectFuncSpecs []funcspec.FuncSpec
 	var projConfig *projectconfig.ProjectConfig
 	var modelDir string
@@ -77,6 +76,13 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 					Name:    string(kind),
 					Status:  reporter.Skip,
 					Summary: "no func/ directory",
+				})
+			} else if kind == KindScenario {
+				// Scenario is optional — user writes .hurl files directly.
+				report.Steps = append(report.Steps, reporter.StepResult{
+					Name:    string(kind),
+					Status:  reporter.Skip,
+					Summary: "no tests/scenario-*.hurl files",
 				})
 			} else {
 				report.Steps = append(report.Steps, reporter.StepResult{
@@ -123,9 +129,9 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 			report.Steps = append(report.Steps, step)
 			parsedPolicies = policies
 		case KindScenario:
-			step, features := validateScenario(d.Path)
+			step, files := validateScenarioHurl(d.Path, root)
 			report.Steps = append(report.Steps, step)
-			parsedFeatures = features
+			hurlFiles = files
 		case KindFunc:
 			step, specs := validateFunc(d.Path)
 			report.Steps = append(report.Steps, step)
@@ -139,7 +145,7 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 	}
 
 	// Cross-validation step.
-	report.Steps = append(report.Steps, runCrossValidate(root, openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, parsedFeatures, projectFuncSpecs, modelDir, projConfig))
+	report.Steps = append(report.Steps, runCrossValidate(root, openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, hurlFiles, projectFuncSpecs, modelDir, projConfig))
 
 	// Contract validation step (if artifacts exist).
 	report.Steps = append(report.Steps, runContractValidate(root))
@@ -206,7 +212,7 @@ func runContractValidate(specsDir string) reporter.StepResult {
 	return step
 }
 
-func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, features []*scenario.Feature, projectFuncSpecs []funcspec.FuncSpec, modelDir string, projConfig *projectconfig.ProjectConfig) reporter.StepResult {
+func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, hurlFiles []string, projectFuncSpecs []funcspec.FuncSpec, modelDir string, projConfig *projectconfig.ProjectConfig) reporter.StepResult {
 	step := reporter.StepResult{Name: "Cross"}
 
 	// Require OpenAPI + DDL + SSaC for cross-validation.
@@ -258,7 +264,7 @@ func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTabl
 		ServiceFuncs:     funcs,
 		StateDiagrams:    diagrams,
 		Policies:         policies,
-		Features:         features,
+		HurlFiles:        hurlFiles,
 		ProjectFuncSpecs: projectFuncSpecs,
 		FullendPkgSpecs:  fullendPkgSpecs,
 		DTOTypes:         dtoTypes,
@@ -536,27 +542,34 @@ func validateTerraform(tfDir string) reporter.StepResult {
 	return step
 }
 
-func validateScenario(scenarioDir string) (reporter.StepResult, []*scenario.Feature) {
+func validateScenarioHurl(testsDir string, specsRoot string) (reporter.StepResult, []string) {
 	step := reporter.StepResult{Name: string(KindScenario)}
-	features, err := scenario.ParseDir(scenarioDir)
-	if err != nil {
+
+	// Check for deprecated .feature files anywhere under specs root.
+	scenarioDir := filepath.Join(specsRoot, "scenario")
+	if featureFiles, _ := filepath.Glob(filepath.Join(scenarioDir, "*.feature")); len(featureFiles) > 0 {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("Scenario parse error: %v", err))
-		return step, nil
-	}
-	if len(features) == 0 {
-		step.Status = reporter.Skip
-		step.Summary = "no feature files found"
+		for _, f := range featureFiles {
+			rel, _ := filepath.Rel(specsRoot, f)
+			step.Errors = append(step.Errors, fmt.Sprintf("%s: .feature is no longer supported. Delete this file.\n       Write scenario tests directly in Hurl format: tests/scenario-*.hurl\n       See: https://hurl.dev/docs/manual.html", rel))
+		}
 		return step, nil
 	}
 
-	totalScenarios := 0
-	for _, f := range features {
-		totalScenarios += len(f.Scenarios)
+	// Collect scenario and invariant .hurl files.
+	scenarioHurls, _ := filepath.Glob(filepath.Join(testsDir, "scenario-*.hurl"))
+	invariantHurls, _ := filepath.Glob(filepath.Join(testsDir, "invariant-*.hurl"))
+	allHurls := append(scenarioHurls, invariantHurls...)
+
+	if len(allHurls) == 0 {
+		step.Status = reporter.Skip
+		step.Summary = "no scenario .hurl files found"
+		return step, nil
 	}
+
 	step.Status = reporter.Pass
-	step.Summary = fmt.Sprintf("%d features, %d scenarios", len(features), totalScenarios)
-	return step, features
+	step.Summary = fmt.Sprintf("%d scenario hurl files", len(allHurls))
+	return step, allHurls
 }
 
 func validateFunc(funcDir string) (reporter.StepResult, []funcspec.FuncSpec) {

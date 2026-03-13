@@ -9,7 +9,6 @@ import (
 
 	"github.com/geul-org/fullend/internal/funcspec"
 	"github.com/geul-org/fullend/internal/policy"
-	"github.com/geul-org/fullend/internal/scenario"
 	"github.com/geul-org/fullend/internal/statemachine"
 	ssacparser "github.com/geul-org/ssac/parser"
 	ssacvalidator "github.com/geul-org/ssac/validator"
@@ -149,15 +148,10 @@ func statusPolicy(relPath, dir string) StatusLine {
 }
 
 func statusScenario(relPath, dir string) StatusLine {
-	summary := "?"
-	features, err := scenario.ParseDir(dir)
-	if err == nil {
-		totalScenarios := 0
-		for _, f := range features {
-			totalScenarios += len(f.Scenarios)
-		}
-		summary = fmt.Sprintf("%d features, %d scenarios", len(features), totalScenarios)
-	}
+	scenarioHurls, _ := filepath.Glob(filepath.Join(dir, "scenario-*.hurl"))
+	invariantHurls, _ := filepath.Glob(filepath.Join(dir, "invariant-*.hurl"))
+	total := len(scenarioHurls) + len(invariantHurls)
+	summary := fmt.Sprintf("%d hurl files", total)
 	return StatusLine{Kind: KindScenario, Path: relPath, Summary: summary}
 }
 

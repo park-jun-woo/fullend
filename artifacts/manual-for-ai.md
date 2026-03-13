@@ -1,6 +1,6 @@
 # fullend — AI SSOT Integration Guide
 
-> Covers SSaC, STML, Func Spec, Mermaid stateDiagram, OPA Rego, Gherkin, OpenAPI x- extensions, cross-validation rules, and pkg/ functions/models.
+> Covers SSaC, STML, Func Spec, Mermaid stateDiagram, OPA Rego, Hurl scenario, OpenAPI x- extensions, cross-validation rules, and pkg/ functions/models.
 > Does NOT explain OpenAPI/SQL DDL/Terraform syntax.
 
 ## Project Directory Structure
@@ -17,7 +17,8 @@
 ├── func/<pkg>/*.go               # Custom func implementations (optional)
 ├── states/*.md                   # Mermaid stateDiagram (state transitions)
 ├── policy/*.rego                 # OPA Rego (authorization policies)
-├── scenario/*.feature            # Gherkin scenarios (fixed-pattern)
+├── tests/scenario-*.hurl         # Scenario tests (user-written Hurl, optional)
+├── tests/invariant-*.hurl        # Invariant tests (user-written Hurl, optional)
 ├── frontend/
 │   ├── *.html                    # STML declarations (HTML5 + data-*)
 │   ├── *.custom.ts               # Frontend computed functions (optional)
@@ -651,31 +652,26 @@ allow if {
 | role+owner | both role + owner |
 | multiple actions | multiple actions in same rule using `{...}` set |
 
-## Gherkin Scenario
+## Scenario Tests (Hurl)
 
-`scenario/*.feature`. Tags: `@scenario` (business), `@invariant` (invariant verification).
+시나리오 테스트는 사용자가 표준 Hurl 문법으로 직접 작성한다. 자체 DSL 없음.
 
-### Action Steps
+- 위치: `tests/scenario-*.hurl` (시나리오), `tests/invariant-*.hurl` (불변식)
+- 자동 생성 대상 아님 — `fullend gen`은 스모크 테스트(smoke.hurl)만 생성
+- `.feature` 파일은 더 이상 지원하지 않음 (validate 시 ERROR)
 
-```
-METHOD operationId {JSON} → result     # request + capture
-METHOD operationId {JSON}              # request only
-METHOD operationId → result            # no-body + capture
-METHOD operationId                     # no-body only
-```
+### 크로스체크 (Scenario → OpenAPI, 단방향)
 
-`→ token` auto-injects Authorization header.
+| 규칙 | 설명 | 수준 |
+|---|---|---|
+| 경로 존재 | `.hurl`의 URL path가 OpenAPI에 정의되어 있는가 | ERROR |
+| 메서드 일치 | 해당 path의 HTTP 메서드가 OpenAPI에 정의되어 있는가 | ERROR |
+| 상태코드 정의 | 기대하는 HTTP 상태코드가 OpenAPI responses에 있는가 | WARNING |
 
-### Assertion Steps
+### Hurl 참조
 
-```
-status == CODE
-response.field exists
-response.field == value
-response.array contains var.Field
-response.array excludes var.Field
-response.array count > N
-```
+- 공식 문서: https://hurl.dev/docs/manual.html
+- 주요 구문: `[Captures]` (변수 캡처), `[Asserts]` (검증), `{{변수}}` (변수 참조)
 
 ## Name Matching Rules
 
@@ -711,10 +707,9 @@ response.array count > N
 | Policy ↔ SSaC @auth (action, resource) | WARNING |
 | Policy @ownership → DDL table.column | ERROR |
 | Policy @ownership via → DDL join FK | ERROR |
-| Scenario operationId → OpenAPI | ERROR |
-| Scenario METHOD → OpenAPI method | ERROR |
-| Scenario JSON fields → request schema | ERROR |
-| Scenario step order → States transitions | WARNING |
+| Hurl path → OpenAPI path exists | ERROR |
+| Hurl method → OpenAPI method defined | ERROR |
+| Hurl status code → OpenAPI responses defined | WARNING |
 | Func → SSaC @call matching | ERROR |
 | Func purity (I/O import forbidden, `os` allowed) | ERROR |
 | Func body TODO stub | ERROR |
@@ -830,10 +825,10 @@ $ fullend chain AcceptProposal specs/gigbridge/
   StateDiag  states/gig.md:7                               diagram: gig → AcceptProposal
   StateDiag  states/proposal.md:6                          diagram: proposal → AcceptProposal
   FuncSpec   func/billing/hold_escrow.go:8                 @func billing.HoldEscrow
-  Gherkin    scenario/gig_lifecycle.feature:4              Scenario: Happy Path - Full Gig Lifecycle
+  Hurl       tests/scenario-gig-lifecycle.hurl:10          scenario: scenario-gig-lifecycle.hurl
 ```
 
-탐색 경로: OpenAPI operationId → SSaC 함수 → `@get`/`@post` Model.Method → DDL 테이블 | `@auth` → Rego 정책 | `@state` → Mermaid stateDiagram | `@call` → Func Spec | Gherkin steps → 시나리오 | STML endpoint → 프론트엔드.
+탐색 경로: OpenAPI operationId → SSaC 함수 → `@get`/`@post` Model.Method → DDL 테이블 | `@auth` → Rego 정책 | `@state` → Mermaid stateDiagram | `@call` → Func Spec | Hurl → 시나리오 | STML endpoint → 프론트엔드.
 
 ### fullend gen-model \<openapi-source\> \<output-dir\>
 외부 OpenAPI에서 Go model 생성.

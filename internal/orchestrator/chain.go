@@ -14,7 +14,6 @@ import (
 	"github.com/geul-org/fullend/internal/contract"
 	"github.com/geul-org/fullend/internal/funcspec"
 	"github.com/geul-org/fullend/internal/policy"
-	"github.com/geul-org/fullend/internal/scenario"
 	"github.com/geul-org/fullend/internal/statemachine"
 	ssacparser "github.com/geul-org/ssac/parser"
 	ssacvalidator "github.com/geul-org/ssac/validator"
@@ -22,7 +21,7 @@ import (
 
 // ChainLink represents one SSOT or artifact node in a feature chain.
 type ChainLink struct {
-	Kind      string // "OpenAPI", "SSaC", "DDL", "Rego", "StateDiag", "FuncSpec", "Gherkin", "STML", "Handler", "Model", "Authz", "Types"
+	Kind      string // "OpenAPI", "SSaC", "DDL", "Rego", "StateDiag", "FuncSpec", "Hurl", "STML", "Handler", "Model", "Authz", "Types"
 	File      string // relative path from specs-dir or artifacts-dir
 	Line      int    // 1-based line number, 0 if unknown
 	Summary   string // brief description of the match
@@ -52,7 +51,6 @@ func Chain(specsDir string, operationID string) ([]ChainLink, error) {
 	var serviceFuncs []ssacparser.ServiceFunc
 	var stateDiagrams []*statemachine.StateDiagram
 	var parsedPolicies []*policy.Policy
-	var parsedFeatures []*scenario.Feature
 	var projectFuncSpecs []funcspec.FuncSpec
 
 	if d, ok := has[KindOpenAPI]; ok {
@@ -83,12 +81,6 @@ func Chain(specsDir string, operationID string) ([]ChainLink, error) {
 		policies, parseErr := policy.ParseDir(d.Path)
 		if parseErr == nil {
 			parsedPolicies = policies
-		}
-	}
-	if d, ok := has[KindScenario]; ok {
-		features, parseErr := scenario.ParseDir(d.Path)
-		if parseErr == nil {
-			parsedFeatures = features
 		}
 	}
 	if d, ok := has[KindFunc]; ok {
@@ -158,10 +150,10 @@ func Chain(specsDir string, operationID string) ([]ChainLink, error) {
 		links = append(links, funcLinks...)
 	}
 
-	// 7. Gherkin — trace scenarios referencing this operationId
-	if parsedFeatures != nil {
-		gherkinLinks := traceScenarios(operationID, parsedFeatures, abs)
-		links = append(links, gherkinLinks...)
+	// 7. Hurl scenario — trace .hurl files referencing this endpoint
+	if d, ok := has[KindScenario]; ok {
+		hurlLinks := traceHurlScenarios(operationID, openAPIDoc, d.Path, abs)
+		links = append(links, hurlLinks...)
 	}
 
 	// 8. STML — trace frontend files referencing this endpoint
@@ -515,37 +507,41 @@ func traceFuncSpecs(sf *ssacparser.ServiceFunc, specs []funcspec.FuncSpec, specs
 	return links
 }
 
-func traceScenarios(opID string, features []*scenario.Feature, specsDir string) []ChainLink {
+func traceHurlScenarios(opID string, doc *openapi3.T, testsDir string, specsDir string) []ChainLink {
+	if doc == nil || doc.Paths == nil {
+		return nil
+	}
+
+	// Find the endpoint path for this operationId.
+	var endpointPath string
+	for path, pi := range doc.Paths.Map() {
+		for _, op := range pi.Operations() {
+			if op.OperationID == opID {
+				endpointPath = path
+				break
+			}
+		}
+		if endpointPath != "" {
+			break
+		}
+	}
+	if endpointPath == "" {
+		return nil
+	}
+
+	// Search .hurl files for the endpoint path.
 	var links []ChainLink
-	for _, f := range features {
-		for _, sc := range f.Scenarios {
-			found := false
-			for _, step := range sc.Steps {
-				if step.OperationID == opID {
-					found = true
-					break
-				}
-			}
-			if !found && f.Background != nil {
-				for _, step := range f.Background.Steps {
-					if step.OperationID == opID {
-						found = true
-						break
-					}
-				}
-			}
-			if found {
-				relPath, _ := filepath.Rel(specsDir, f.File)
-				if relPath == "" {
-					relPath = f.File
-				}
-				links = append(links, ChainLink{
-					Kind:    "Gherkin",
-					File:    relPath,
-					Line:    sc.Line,
-					Summary: "Scenario: " + sc.Name,
-				})
-			}
+	hurlFiles, _ := filepath.Glob(filepath.Join(testsDir, "*.hurl"))
+	for _, f := range hurlFiles {
+		line := grepLine(f, endpointPath)
+		if line > 0 {
+			relPath, _ := filepath.Rel(specsDir, f)
+			links = append(links, ChainLink{
+				Kind:    "Hurl",
+				File:    relPath,
+				Line:    line,
+				Summary: "scenario: " + filepath.Base(f),
+			})
 		}
 	}
 	return links

@@ -15,7 +15,6 @@ import (
 	"github.com/geul-org/fullend/internal/policy"
 	"github.com/geul-org/fullend/internal/projectconfig"
 	"github.com/geul-org/fullend/internal/reporter"
-	"github.com/geul-org/fullend/internal/scenario"
 	"github.com/geul-org/fullend/internal/statemachine"
 	ssacgenerator "github.com/geul-org/ssac/generator"
 	ssacparser "github.com/geul-org/ssac/parser"
@@ -140,11 +139,7 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 		report.Steps = append(report.Steps, genAuthz(d.Path, specsDir, artifactsDir))
 	}
 
-
-	// 11. Scenario Hurl generation.
-	if d, ok := has[KindScenario]; ok {
-		report.Steps = append(report.Steps, genScenarioHurl(d.Path, specsDir, artifactsDir))
-	}
+	// 11. Scenario: user writes .hurl directly, no generation needed.
 
 	// 12. Func copy (custom func specs → artifacts).
 	if d, ok := has[KindFunc]; ok {
@@ -601,45 +596,6 @@ func countPolicyRules(policies []*policy.Policy) int {
 		total += len(p.Rules)
 	}
 	return total
-}
-
-func genScenarioHurl(scenarioDir, specsDir, artifactsDir string) reporter.StepResult {
-	step := reporter.StepResult{Name: "scenario-gen"}
-
-	features, err := scenario.ParseDir(scenarioDir)
-	if err != nil {
-		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("Scenario parse error: %v", err))
-		return step
-	}
-	if len(features) == 0 {
-		step.Status = reporter.Skip
-		step.Summary = "no feature files"
-		return step
-	}
-
-	// Load OpenAPI doc for path resolution.
-	apiPath := filepath.Join(specsDir, "api", "openapi.yaml")
-	doc, err := openapi3.NewLoader().LoadFromFile(apiPath)
-	if err != nil {
-		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("OpenAPI load error: %v", err))
-		return step
-	}
-
-	if err := gluegen.GenerateScenarioHurl(features, doc, artifactsDir); err != nil {
-		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("scenario-gen error: %v", err))
-		return step
-	}
-
-	totalScenarios := 0
-	for _, f := range features {
-		totalScenarios += len(f.Scenarios)
-	}
-	step.Status = reporter.Pass
-	step.Summary = fmt.Sprintf("%d feature files → %d hurl files", len(features), len(features))
-	return step
 }
 
 func genFunc(funcDir, specsDir, artifactsDir, modulePath string) reporter.StepResult {

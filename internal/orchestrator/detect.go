@@ -87,10 +87,18 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 		found = append(found, DetectedSSOT{Kind: KindPolicy, Path: policyDir})
 	}
 
-	// Check for scenario/ directory (Gherkin .feature files).
-	scenarioDir := filepath.Join(abs, "scenario")
-	if scenarioMatches, _ := filepath.Glob(filepath.Join(scenarioDir, "*.feature")); len(scenarioMatches) > 0 {
-		found = append(found, DetectedSSOT{Kind: KindScenario, Path: scenarioDir})
+	// Check for tests/ directory (scenario .hurl files).
+	testsDir := filepath.Join(abs, "tests")
+	scenarioHurls, _ := filepath.Glob(filepath.Join(testsDir, "scenario-*.hurl"))
+	invariantHurls, _ := filepath.Glob(filepath.Join(testsDir, "invariant-*.hurl"))
+	if len(scenarioHurls)+len(invariantHurls) > 0 {
+		found = append(found, DetectedSSOT{Kind: KindScenario, Path: testsDir})
+	} else {
+		// Also detect deprecated .feature files so validate can emit ERROR.
+		scenarioDir := filepath.Join(abs, "scenario")
+		if featureFiles, _ := filepath.Glob(filepath.Join(scenarioDir, "*.feature")); len(featureFiles) > 0 {
+			found = append(found, DetectedSSOT{Kind: KindScenario, Path: testsDir})
+		}
 	}
 
 	// Check for fullend.yaml (project config).

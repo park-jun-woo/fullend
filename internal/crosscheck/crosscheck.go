@@ -5,7 +5,6 @@ import (
 
 	"github.com/geul-org/fullend/internal/funcspec"
 	"github.com/geul-org/fullend/internal/policy"
-	"github.com/geul-org/fullend/internal/scenario"
 	"github.com/geul-org/fullend/internal/statemachine"
 	ssacparser "github.com/geul-org/ssac/parser"
 	ssacvalidator "github.com/geul-org/ssac/validator"
@@ -18,7 +17,7 @@ type CrossValidateInput struct {
 	ServiceFuncs     []ssacparser.ServiceFunc
 	StateDiagrams    []*statemachine.StateDiagram
 	Policies         []*policy.Policy
-	Features         []*scenario.Feature
+	HurlFiles        []string // scenario .hurl file paths for crosscheck
 	ProjectFuncSpecs []funcspec.FuncSpec
 	FullendPkgSpecs  []funcspec.FuncSpec
 	DTOTypes         map[string]bool   // model types marked with @dto (skip DDL matching)
@@ -60,9 +59,9 @@ func Run(input *CrossValidateInput) []CrossError {
 		errs = append(errs, CheckPolicy(input.Policies, input.ServiceFuncs, input.SymbolTable, input.StateDiagrams)...)
 	}
 
-	// Scenario ↔ OpenAPI/States/Policy
-	if len(input.Features) > 0 {
-		errs = append(errs, CheckScenarios(input.Features, input.OpenAPIDoc, input.StateDiagrams, input.Policies, input.ServiceFuncs)...)
+	// Hurl scenario → OpenAPI (단방향 크로스체크)
+	if len(input.HurlFiles) > 0 && input.OpenAPIDoc != nil {
+		errs = append(errs, CheckHurlFiles(input.HurlFiles, input.OpenAPIDoc)...)
 	}
 
 	// Func ↔ SSaC
