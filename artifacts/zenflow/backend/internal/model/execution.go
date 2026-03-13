@@ -39,8 +39,8 @@ func (m *executionModelImpl) WithTx(tx *sql.Tx) ExecutionModel {
 	return &executionModelImpl{db: m.db, tx: tx}
 }
 
-//fullend:gen ssot=db/executions.sql contract=6724612
-func (m *executionModelImpl) Create(workflowID int64, orgID int64, status string, creditsSpent string) (*Execution, error) {
+//fullend:gen ssot=db/executions.sql contract=22d4376
+func (m *executionModelImpl) Create(workflowID int64, orgID int64, status string, creditsSpent int64) (*Execution, error) {
 	row := m.conn().QueryRowContext(context.Background(),
 		"INSERT INTO executions (workflow_id, org_id, status, credits_spent)\nVALUES ($1, $2, $3, $4)\nRETURNING *;",
 		workflowID, orgID, status, creditsSpent)

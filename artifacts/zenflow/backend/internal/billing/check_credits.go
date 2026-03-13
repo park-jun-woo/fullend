@@ -7,7 +7,7 @@ import "fmt"
 // @description Validates that the organization has sufficient credits
 
 type CheckCreditsRequest struct {
-	Balance int32
+	Balance int64
 }
 
 type CheckCreditsResponse struct{}

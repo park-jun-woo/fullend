@@ -12,7 +12,7 @@ import "github.com/zenflow/zenflow/internal/worker"
 // @call worker.ProcessActionResponse result = worker.ProcessAction({WorkflowID: workflow.ID})
 // @get Organization org = Organization.FindByID({ID: user.OrgID})
 // @empty org "Organization not found" 404
-// @put Organization.UpdateCredits({ID: org.ID, Amount: result.ProcessedCount})
+// @put Organization.UpdateCredits({ID: org.ID, CreditsBalance: result.ProcessedCount})
 // @post Execution execution = Execution.Create({WorkflowID: workflow.ID, OrgID: org.ID, Status: "completed", CreditsSpent: result.ProcessedCount})
 // @response { execution: execution }
 func ExecuteWorkflow() {}

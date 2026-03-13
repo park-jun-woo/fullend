@@ -62,10 +62,10 @@ func (m *organizationModelImpl) FindByID(id int64) (*Organization, error) {
 	return v, nil
 }
 
-//fullend:gen ssot=db/organizations.sql contract=6582bb5
-func (m *organizationModelImpl) UpdateCredits(id int64, amount string) error {
+//fullend:gen ssot=db/organizations.sql contract=1277730
+func (m *organizationModelImpl) UpdateCredits(id int64, creditsBalance int64) error {
 	_, err := m.conn().ExecContext(context.Background(),
 		"UPDATE organizations SET credits_balance = credits_balance - $2 WHERE id = $1;",
-		id, amount)
+		id, creditsBalance)
 	return err
 }

@@ -142,9 +142,16 @@ func deriveInterfaces(usages []modelUsage, st *validator.SymbolTable) []derivedI
 					dm.HasQueryOpts = true
 					continue
 				}
+				goType := resolveInputParamType(val, usage.ModelName, st)
+				// VALUE-based resolution fell back to string — try KEY-based DDL lookup.
+				if goType == "string" && !strings.HasPrefix(val, `"`) {
+					if keyType := resolveKeyParamType(k, usage.ModelName, st); keyType != "string" {
+						goType = keyType
+					}
+				}
 				dp := derivedParam{
 					Name:   strcase.ToGoCamel(k),
-					GoType: resolveInputParamType(val, usage.ModelName, st),
+					GoType: goType,
 				}
 				if dp.Name != "" {
 					dm.Params = append(dm.Params, dp)
@@ -271,6 +278,40 @@ func resolveInputParamType(val string, modelName string, st *validator.SymbolTab
 	}
 
 	// 전체 순회
+	for _, table := range st.DDLTables {
+		if goType, ok := table.Columns[snakeName]; ok {
+			return goType
+		}
+	}
+
+	return "string"
+}
+
+// resolveKeyParamType resolves a Go type from the SSaC input KEY name against DDL tables.
+// Used as fallback when VALUE-based resolution returns "string".
+func resolveKeyParamType(key, modelName string, st *validator.SymbolTable) string {
+	snakeName := toSnakeCase(key)
+
+	// Model's own table first.
+	tableName := toSnakeCase(modelName) + "s"
+	if table, ok := st.DDLTables[tableName]; ok {
+		if goType, ok := table.Columns[snakeName]; ok {
+			return goType
+		}
+	}
+
+	// {Model}ID pattern.
+	if strings.HasSuffix(key, "ID") {
+		refModel := key[:len(key)-2]
+		refTable := toSnakeCase(refModel) + "s"
+		if table, ok := st.DDLTables[refTable]; ok {
+			if goType, ok := table.Columns["id"]; ok {
+				return goType
+			}
+		}
+	}
+
+	// All tables.
 	for _, table := range st.DDLTables {
 		if goType, ok := table.Columns[snakeName]; ok {
 			return goType

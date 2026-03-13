@@ -12,14 +12,14 @@ type ActionModel interface {
 
 type ExecutionModel interface {
 	WithTx(tx *sql.Tx) ExecutionModel
-	Create(workflowID int64, orgID int64, status string, creditsSpent string) (*Execution, error)
+	Create(workflowID int64, orgID int64, status string, creditsSpent int64) (*Execution, error)
 }
 
 type OrganizationModel interface {
 	WithTx(tx *sql.Tx) OrganizationModel
 	Create(name string, planType string, creditsBalance int64) (*Organization, error)
 	FindByID(id int64) (*Organization, error)
-	UpdateCredits(id int64, amount string) error
+	UpdateCredits(id int64, creditsBalance int64) error
 }
 
 type UserModel interface {
