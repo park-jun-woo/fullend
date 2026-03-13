@@ -185,8 +185,9 @@ func generateTypesFile(modelDir string, models []string, tables map[string]*ddlT
 	var b strings.Builder
 	b.WriteString("package model\n\n")
 
-	// Determine if we need time import.
+	// Determine if we need time/json imports.
 	needsTime := false
+	needsJSON := false
 	for _, m := range models {
 		t := tables[m]
 		if t == nil {
@@ -195,16 +196,29 @@ func generateTypesFile(modelDir string, models []string, tables map[string]*ddlT
 		for _, col := range t.Columns {
 			if col.GoType == "time.Time" {
 				needsTime = true
-				break
+			}
+			if col.GoType == "json.RawMessage" {
+				needsJSON = true
 			}
 		}
-		if needsTime {
+		if needsTime && needsJSON {
 			break
 		}
 	}
 
-	if needsTime {
-		b.WriteString("import \"time\"\n\n")
+	if needsJSON || needsTime {
+		var imports []string
+		if needsJSON {
+			imports = append(imports, "\"encoding/json\"")
+		}
+		if needsTime {
+			imports = append(imports, "\"time\"")
+		}
+		b.WriteString("import (\n")
+		for _, imp := range imports {
+			b.WriteString("\t" + imp + "\n")
+		}
+		b.WriteString(")\n\n")
 	}
 
 	for i, m := range models {
@@ -256,9 +270,25 @@ func generateModelFile(modelDir string, modelName string, methods []ifaceMethod,
 		}
 	}
 
+	needsJSON := false
+	for _, method := range methods {
+		for _, p := range method.Params {
+			if p.Type == "json.RawMessage" {
+				needsJSON = true
+				break
+			}
+		}
+		if needsJSON {
+			break
+		}
+	}
+
 	b.WriteString("import (\n")
 	b.WriteString("\t\"context\"\n")
 	b.WriteString("\t\"database/sql\"\n")
+	if needsJSON {
+		b.WriteString("\t\"encoding/json\"\n")
+	}
 	if needsCursor {
 		b.WriteString("\t\"fmt\"\n")
 	}
@@ -693,7 +723,7 @@ func parseDDLFiles(specsDir string) map[string]*ddlTable {
 	createRe := regexp.MustCompile(`(?i)CREATE\s+TABLE\s+(\w+)\s*\(`)
 	// Match column definitions: name TYPE(...) constraints
 	// Stop at lines starting with constraints or indexes.
-	colRe := regexp.MustCompile(`^\s+(\w+)\s+(BIGSERIAL|BIGINT|INT|INTEGER|VARCHAR\(\d+\)|TEXT|BOOLEAN|BOOL|TIMESTAMPTZ|TIMESTAMP)`)
+	colRe := regexp.MustCompile(`^\s+(\w+)\s+(BIGSERIAL|BIGINT|INT|INTEGER|VARCHAR\(\d+\)|TEXT|BOOLEAN|BOOL|TIMESTAMPTZ|TIMESTAMP|JSONB|JSON)`)
 	fkRe := regexp.MustCompile(`REFERENCES\s+(\w+)\s*\(`)
 
 	for _, entry := range entries {
@@ -920,6 +950,8 @@ func sqlTypeToGo(sqlType string) string {
 		return "bool"
 	case "TIMESTAMPTZ", "TIMESTAMP":
 		return "time.Time"
+	case "JSONB", "JSON":
+		return "json.RawMessage"
 	default:
 		return "string"
 	}

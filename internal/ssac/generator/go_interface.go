@@ -356,9 +356,13 @@ func renderInterfaces(interfaces []derivedInterface) []byte {
 	buf.WriteString("package model\n\n")
 
 	needTime := needsTimeImport(interfaces)
+	needJSON := needsJSONImport(interfaces)
 	needPagination := needsPaginationImport(interfaces)
 	buf.WriteString("import (\n")
 	buf.WriteString("\t\"database/sql\"\n")
+	if needJSON {
+		buf.WriteString("\t\"encoding/json\"\n")
+	}
 	if needTime {
 		buf.WriteString("\t\"time\"\n")
 	}
@@ -413,6 +417,19 @@ func needsTimeImport(interfaces []derivedInterface) bool {
 		for _, m := range iface.Methods {
 			for _, p := range m.Params {
 				if p.GoType == "time.Time" {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func needsJSONImport(interfaces []derivedInterface) bool {
+	for _, iface := range interfaces {
+		for _, m := range iface.Methods {
+			for _, p := range m.Params {
+				if p.GoType == "json.RawMessage" {
 					return true
 				}
 			}

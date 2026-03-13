@@ -2,11 +2,12 @@ package model
 
 import (
 	"database/sql"
+	"encoding/json"
 )
 
 type ActionModel interface {
 	WithTx(tx *sql.Tx) ActionModel
-	Create(workflowID int64, actionType string, payloadTemplate string, sequenceOrder int64) (*Action, error)
+	Create(workflowID int64, actionType string, payloadTemplate json.RawMessage, sequenceOrder int64) (*Action, error)
 	ListByWorkflow(workflowID int64) ([]Action, error)
 }
 

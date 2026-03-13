@@ -1067,6 +1067,8 @@ func pgTypeToGo(pgType string) string {
 		return "time.Time"
 	case "NUMERIC", "DECIMAL", "REAL", "FLOAT", "DOUBLE":
 		return "float64"
+	case "JSONB", "JSON":
+		return "json.RawMessage"
 	default:
 		// VARCHAR(255) 같은 경우
 		if strings.HasPrefix(pgType, "VARCHAR") || strings.HasPrefix(pgType, "CHAR") {
@@ -1088,6 +1090,8 @@ func oaTypeToGo(oaType, format string) string {
 		return "float64"
 	case "boolean":
 		return "bool"
+	case "object", "array":
+		return "json.RawMessage"
 	default: // string, string+uuid 등
 		return "string"
 	}

@@ -111,9 +111,8 @@ func buildJSONBodyParams(rawParams []struct {
 		extractCode: buf.String(),
 	}}
 	for _, rp := range rawParams {
-		if rp.goType == "time.Time" {
+		if rp.goType == "time.Time" || rp.goType == "json.RawMessage" {
 			result = append(result, typedRequestParam{name: rp.name, goType: rp.goType})
-			break
 		}
 	}
 	return result
@@ -221,6 +220,8 @@ func collectImports(sf parser.ServiceFunc, reqParams []typedRequestParam, pathPa
 			seen["strconv"] = true
 		case "time.Time":
 			seen["time"] = true
+		case "json.RawMessage":
+			seen["encoding/json"] = true
 		}
 	}
 
@@ -243,7 +244,7 @@ func collectImports(sf parser.ServiceFunc, reqParams []typedRequestParam, pathPa
 	}
 
 	var imports []string
-	order := []string{"database/sql", "net/http", "strconv", "time"}
+	order := []string{"database/sql", "encoding/json", "net/http", "strconv", "time"}
 	for _, imp := range order {
 		if seen[imp] {
 			imports = append(imports, imp)

@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 )
 
 type actionModelImpl struct {
@@ -27,7 +28,7 @@ func NewActionModel(db *sql.DB) ActionModel {
 
 func scanAction(row interface{ Scan(...interface{}) error }) (*Action, error) {
 	var a Action
-	err := row.Scan(&a.ID, &a.WorkflowID, &a.ActionType, &a.SequenceOrder)
+	err := row.Scan(&a.ID, &a.WorkflowID, &a.ActionType, &a.PayloadTemplate, &a.SequenceOrder)
 	if err != nil {
 		return nil, err
 	}
@@ -39,8 +40,8 @@ func (m *actionModelImpl) WithTx(tx *sql.Tx) ActionModel {
 	return &actionModelImpl{db: m.db, tx: tx}
 }
 
-//fullend:gen ssot=db/actions.sql contract=103438b
-func (m *actionModelImpl) Create(workflowID int64, actionType string, payloadTemplate string, sequenceOrder int64) (*Action, error) {
+//fullend:gen ssot=db/actions.sql contract=482f54a
+func (m *actionModelImpl) Create(workflowID int64, actionType string, payloadTemplate json.RawMessage, sequenceOrder int64) (*Action, error) {
 	row := m.conn().QueryRowContext(context.Background(),
 		"INSERT INTO actions (workflow_id, action_type, payload_template, sequence_order)\nVALUES ($1, $2, $3, $4)\nRETURNING *;",
 		workflowID, actionType, payloadTemplate, sequenceOrder)

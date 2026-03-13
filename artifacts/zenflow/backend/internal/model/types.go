@@ -1,11 +1,15 @@
 package model
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Action struct {
 	ID           int64 `json:"id"`
 	WorkflowID   int64 `json:"workflow_id"`
 	ActionType   string `json:"action_type"`
+	PayloadTemplate json.RawMessage `json:"payload_template"`
 	SequenceOrder int64 `json:"sequence_order"`
 }
 

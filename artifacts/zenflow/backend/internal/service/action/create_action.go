@@ -3,6 +3,7 @@ package action
 import (
 	"github.com/zenflow/zenflow/internal/model"
 	"github.com/geul-org/fullend/pkg/authz"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -20,9 +21,9 @@ func (h *Handler) CreateAction(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(*model.CurrentUser)
 
 	var req struct {
-		ActionType      string `json:"action_type"`
-		PayloadTemplate string `json:"payload_template"`
-		SequenceOrder   int64  `json:"sequence_order"`
+		ActionType      string          `json:"action_type"`
+		PayloadTemplate json.RawMessage `json:"payload_template"`
+		SequenceOrder   int64           `json:"sequence_order"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
