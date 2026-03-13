@@ -783,6 +783,39 @@ $ fullend chain AcceptProposal specs/gigbridge/
 ### fullend gen-model \<openapi-source\> \<output-dir\>
 외부 OpenAPI에서 Go model 생성.
 
+### fullend map [path]
+프로젝트의 keyword map 생성 (whyso/v1 포맷). 함수명, endpoint, 규칙, 상태 등 전체 심볼을 언어별로 분류 출력. `.whyso/_map.md`에 캐시.
+
+```bash
+fullend map                    # 현재 디렉토리
+fullend map specs/gigbridge/   # 특정 경로
+fullend map -f                 # 강제 재생성
+fullend map -o custom.md       # 출력 파일 지정
+```
+
+### fullend history \<file|dir\> [options]
+파일의 변경 이력 조회 (whyso/v1 포맷). Claude Code 세션에서 누가 왜 수정했는지 추적.
+
+```bash
+fullend history cmd/fullend/main.go           # 단일 파일 이력
+fullend history internal/ --all               # 디렉토리 전체 이력
+fullend history cmd/fullend/main.go --format json   # JSON 출력
+fullend history cmd/fullend/main.go -q        # 캐시만 갱신 (stdout 없음)
+```
+
+출력 예시:
+```yaml
+apiVersion: whyso/v1
+file: cmd/fullend/main.go
+created: 2026-03-11T06:15:13Z
+history:
+  - timestamp: 2026-03-11T06:15:13Z
+    session: 9b624be7-...
+    user_request: "구현해"
+    tool: Edit
+    source: ~/.claude/projects/.../9b624be7.jsonl:7420
+```
+
 ### --skip flag
 `--skip openapi,stml` 등으로 특정 SSOT 검증/생성 제외.
 유효값: openapi, ddl, ssac, model, stml, states, policy, scenario, func, terraform

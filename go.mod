@@ -3,6 +3,7 @@ module github.com/geul-org/fullend
 go 1.25.0
 
 replace (
+	github.com/clari/whyso => ../whyso
 	github.com/geul-org/ssac => ../ssac
 	github.com/geul-org/stml => ../stml
 )
@@ -11,7 +12,9 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.3
 	github.com/aws/aws-sdk-go-v2/config v1.32.11
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.96.4
+	github.com/clari/whyso v0.0.0-00010101000000-000000000000
 	github.com/disintegration/imaging v1.6.2
+	github.com/ettle/strcase v0.2.0
 	github.com/getkin/kin-openapi v0.133.0
 	github.com/geul-org/ssac v0.0.0-20260311111023-9bca86a71b77
 	github.com/geul-org/stml v0.0.0-00010101000000-000000000000
@@ -46,7 +49,6 @@ require (
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
-	github.com/ettle/strcase v0.2.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
@@ -70,6 +72,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
+	github.com/smacker/go-tree-sitter v0.0.0-20240827094217-dd81d9e9be82 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.3 // indirect
 	github.com/ugorji/go/codec v1.3.1 // indirect
 	github.com/valyala/fastjson v1.6.7 // indirect

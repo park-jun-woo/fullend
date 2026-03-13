@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/geul-org/fullend/internal/contract"
 	"github.com/geul-org/fullend/internal/statemachine"
 )
 
@@ -27,6 +28,15 @@ func GenerateStateMachines(diagrams []*statemachine.StateDiagram, artifactsDir, 
 		}
 
 		src := generateStateMachineSource(d, pkgName)
+
+		// Inject file-level //fullend:gen directive.
+		dir := &contract.Directive{
+			Ownership: "gen",
+			SSOT:      "states/" + d.ID + ".md",
+			Contract:  contract.HashStateDiagram(d),
+		}
+		src = injectFileDirective(src, dir)
+
 		outPath := filepath.Join(pkgDir, pkgName+".go")
 		if err := os.WriteFile(outPath, []byte(src), 0644); err != nil {
 			return fmt.Errorf("write state machine %s: %w", d.ID, err)

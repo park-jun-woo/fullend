@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/ettle/strcase"
+	"github.com/geul-org/fullend/internal/contract"
 	ssacparser "github.com/geul-org/ssac/parser"
 )
 
@@ -274,6 +275,18 @@ func generateModelFile(modelDir string, modelName string, methods []ifaceMethod,
 	// Generate methods.
 	for _, method := range methods {
 		b.WriteString("\n")
+		// Inject //fullend:gen directive.
+		if table != nil {
+			ssotPath := "db/" + table.TableName + ".sql"
+			params := make([]string, len(method.Params))
+			for i, p := range method.Params {
+				params[i] = p.Type
+			}
+			returns := parseReturnTypes(method.ReturnSig)
+			hash := contract.HashModelMethod(method.Name, params, returns)
+			d := &contract.Directive{Ownership: "gen", SSOT: ssotPath, Contract: hash}
+			b.WriteString(d.String() + "\n")
+		}
 		query := queries[method.Name]
 		seqType := seqTypes[method.Name]
 		generateMethodFromIface(&b, implName, modelName, method, &query, seqType, table, includes)
@@ -932,4 +945,24 @@ func generateIncludeHelpersFile(modelDir string) error {
 	b.WriteString("}\n")
 
 	return os.WriteFile(filepath.Join(modelDir, "include_helpers.go"), []byte(b.String()), 0644)
+}
+
+// parseReturnTypes extracts individual return types from a return signature string.
+// e.g. "(*Course, error)" → ["*Course", "error"]
+func parseReturnTypes(sig string) []string {
+	s := strings.TrimSpace(sig)
+	s = strings.TrimPrefix(s, "(")
+	s = strings.TrimSuffix(s, ")")
+	if s == "" {
+		return nil
+	}
+	parts := strings.Split(s, ",")
+	var result []string
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			result = append(result, p)
+		}
+	}
+	return result
 }

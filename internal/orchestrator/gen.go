@@ -9,6 +9,7 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 
+	"github.com/geul-org/fullend/internal/contract"
 	"github.com/geul-org/fullend/internal/gluegen"
 	"github.com/geul-org/fullend/internal/policy"
 	"github.com/geul-org/fullend/internal/projectconfig"
@@ -24,16 +25,15 @@ import (
 
 // Gen runs validate first, then generates code from all detected SSOTs.
 // Returns the validate report (with gen steps appended) and whether gen succeeded.
-func Gen(specsDir, artifactsDir string, skipKinds ...map[SSOTKind]bool) (*reporter.Report, bool) {
-	skip := make(map[SSOTKind]bool)
-	if len(skipKinds) > 0 && skipKinds[0] != nil {
-		skip = skipKinds[0]
-	}
-	return GenWith(DefaultProfile(), specsDir, artifactsDir, skip)
+func Gen(specsDir, artifactsDir string, skipKinds map[SSOTKind]bool, reset ...bool) (*reporter.Report, bool) {
+	r := len(reset) > 0 && reset[0]
+	return GenWith(DefaultProfile(), specsDir, artifactsDir, skipKinds, r)
 }
 
 // GenWith runs code generation with the specified TargetProfile.
-func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds map[SSOTKind]bool) (*reporter.Report, bool) {
+// When reset is false (default), preserved function bodies are restored after generation.
+func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds map[SSOTKind]bool, reset ...bool) (*reporter.Report, bool) {
+	isReset := len(reset) > 0 && reset[0]
 	detected, err := DetectSSOTs(specsDir)
 	if err != nil {
 		report := &reporter.Report{}
@@ -79,6 +79,13 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 			Errors: []string{fmt.Sprintf("cannot create artifacts dir: %v", err)},
 		})
 		return report, false
+	}
+
+	// Pre-gen: scan preserved functions (unless reset).
+	var preserveSnap *contract.PreserveSnapshot
+	backendDir := filepath.Join(artifactsDir, "backend")
+	if !isReset {
+		preserveSnap = contract.ScanPreserveSnapshot(backendDir)
 	}
 
 	// 2. sqlc generate (exec) — auto-generate sqlc.yaml if needed.
@@ -155,6 +162,32 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 				Summary: "terraform 미설치, 스킵",
 				Errors:  []string{"[WARN] terraform이 설치되어 있지 않습니다 — HCL 포맷팅을 건너뜁니다"},
 			})
+		}
+	}
+
+	// Post-gen: restore preserved function bodies.
+	if preserveSnap != nil {
+		hasPreserves := len(preserveSnap.FilePreserves) > 0 || len(preserveSnap.FuncPreserves) > 0
+		if hasPreserves {
+			warnings := contract.RestorePreserved(preserveSnap)
+			preserveCount := len(preserveSnap.FilePreserves)
+			for _, funcs := range preserveSnap.FuncPreserves {
+				preserveCount += len(funcs)
+			}
+			step := reporter.StepResult{
+				Name:    "preserve",
+				Status:  reporter.Pass,
+				Summary: fmt.Sprintf("%d preserved", preserveCount),
+			}
+			for _, w := range warnings {
+				step.Errors = append(step.Errors,
+					fmt.Sprintf("[WARN] contract changed: %s:%s (old=%s new=%s)",
+						w.File, w.Function, w.OldContract, w.NewContract))
+			}
+			if len(warnings) > 0 {
+				step.Suggestions = append(step.Suggestions, ".new 파일에서 새 계약 코드를 확인하세요")
+			}
+			report.Steps = append(report.Steps, step)
 		}
 	}
 

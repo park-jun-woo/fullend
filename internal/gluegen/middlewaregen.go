@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/geul-org/fullend/internal/contract"
 )
 
 // claimToVerifyField maps a JWT claim key to the corresponding pkg/auth.VerifyTokenResponse field.
@@ -80,6 +82,14 @@ func BearerAuth(secret string) gin.HandlerFunc {
 	}
 }
 `, modulePath, assignBlock)
+
+	// Inject file-level //fullend:gen directive.
+	d := &contract.Directive{
+		Ownership: "gen",
+		SSOT:      "fullend.yaml",
+		Contract:  contract.HashClaims(claims),
+	}
+	src = injectFileDirective(src, d)
 
 	return os.WriteFile(filepath.Join(mwDir, "bearerauth.go"), []byte(src), 0644)
 }

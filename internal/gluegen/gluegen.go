@@ -61,6 +61,9 @@ func Generate(input *GlueInput) error {
 		if err := transformServiceFilesWithDomains(intDir, input.ServiceFuncs, models, allFuncs, input.ModulePath, xConfigs); err != nil {
 			return fmt.Errorf("service transform (domain): %w", err)
 		}
+		if err := attachServiceDirectives(intDir, input.ServiceFuncs); err != nil {
+			return fmt.Errorf("service directives (domain): %w", err)
+		}
 		if err := generateAuthStubWithDomains(intDir, input.ModulePath, input.Claims); err != nil {
 			return fmt.Errorf("auth (domain): %w", err)
 		}
@@ -81,6 +84,9 @@ func Generate(input *GlueInput) error {
 
 		if err := transformServiceFiles(intDir, models, funcs, input.ModulePath, xConfigs); err != nil {
 			return fmt.Errorf("service transform: %w", err)
+		}
+		if err := attachServiceDirectives(intDir, input.ServiceFuncs); err != nil {
+			return fmt.Errorf("service directives: %w", err)
 		}
 		if err := generateServerStruct(intDir, models, funcs, input.ModulePath, input.OpenAPIDoc); err != nil {
 			return fmt.Errorf("server.go: %w", err)
