@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -36,6 +37,9 @@ func generateHurlTests(doc *openapi3.T, outDir, specsDir string, diagrams []*sta
 		return fmt.Errorf("create tests dir: %w", err)
 	}
 
+	// Parse DDL CHECK constraints for enum values.
+	checkEnums := parseDDLCheckEnums(specsDir)
+
 	steps := buildScenarioOrder(doc, specsDir, diagrams, serviceFuncs)
 	if len(steps) == 0 {
 		return nil
@@ -55,16 +59,17 @@ func generateHurlTests(doc *openapi3.T, outDir, specsDir string, diagrams []*sta
 	// Determine required roles for multi-user auth.
 	roles := collectRequiredRoles(roleMap)
 
-	// Write auth preamble if needed.
-	if hasAuth {
-		writeAuthSection(&buf, doc, captures, roles)
-	}
-
-	// Group by resource for section comments.
+	// Write steps in order returned by buildScenarioOrder.
+	// Auth is emitted via writeAuthSection when first auth step is encountered.
+	authWritten := false
 	currentResource := ""
 	for _, step := range steps {
 		if step.IsAuth {
-			continue // already written
+			if !authWritten && hasAuth {
+				writeAuthSection(&buf, doc, captures, roles, checkEnums)
+				authWritten = true
+			}
+			continue
 		}
 
 		// Skip steps whose path params cannot be resolved from captured variables.
@@ -78,7 +83,7 @@ func generateHurlTests(doc *openapi3.T, outDir, specsDir string, diagrams []*sta
 			buf.WriteString(fmt.Sprintf("\n# ===== %s =====\n\n", strcase.ToGoPascal(resource)))
 		}
 
-		writeStep(&buf, step, captures, doc, roleMap)
+		writeStep(&buf, step, captures, doc, roleMap, checkEnums)
 	}
 
 	return os.WriteFile(filepath.Join(testsDir, "smoke.hurl"), []byte(buf.String()), 0644)
@@ -223,16 +228,66 @@ func buildScenarioOrder(doc *openapi3.T, specsDir string, diagrams []*statemachi
 	// Sort deletes by FK dependency.
 	deleteSteps = sortDeletesByFK(deleteSteps, specsDir)
 
-	// Final order: auth → mid (creates + transitions interleaved) → read → delete
-	var result []scenarioStep
-	result = append(result, authSteps...)
+	// Detect auth FK prerequisites: if Register request body has _id fields,
+	// move the corresponding top-level create endpoints before auth.
+	var prereqSteps []orderedStep
+	var remainMidSteps []orderedStep
+	authFKPrefixes := collectAuthFKResources(authSteps, doc)
 	for _, ms := range midSteps {
+		if ms.step.Method == "POST" && ms.order < 0 {
+			resource := inferResource(ms.step.Path)
+			if matchFKPrefix(resource, authFKPrefixes) {
+				prereqSteps = append(prereqSteps, ms)
+				continue
+			}
+		}
+		remainMidSteps = append(remainMidSteps, ms)
+	}
+
+	// Final order: prereq creates → auth → mid → read → delete
+	var result []scenarioStep
+	for _, ps := range prereqSteps {
+		result = append(result, ps.step)
+	}
+	result = append(result, authSteps...)
+	for _, ms := range remainMidSteps {
 		result = append(result, ms.step)
 	}
 	result = append(result, readSteps...)
 	result = append(result, deleteSteps...)
 
 	return result
+}
+
+// collectAuthFKResources detects FK-like fields in auth operation request bodies
+// and returns the set of plural resource names that must be created before auth.
+// e.g. Register body has "org_id" → returns {"organizations": true}
+func collectAuthFKResources(authSteps []scenarioStep, doc *openapi3.T) []string {
+	var fkPrefixes []string
+	for _, s := range authSteps {
+		reqSchema := getRequestSchema(s.Operation)
+		if reqSchema == nil {
+			continue
+		}
+		for name := range reqSchema.Properties {
+			if strings.HasSuffix(name, "_id") {
+				// org_id → "org"
+				fkPrefixes = append(fkPrefixes, strings.TrimSuffix(name, "_id"))
+			}
+		}
+	}
+	return fkPrefixes
+}
+
+// matchFKPrefix returns true if the resource name starts with any FK prefix.
+// e.g. resource="organizations", prefix="org" → true (organizations starts with org).
+func matchFKPrefix(resource string, fkPrefixes []string) bool {
+	for _, prefix := range fkPrefixes {
+		if strings.HasPrefix(resource, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 // findParentResource extracts the parent resource from a nested path.
@@ -359,7 +414,7 @@ func sortByDepthPath(steps []scenarioStep) {
 // writeAuthSection writes Register + Login steps for each required role.
 // When multiple roles are needed, creates separate users per role with
 // role-suffixed tokens (e.g. token_client, token_freelancer).
-func writeAuthSection(buf *strings.Builder, doc *openapi3.T, captures map[string]bool, roles []string) {
+func writeAuthSection(buf *strings.Builder, doc *openapi3.T, captures map[string]bool, roles []string, checkEnums map[string][]string) {
 	buf.WriteString("# ===== Auth =====\n\n")
 
 	// Find Register and Login operations.
@@ -388,20 +443,20 @@ func writeAuthSection(buf *strings.Builder, doc *openapi3.T, captures map[string
 		if len(roles) == 1 {
 			role = roles[0]
 		}
-		writeAuthPair(buf, registerOp, registerPath, loginOp, loginPath, captures, role, false)
+		writeAuthPair(buf, registerOp, registerPath, loginOp, loginPath, captures, role, false, checkEnums)
 		return
 	}
 
 	// Multi-role: register + login for each role.
 	for _, role := range roles {
-		writeAuthPair(buf, registerOp, registerPath, loginOp, loginPath, captures, role, true)
+		writeAuthPair(buf, registerOp, registerPath, loginOp, loginPath, captures, role, true, checkEnums)
 	}
 }
 
 // writeAuthPair writes a Register + Login pair for a specific role.
 // If multiRole is true, token is captured as token_<role>.
 func writeAuthPair(buf *strings.Builder, registerOp *openapi3.Operation, registerPath string,
-	loginOp *openapi3.Operation, loginPath string, captures map[string]bool, role string, multiRole bool) {
+	loginOp *openapi3.Operation, loginPath string, captures map[string]bool, role string, multiRole bool, checkEnums map[string][]string) {
 
 	suffix := ""
 	emailPrefix := "test"
@@ -419,7 +474,7 @@ func writeAuthPair(buf *strings.Builder, registerOp *openapi3.Operation, registe
 		buf.WriteString(fmt.Sprintf("POST {{host}}%s\n", registerPath))
 		buf.WriteString("Content-Type: application/json\n")
 		reqSchema := getRequestSchema(registerOp)
-		body := generateRequestBodyWithOverrides(reqSchema, role, emailPrefix)
+		body := generateRequestBodyWithOverrides(reqSchema, role, emailPrefix, checkEnums, captures)
 		buf.WriteString(body + "\n")
 		buf.WriteString(fmt.Sprintf("\nHTTP %s\n", getSuccessHTTPCode(registerOp)))
 
@@ -443,7 +498,7 @@ func writeAuthPair(buf *strings.Builder, registerOp *openapi3.Operation, registe
 		buf.WriteString(fmt.Sprintf("POST {{host}}%s\n", loginPath))
 		buf.WriteString("Content-Type: application/json\n")
 		reqSchema := getRequestSchema(loginOp)
-		body := generateLoginBodyWithEmail(reqSchema, emailPrefix)
+		body := generateLoginBodyWithEmail(reqSchema, emailPrefix, checkEnums)
 		buf.WriteString(body + "\n")
 		buf.WriteString(fmt.Sprintf("\nHTTP %s\n", getSuccessHTTPCode(loginOp)))
 
@@ -462,7 +517,8 @@ func writeAuthPair(buf *strings.Builder, registerOp *openapi3.Operation, registe
 }
 
 // generateRequestBodyWithOverrides builds a JSON body with role and email overrides.
-func generateRequestBodyWithOverrides(schema *openapi3.Schema, role, emailPrefix string) string {
+// FK fields (ending in _id) are resolved to captured variable references if available.
+func generateRequestBodyWithOverrides(schema *openapi3.Schema, role, emailPrefix string, checkEnums map[string][]string, captures map[string]bool) string {
 	if schema == nil {
 		return "{}"
 	}
@@ -470,23 +526,54 @@ func generateRequestBodyWithOverrides(schema *openapi3.Schema, role, emailPrefix
 	for name, propRef := range schema.Properties {
 		prop := propRef.Value
 		lower := strings.ToLower(name)
-		var val interface{}
 		switch {
 		case lower == "role" && role != "":
-			val = role
+			lines = append(lines, fmt.Sprintf("  %s: %s", formatDummyValue(name), formatDummyValue(role)))
 		case lower == "email" || (prop != nil && prop.Format == "email"):
-			val = emailPrefix + "@test.com"
+			lines = append(lines, fmt.Sprintf("  %s: %s", formatDummyValue(name), formatDummyValue(emailPrefix+"@test.com")))
+		case strings.HasSuffix(lower, "_id"):
+			// Try to resolve FK field to a captured variable.
+			if capVar := findMatchingCapture(name, captures); capVar != "" {
+				lines = append(lines, fmt.Sprintf("  %s: {{%s}}", formatDummyValue(name), capVar))
+			} else {
+				val := generateDummyValue(name, prop, checkEnums)
+				lines = append(lines, fmt.Sprintf("  %s: %s", formatDummyValue(name), formatDummyValue(val)))
+			}
 		default:
-			val = generateDummyValue(name, prop)
+			val := generateDummyValue(name, prop, checkEnums)
+			lines = append(lines, fmt.Sprintf("  %s: %s", formatDummyValue(name), formatDummyValue(val)))
 		}
-		lines = append(lines, fmt.Sprintf("  %s: %s", formatDummyValue(name), formatDummyValue(val)))
 	}
 	sortedLines := sortStringSlice(lines)
 	return "{\n" + strings.Join(sortedLines, ",\n") + "\n}"
 }
 
+// findMatchingCapture finds a captured variable that matches an FK field name.
+// e.g. fieldName="org_id", captures has "organization_id" → returns "organization_id".
+// Tries direct match first, then prefix match (org → organization).
+func findMatchingCapture(fieldName string, captures map[string]bool) string {
+	// Direct match.
+	if captures[fieldName] {
+		return fieldName
+	}
+	// Prefix match: org_id → prefix "org", find "*_id" capture where prefix matches.
+	if !strings.HasSuffix(fieldName, "_id") {
+		return ""
+	}
+	prefix := strings.TrimSuffix(fieldName, "_id")
+	for cap := range captures {
+		if strings.HasSuffix(cap, "_id") {
+			capPrefix := strings.TrimSuffix(cap, "_id")
+			if strings.HasPrefix(capPrefix, prefix) {
+				return cap
+			}
+		}
+	}
+	return ""
+}
+
 // generateLoginBodyWithEmail builds a login JSON body matching the registered email.
-func generateLoginBodyWithEmail(schema *openapi3.Schema, emailPrefix string) string {
+func generateLoginBodyWithEmail(schema *openapi3.Schema, emailPrefix string, checkEnums map[string][]string) string {
 	if schema == nil {
 		return "{}"
 	}
@@ -499,7 +586,7 @@ func generateLoginBodyWithEmail(schema *openapi3.Schema, emailPrefix string) str
 		case lower == "email" || (prop != nil && prop.Format == "email"):
 			val = emailPrefix + "@test.com"
 		default:
-			val = generateDummyValue(name, prop)
+			val = generateDummyValue(name, prop, checkEnums)
 		}
 		lines = append(lines, fmt.Sprintf("  %s: %s", formatDummyValue(name), formatDummyValue(val)))
 	}
@@ -508,7 +595,7 @@ func generateLoginBodyWithEmail(schema *openapi3.Schema, emailPrefix string) str
 }
 
 // writeStep writes a single endpoint test step.
-func writeStep(buf *strings.Builder, step scenarioStep, captures map[string]bool, doc *openapi3.T, roleMap map[string]string) {
+func writeStep(buf *strings.Builder, step scenarioStep, captures map[string]bool, doc *openapi3.T, roleMap map[string]string, checkEnums map[string][]string) {
 	op := step.Operation
 
 	buf.WriteString(fmt.Sprintf("# %s\n", step.OperationID))
@@ -539,7 +626,7 @@ func writeStep(buf *strings.Builder, step scenarioStep, captures map[string]bool
 		if reqSchema != nil {
 			buf.WriteString("Content-Type: application/json\n")
 			var body string
-			body, sentValues = generateRequestBody(reqSchema)
+			body, sentValues = generateRequestBody(reqSchema, checkEnums)
 			buf.WriteString(body + "\n")
 		}
 	}
@@ -918,4 +1005,38 @@ func inferTableFromPath(path string) string {
 		}
 	}
 	return ""
+}
+
+// parseDDLCheckEnums parses DDL files for CHECK constraints with IN (...) and returns
+// a map of column_name → allowed values.
+// e.g. CHECK (plan_type IN ('free', 'pro', 'enterprise')) → {"plan_type": ["free", "pro", "enterprise"]}
+func parseDDLCheckEnums(specsDir string) map[string][]string {
+	result := make(map[string][]string)
+	dbDir := filepath.Join(specsDir, "db")
+	entries, err := os.ReadDir(dbDir)
+	if err != nil {
+		return result
+	}
+	re := regexp.MustCompile(`CHECK\s*\(\s*(\w+)\s+IN\s*\(([^)]+)\)\s*\)`)
+	valRe := regexp.MustCompile(`'([^']*)'`)
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".sql") {
+			continue
+		}
+		data, err := os.ReadFile(filepath.Join(dbDir, e.Name()))
+		if err != nil {
+			continue
+		}
+		for _, m := range re.FindAllStringSubmatch(string(data), -1) {
+			col := m[1]
+			var vals []string
+			for _, vm := range valRe.FindAllStringSubmatch(m[2], -1) {
+				vals = append(vals, vm[1])
+			}
+			if len(vals) > 0 {
+				result[col] = vals
+			}
+		}
+	}
+	return result
 }

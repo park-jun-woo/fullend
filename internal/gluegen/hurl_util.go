@@ -9,14 +9,19 @@ import (
 )
 
 // generateDummyValue returns a dummy value for a schema field based on type, format, and field name hints.
-func generateDummyValue(fieldName string, schema *openapi3.Schema) interface{} {
+func generateDummyValue(fieldName string, schema *openapi3.Schema, checkEnums map[string][]string) interface{} {
 	if schema == nil {
 		return "test_string"
 	}
 
-	// Use first enum value if available.
+	// Use first enum value if available (OpenAPI enum).
 	if len(schema.Enum) > 0 {
 		return fmt.Sprint(schema.Enum[0])
+	}
+
+	// Use DDL CHECK constraint enum values.
+	if vals, ok := checkEnums[fieldName]; ok && len(vals) > 0 {
+		return vals[0]
 	}
 
 	// Field name hints (checked before type-based defaults).
@@ -74,7 +79,7 @@ func formatDummyValue(v interface{}) string {
 
 // generateRequestBody builds a JSON request body from an OpenAPI schema.
 // Returns the JSON string and a map of field→value for assertion generation.
-func generateRequestBody(schema *openapi3.Schema) (string, map[string]interface{}) {
+func generateRequestBody(schema *openapi3.Schema, checkEnums map[string][]string) (string, map[string]interface{}) {
 	if schema == nil {
 		return "{}", nil
 	}
@@ -83,7 +88,7 @@ func generateRequestBody(schema *openapi3.Schema) (string, map[string]interface{
 	var lines []string
 	for name, propRef := range schema.Properties {
 		prop := propRef.Value
-		val := generateDummyValue(name, prop)
+		val := generateDummyValue(name, prop, checkEnums)
 		values[name] = val
 		lines = append(lines, fmt.Sprintf("  %s: %s", formatDummyValue(name), formatDummyValue(val)))
 	}
