@@ -12,7 +12,8 @@ import (
 	ssacvalidator "github.com/geul-org/ssac/validator"
 )
 
-// CheckOpenAPIDDL validates x-sort, x-filter, x-include against DDL tables.
+// CheckOpenAPIDDL validates x-sort, x-filter, x-include against DDL tables,
+// and checks for ghost properties (OpenAPI schema properties not in DDL).
 func CheckOpenAPIDDL(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc) []CrossError {
 	var errs []CrossError
 
@@ -36,6 +37,9 @@ func CheckOpenAPIDDL(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssa
 			errs = append(errs, checkXInclude(op, st, ctx, primaryTable)...)
 		}
 	}
+
+	// Ghost property check: OpenAPI schema properties → DDL columns.
+	errs = append(errs, checkGhostProperties(doc, st)...)
 
 	return errs
 }
@@ -196,6 +200,86 @@ func checkXInclude(op *openapi3.Operation, st *ssacvalidator.SymbolTable, ctx st
 	}
 
 	return errs
+}
+
+// checkGhostProperties detects OpenAPI schema properties that have no corresponding DDL column.
+// Exceptions: x-include FK join fields, @dto models (no DDL table).
+func checkGhostProperties(doc *openapi3.T, st *ssacvalidator.SymbolTable) []CrossError {
+	var errs []CrossError
+
+	if doc.Components == nil || doc.Components.Schemas == nil {
+		return errs
+	}
+
+	// Collect x-include local field names (FK join fields are legitimate extensions).
+	xIncludeFields := collectXIncludeLocalFields(doc)
+
+	for schemaName, schemaRef := range doc.Components.Schemas {
+		if schemaRef == nil || schemaRef.Value == nil {
+			continue
+		}
+		schema := schemaRef.Value
+
+		// Map schema name to DDL table.
+		tableName := modelToTable(schemaName)
+		table, ok := st.DDLTables[tableName]
+		if !ok {
+			// No DDL table for this schema — likely @dto or non-entity. Skip.
+			continue
+		}
+
+		for propName := range schema.Properties {
+			// Skip x-include FK join fields.
+			if xIncludeFields[propName] {
+				continue
+			}
+			if _, colExists := table.Columns[propName]; !colExists {
+				errs = append(errs, CrossError{
+					Rule:       "OpenAPI ↔ DDL",
+					Context:    fmt.Sprintf("schema %s.%s", schemaName, propName),
+					Message:    fmt.Sprintf("OpenAPI property %q — DDL %s에 해당 컬럼 없음 (유령 property)", propName, tableName),
+					Level:      "ERROR",
+					Suggestion: fmt.Sprintf("DDL에 추가하거나 OpenAPI에서 제거: %s.%s", tableName, propName),
+				})
+			}
+		}
+	}
+
+	return errs
+}
+
+// collectXIncludeLocalFields collects local column names from x-include across all operations.
+// e.g., x-include: [client_id:users.id] → "client_id" is a legitimate extension.
+func collectXIncludeLocalFields(doc *openapi3.T) map[string]bool {
+	result := make(map[string]bool)
+	if doc.Paths == nil {
+		return result
+	}
+	for _, pi := range doc.Paths.Map() {
+		for _, op := range pi.Operations() {
+			if op == nil {
+				continue
+			}
+			raw, ok := op.Extensions["x-include"]
+			if !ok {
+				continue
+			}
+			var includeExt struct {
+				Allowed []string `json:"allowed"`
+			}
+			if err := unmarshalExt(raw, &includeExt); err != nil {
+				continue
+			}
+			for _, spec := range includeExt.Allowed {
+				colonIdx := strings.Index(spec, ":")
+				if colonIdx > 0 {
+					localCol := spec[:colonIdx]
+					result[localCol] = true
+				}
+			}
+		}
+	}
+	return result
 }
 
 // inferTableFromCtx guesses the primary table name from the operation's path.

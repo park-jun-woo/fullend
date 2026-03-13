@@ -10,7 +10,20 @@ import (
 )
 
 // sensitivePatterns are column name substrings that suggest sensitive data.
-var sensitivePatterns = []string{"password", "secret", "hash", "token"}
+var sensitivePatterns = []string{
+	// 인증 정보
+	"password", "passwd", "passphrase",
+	"secret", "token", "hash", "salt",
+	"credential", "otp", "pin",
+	// 암호화
+	"private_key", "cipher", "encrypted",
+	// 금융
+	"credit_card", "card_number", "cvv",
+	"bank_account", "routing_number",
+	// 개인식별
+	"ssn", "passport", "license_number",
+	"biometric",
+}
 
 // CheckSensitiveColumns warns when DDL column names match sensitive patterns
 // but lack an @sensitive annotation.

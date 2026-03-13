@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/geul-org/fullend/internal/policy"
 	ssacparser "github.com/geul-org/ssac/parser"
 )
 
@@ -52,6 +53,57 @@ func CheckClaims(serviceFuncs []ssacparser.ServiceFunc, claims map[string]string
 				Context: strings.Join(locations, ", "),
 				Message: fmt.Sprintf("currentUser.%s — claims에 미정의", field),
 				Level:   "ERROR",
+			})
+		}
+	}
+
+	return errs
+}
+
+// CheckClaimsRego validates that Rego input.claims.xxx references match fullend.yaml claims values.
+func CheckClaimsRego(policies []*policy.Policy, claims map[string]string) []CrossError {
+	if claims == nil {
+		return nil
+	}
+
+	// Build set of claim values (e.g., "user_id", "email", "role").
+	claimValues := make(map[string]bool)
+	for _, v := range claims {
+		claimValues[v] = true
+	}
+
+	// Collect all Rego claims refs across policies.
+	regoRefs := make(map[string]string) // ref → file
+	for _, p := range policies {
+		for _, ref := range p.ClaimsRefs {
+			if _, exists := regoRefs[ref]; !exists {
+				regoRefs[ref] = p.File
+			}
+		}
+	}
+
+	var errs []CrossError
+
+	// Forward: Rego claims ref → fullend.yaml claims value
+	for ref, file := range regoRefs {
+		if !claimValues[ref] {
+			errs = append(errs, CrossError{
+				Rule:    "Claims ↔ Rego",
+				Context: file,
+				Message: fmt.Sprintf("Rego input.claims.%s — fullend.yaml claims 값에 %q 없음", ref, ref),
+				Level:   "ERROR",
+			})
+		}
+	}
+
+	// Reverse: fullend.yaml claims value → Rego (WARNING if unused)
+	for _, v := range claims {
+		if _, used := regoRefs[v]; !used {
+			errs = append(errs, CrossError{
+				Rule:    "Claims ↔ Rego",
+				Context: "fullend.yaml",
+				Message: fmt.Sprintf("claims 값 %q — Rego에서 미참조", v),
+				Level:   "WARNING",
 			})
 		}
 	}

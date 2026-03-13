@@ -72,13 +72,18 @@ func Run(input *CrossValidateInput) []CrossError {
 	}
 
 	// Middleware ↔ OpenAPI securitySchemes
-	if input.OpenAPIDoc != nil && input.Middleware != nil {
+	if input.OpenAPIDoc != nil {
 		errs = append(errs, CheckMiddleware(input.Middleware, input.OpenAPIDoc)...)
 	}
 
 	// Claims ↔ SSaC currentUser
 	if input.ServiceFuncs != nil {
 		errs = append(errs, CheckClaims(input.ServiceFuncs, input.Claims)...)
+	}
+
+	// Claims ↔ Rego input.claims references
+	if len(input.Policies) > 0 && input.Claims != nil {
+		errs = append(errs, CheckClaimsRego(input.Policies, input.Claims)...)
 	}
 
 	// DDL → SSaC coverage

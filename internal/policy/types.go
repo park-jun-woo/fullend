@@ -5,6 +5,7 @@ type Policy struct {
 	File       string
 	Rules      []AllowRule
 	Ownerships []OwnershipMapping
+	ClaimsRefs []string // all input.claims.xxx references (deduplicated)
 }
 
 // AllowRule represents an extracted (action, resource) pair from an allow rule.
