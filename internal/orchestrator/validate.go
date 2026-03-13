@@ -17,10 +17,10 @@ import (
 	"github.com/geul-org/fullend/internal/projectconfig"
 	"github.com/geul-org/fullend/internal/reporter"
 	"github.com/geul-org/fullend/internal/statemachine"
-	ssacparser "github.com/geul-org/ssac/parser"
-	ssacvalidator "github.com/geul-org/ssac/validator"
-	stmlparser "github.com/geul-org/stml/parser"
-	stmlvalidator "github.com/geul-org/stml/validator"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	stmlparser "github.com/geul-org/fullend/internal/stml/parser"
+	stmlvalidator "github.com/geul-org/fullend/internal/stml/validator"
 )
 
 // allKinds defines the display order of SSOT kinds for validation.

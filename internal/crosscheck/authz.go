@@ -3,7 +3,7 @@ package crosscheck
 import (
 	"fmt"
 
-	ssacparser "github.com/geul-org/ssac/parser"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
 // defaultCheckRequestFields are the fields of the default pkg/authz CheckRequest struct.

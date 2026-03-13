@@ -1,0 +1,8 @@
+package service
+
+// @auth "CreateWorkflow" "workflow" {} "Permission denied" 403
+// @get User user = User.FindByID({ID: currentUser.ID})
+// @empty user "User not found" 404
+// @post Workflow workflow = Workflow.Create({OrgID: user.OrgID, Title: request.title, TriggerEvent: request.trigger_event})
+// @response { workflow: workflow }
+func CreateWorkflow() {}

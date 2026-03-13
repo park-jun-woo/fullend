@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><title>ZenFlow - Workflows</title></head>
+<body>
+  <h1>Workflows</h1>
+
+  <section data-fetch="ListWorkflows">
+    <ul>
+      <li data-each="workflows">
+        <span data-bind="workflows.title"></span>
+        <span data-bind="workflows.status"></span>
+      </li>
+    </ul>
+    <p data-state="workflows.empty">No workflows yet.</p>
+  </section>
+
+  <h2>Create Workflow</h2>
+  <form data-action="CreateWorkflow">
+    <input data-field="title" type="text" placeholder="Title" />
+    <input data-field="trigger_event" type="text" placeholder="Trigger Event" />
+    <button type="submit">Create</button>
+  </form>
+</body>
+</html>

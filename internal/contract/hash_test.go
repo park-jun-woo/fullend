@@ -3,7 +3,7 @@ package contract
 import (
 	"testing"
 
-	ssacparser "github.com/geul-org/ssac/parser"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 
 	"github.com/geul-org/fullend/internal/statemachine"
 )

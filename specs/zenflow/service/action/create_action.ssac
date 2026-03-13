@@ -1,0 +1,10 @@
+package service
+
+// @auth "CreateAction" "action" {} "Permission denied" 403
+// @get User user = User.FindByID({ID: currentUser.ID})
+// @empty user "User not found" 404
+// @get Workflow workflow = Workflow.FindByIDAndOrg({ID: request.id, OrgID: user.OrgID})
+// @empty workflow "Workflow not found" 404
+// @post Action action = Action.Create({WorkflowID: workflow.ID, ActionType: request.action_type, PayloadTemplate: request.payload_template, SequenceOrder: request.sequence_order})
+// @response { action: action }
+func CreateAction() {}

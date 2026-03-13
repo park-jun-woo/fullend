@@ -12,7 +12,7 @@ import (
 
 	"github.com/ettle/strcase"
 	"github.com/geul-org/fullend/internal/contract"
-	ssacparser "github.com/geul-org/ssac/parser"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
 // ddlColumn represents a column parsed from a CREATE TABLE statement.

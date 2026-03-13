@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/geul-org/fullend/internal/policy"
-	ssacparser "github.com/geul-org/ssac/parser"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
 // generateMain creates backend/go.mod (if missing) and backend/cmd/main.go.

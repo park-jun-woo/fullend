@@ -2,11 +2,7 @@ module github.com/geul-org/fullend
 
 go 1.25.0
 
-replace (
-	github.com/clari/whyso => ../whyso
-	github.com/geul-org/ssac => ../ssac
-	github.com/geul-org/stml => ../stml
-)
+replace github.com/clari/whyso => ../whyso
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.41.3
@@ -16,14 +12,13 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/ettle/strcase v0.2.0
 	github.com/getkin/kin-openapi v0.133.0
-	github.com/geul-org/ssac v0.0.0-20260311111023-9bca86a71b77
-	github.com/geul-org/stml v0.0.0-00010101000000-000000000000
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gosimple/slug v1.15.0
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/open-policy-agent/opa v1.14.1
 	github.com/pquerna/otp v1.5.0
 	golang.org/x/crypto v0.48.0
+	golang.org/x/net v0.51.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -84,7 +79,6 @@ require (
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
-	golang.org/x/net v0.51.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect

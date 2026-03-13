@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/geul-org/fullend/internal/policy"
-	ssacparser "github.com/geul-org/ssac/parser"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
 // CheckClaims validates that all currentUser field references in SSaC specs

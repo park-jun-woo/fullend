@@ -10,7 +10,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/geul-org/fullend/internal/policy"
-	ssacparser "github.com/geul-org/ssac/parser"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
 // transformServiceFilesWithDomains transforms service files in both flat and domain subdirectories.

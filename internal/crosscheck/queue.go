@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	ssacparser "github.com/geul-org/ssac/parser"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
 // CheckQueue validates publish ↔ subscribe cross-references.

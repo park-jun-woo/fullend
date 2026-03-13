@@ -6,8 +6,8 @@ import (
 
 	"github.com/ettle/strcase"
 
-	ssacparser "github.com/geul-org/ssac/parser"
-	ssacvalidator "github.com/geul-org/ssac/validator"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
 )
 
 // CheckDDLCoverage validates that DDL tables and columns are referenced by SSaC/OpenAPI.

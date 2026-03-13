@@ -1,0 +1,18 @@
+package service
+
+import "github.com/zenflow/zenflow/internal/worker"
+
+// @auth "ExecuteWorkflow" "workflow" {} "Permission denied" 403
+// @get User user = User.FindByID({ID: currentUser.ID})
+// @empty user "User not found" 404
+// @get Workflow workflow = Workflow.FindByIDAndOrg({ID: request.id, OrgID: user.OrgID})
+// @empty workflow "Workflow not found" 404
+// @state workflow {status: workflow.Status} "ExecuteWorkflow" "Workflow not active" 409
+// @get []Action actions = Action.ListByWorkflow({WorkflowID: workflow.ID})
+// @call worker.ProcessActionResponse result = worker.ProcessAction({WorkflowID: workflow.ID})
+// @get Organization org = Organization.FindByID({ID: user.OrgID})
+// @empty org "Organization not found" 404
+// @put Organization.UpdateCredits({ID: org.ID, Amount: result.ProcessedCount})
+// @post Execution execution = Execution.Create({WorkflowID: workflow.ID, OrgID: org.ID, Status: "completed", CreditsSpent: result.ProcessedCount})
+// @response { execution: execution }
+func ExecuteWorkflow() {}

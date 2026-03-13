@@ -3,7 +3,7 @@ package crosscheck
 import (
 	"testing"
 
-	ssacparser "github.com/geul-org/ssac/parser"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
 func TestCheckQueueNoConfig(t *testing.T) {

@@ -8,8 +8,8 @@ import (
 	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 
-	ssacparser "github.com/geul-org/ssac/parser"
-	ssacvalidator "github.com/geul-org/ssac/validator"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
 )
 
 // CheckOpenAPIDDL validates x-sort, x-filter, x-include against DDL tables,

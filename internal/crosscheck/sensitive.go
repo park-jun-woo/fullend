@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	ssacvalidator "github.com/geul-org/ssac/validator"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
 )
 
 // sensitivePatterns are column name substrings that suggest sensitive data.

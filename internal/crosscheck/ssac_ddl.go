@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	ssacparser "github.com/geul-org/ssac/parser"
-	ssacvalidator "github.com/geul-org/ssac/validator"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
 )
 
 // primitiveTypes are Go types that never map to DDL tables.

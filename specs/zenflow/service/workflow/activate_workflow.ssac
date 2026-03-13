@@ -1,0 +1,18 @@
+package service
+
+import "github.com/zenflow/zenflow/internal/billing"
+
+// @auth "ActivateWorkflow" "workflow" {} "Permission denied" 403
+// @get User user = User.FindByID({ID: currentUser.ID})
+// @empty user "User not found" 404
+// @get Workflow workflow = Workflow.FindByIDAndOrg({ID: request.id, OrgID: user.OrgID})
+// @empty workflow "Workflow not found" 404
+// @get Organization org = Organization.FindByID({ID: user.OrgID})
+// @empty org "Organization not found" 404
+// @call billing.CheckCredits({Balance: org.CreditsBalance})
+// @state workflow {status: workflow.Status} "ActivateWorkflow" "Cannot transition" 409
+// @put Workflow.UpdateStatus({ID: workflow.ID, Status: "active"})
+// @get Workflow updated = Workflow.FindByID({ID: workflow.ID})
+// @empty updated "Workflow not found" 404
+// @response { workflow: updated }
+func ActivateWorkflow() {}

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/geul-org/fullend/internal/contract"
-	ssacparser "github.com/geul-org/ssac/parser"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
 // attachServiceDirectives scans service .go files and injects //fullend:gen directives.

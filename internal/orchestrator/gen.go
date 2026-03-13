@@ -15,11 +15,11 @@ import (
 	"github.com/geul-org/fullend/internal/projectconfig"
 	"github.com/geul-org/fullend/internal/reporter"
 	"github.com/geul-org/fullend/internal/statemachine"
-	ssacgenerator "github.com/geul-org/ssac/generator"
-	ssacparser "github.com/geul-org/ssac/parser"
-	ssacvalidator "github.com/geul-org/ssac/validator"
-	stmlgenerator "github.com/geul-org/stml/generator"
-	stmlparser "github.com/geul-org/stml/parser"
+	ssacgenerator "github.com/geul-org/fullend/internal/ssac/generator"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	stmlgenerator "github.com/geul-org/fullend/internal/stml/generator"
+	stmlparser "github.com/geul-org/fullend/internal/stml/parser"
 )
 
 // Gen runs validate first, then generates code from all detected SSOTs.

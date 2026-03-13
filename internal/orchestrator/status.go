@@ -10,9 +10,9 @@ import (
 	"github.com/geul-org/fullend/internal/funcspec"
 	"github.com/geul-org/fullend/internal/policy"
 	"github.com/geul-org/fullend/internal/statemachine"
-	ssacparser "github.com/geul-org/ssac/parser"
-	ssacvalidator "github.com/geul-org/ssac/validator"
-	stmlparser "github.com/geul-org/stml/parser"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	stmlparser "github.com/geul-org/fullend/internal/stml/parser"
 )
 
 // StatusLine holds one SSOT's status info.

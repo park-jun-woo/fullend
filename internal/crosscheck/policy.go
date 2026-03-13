@@ -5,8 +5,8 @@ import (
 
 	"github.com/geul-org/fullend/internal/policy"
 	"github.com/geul-org/fullend/internal/statemachine"
-	ssacparser "github.com/geul-org/ssac/parser"
-	ssacvalidator "github.com/geul-org/ssac/validator"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
 )
 
 // CheckPolicy validates policy against SSaC, DDL, and States.

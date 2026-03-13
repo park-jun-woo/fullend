@@ -1,0 +1,10 @@
+package service
+
+// @auth "ListActions" "action" {} "Permission denied" 403
+// @get User user = User.FindByID({ID: currentUser.ID})
+// @empty user "User not found" 404
+// @get Workflow workflow = Workflow.FindByIDAndOrg({ID: request.id, OrgID: user.OrgID})
+// @empty workflow "Workflow not found" 404
+// @get []Action actions = Action.ListByWorkflow({WorkflowID: workflow.ID})
+// @response { actions: actions }
+func ListActions() {}

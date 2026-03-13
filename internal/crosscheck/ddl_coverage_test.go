@@ -3,8 +3,8 @@ package crosscheck
 import (
 	"testing"
 
-	ssacparser "github.com/geul-org/ssac/parser"
-	ssacvalidator "github.com/geul-org/ssac/validator"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
 )
 
 func TestCheckDDLCoverage_PackageModelSkipped(t *testing.T) {

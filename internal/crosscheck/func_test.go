@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/geul-org/fullend/internal/funcspec"
-	ssacparser "github.com/geul-org/ssac/parser"
-	ssacvalidator "github.com/geul-org/ssac/validator"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
 )
 
 func TestCheckFuncs_ParamCount(t *testing.T) {
