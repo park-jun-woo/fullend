@@ -1,6 +1,6 @@
 # fullend
 
-Full-stack SSOT orchestrator — validates consistency across 10 SSOT sources (fullend.yaml, STML, OpenAPI, SSaC, SQL DDL, Mermaid stateDiagram, OPA Rego, Gherkin Scenario, Func Spec, Terraform) and generates code from them in a single CLI.
+Full-stack SSOT orchestrator — validates consistency across 9 SSOT sources (fullend.yaml, STML, OpenAPI, SSaC, SQL DDL, Mermaid stateDiagram, OPA Rego, Gherkin Scenario, Func Spec) and generates code from them in a single CLI.
 
 ```
 specs/
@@ -14,7 +14,6 @@ specs/
 ├── policy/*.rego            → OPA Rego (authorization policies)
 ├── scenario/*.feature       → Gherkin (business scenarios)
 ├── frontend/*.html          → STML (HTML5 + data-*)
-└── terraform/*.tf           → HCL
 ```
 
 ## Install
@@ -27,11 +26,11 @@ go install github.com/geul-org/fullend/cmd/fullend@latest
 
 ### validate
 
-Validates each SSOT individually, then cross-validates consistency between layers. 10 SSOTs are required by default; Func is optional (only when `func/` exists). Use `--skip` to exclude specific kinds.
+Validates each SSOT individually, then cross-validates consistency between layers. 9 SSOTs are required by default; Func is optional (only when `func/` exists). Use `--skip` to exclude specific kinds.
 
 ```bash
 fullend validate <specs-dir>
-fullend validate --skip states,terraform <specs-dir>
+fullend validate --skip states <specs-dir>
 ```
 
 ```
@@ -45,13 +44,12 @@ fullend validate --skip states,terraform <specs-dir>
 ✓ Policy       1 files, 5 rules, 3 ownership mappings
 ✓ Scenario     4 features, 5 scenarios
 ✓ Func         3 funcs
-✓ Terraform    2 files
 ✓ Cross        0 mismatches
 
 All SSOT sources are consistent.
 ```
 
-Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `scenario`, `func`, `terraform`
+Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `scenario`, `func`
 
 ### gen
 
@@ -59,7 +57,7 @@ Validates first, then generates code from all SSOTs. Accepts the same `--skip` o
 
 ```bash
 fullend gen <specs-dir> <artifacts-dir>
-fullend gen --skip terraform <specs-dir> <artifacts-dir>
+fullend gen <specs-dir> <artifacts-dir>
 ```
 
 ### gen-model
@@ -219,7 +217,6 @@ These projects define the standards that fullend orchestrates. They are the reas
 - [sqlc](https://sqlc.dev/) — SQL-first Go code generation. fullend's DDL-driven model approach is directly inspired by sqlc's philosophy
 - [Open Policy Agent](https://www.openpolicyagent.org/) — Policy as code. OPA's Rego language powers fullend's authorization layer
 - [Mermaid](https://mermaid.js.org/) — Diagram as code. State diagrams become runtime-enforceable state machines
-- [Terraform](https://www.terraform.io/) — Infrastructure as code. The original declarative infrastructure standard
 
 ### Code Generation & Validation
 

@@ -1,7 +1,7 @@
 # fullend — AI SSOT Integration Guide
 
 > Covers SSaC, STML, Func Spec, Mermaid stateDiagram, OPA Rego, Hurl scenario, OpenAPI x- extensions, cross-validation rules, and pkg/ functions/models.
-> Does NOT explain OpenAPI/SQL DDL/Terraform syntax.
+> Does NOT explain OpenAPI/SQL DDL syntax.
 
 ## Project Directory Structure
 
@@ -23,7 +23,6 @@
 │   ├── *.html                    # STML declarations (HTML5 + data-*)
 │   ├── *.custom.ts               # Frontend computed functions (optional)
 │   └── components/*.tsx          # React component wrappers (optional)
-└── terraform/*.tf                # HCL infrastructure declarations
 ```
 
 ## fullend.yaml
@@ -959,4 +958,4 @@ history:
 
 ### --skip flag
 `--skip openapi,stml` 등으로 특정 SSOT 검증/생성 제외.
-유효값: openapi, ddl, ssac, model, stml, states, policy, scenario, func, terraform
+유효값: openapi, ddl, ssac, model, stml, states, policy, scenario, func

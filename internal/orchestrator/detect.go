@@ -15,8 +15,7 @@ const (
 	KindSSaC      SSOTKind = "SSaC"
 	KindModel     SSOTKind = "Model"
 	KindSTML      SSOTKind = "STML"
-	KindTerraform SSOTKind = "Terraform"
-	KindStates    SSOTKind = "States"
+	KindStates SSOTKind = "States"
 	KindPolicy    SSOTKind = "Policy"
 	KindScenario  SSOTKind = "Scenario"
 	KindFunc      SSOTKind = "Func"
@@ -55,7 +54,6 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 		{KindSSaC, "service/*.ssac"},
 		{KindModel, "model/*.go"},
 		{KindSTML, "frontend/*.html"},
-		{KindTerraform, "terraform/*.tf"},
 	}
 
 	for _, c := range checks {
@@ -124,7 +122,7 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 func AllSSOTKinds() []SSOTKind {
 	return []SSOTKind{
 		KindConfig, KindOpenAPI, KindDDL, KindSSaC, KindModel,
-		KindSTML, KindStates, KindPolicy, KindScenario, KindFunc, KindTerraform,
+		KindSTML, KindStates, KindPolicy, KindScenario, KindFunc,
 	}
 }
 
@@ -137,8 +135,7 @@ var kindNames = map[string]SSOTKind{
 	"stml":      KindSTML,
 	"states":    KindStates,
 	"policy":    KindPolicy,
-	"terraform": KindTerraform,
-	"scenario":  KindScenario,
+	"scenario": KindScenario,
 	"func":      KindFunc,
 	"config":    KindConfig,
 }

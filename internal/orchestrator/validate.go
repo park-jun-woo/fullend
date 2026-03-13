@@ -24,7 +24,7 @@ import (
 )
 
 // allKinds defines the display order of SSOT kinds for validation.
-var allKinds = []SSOTKind{KindConfig, KindOpenAPI, KindDDL, KindSSaC, KindModel, KindSTML, KindStates, KindPolicy, KindScenario, KindFunc, KindTerraform}
+var allKinds = []SSOTKind{KindConfig, KindOpenAPI, KindDDL, KindSSaC, KindModel, KindSTML, KindStates, KindPolicy, KindScenario, KindFunc}
 
 // Validate runs individual SSOT validations on the detected sources,
 // then runs cross-validation if OpenAPI + DDL + SSaC are all present.
@@ -140,8 +140,6 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 		case KindModel:
 			report.Steps = append(report.Steps, validateModel(d.Path))
 			modelDir = d.Path
-		case KindTerraform:
-			report.Steps = append(report.Steps, validateTerraform(d.Path))
 		}
 	}
 
@@ -523,19 +521,6 @@ func validateModel(modelDir string) reporter.StepResult {
 	if len(matches) == 0 {
 		step.Status = reporter.Fail
 		step.Summary = "no model files found"
-		return step
-	}
-	step.Status = reporter.Pass
-	step.Summary = fmt.Sprintf("%d files", len(matches))
-	return step
-}
-
-func validateTerraform(tfDir string) reporter.StepResult {
-	step := reporter.StepResult{Name: string(KindTerraform)}
-	matches, _ := filepath.Glob(filepath.Join(tfDir, "*.tf"))
-	if len(matches) == 0 {
-		step.Status = reporter.Fail
-		step.Summary = "no terraform files found"
 		return step
 	}
 	step.Status = reporter.Pass

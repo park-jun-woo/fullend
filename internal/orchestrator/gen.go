@@ -3,7 +3,6 @@ package orchestrator
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -54,14 +53,6 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 	has := make(map[SSOTKind]DetectedSSOT)
 	for _, d := range detected {
 		has[d.Kind] = d
-	}
-
-	// Terraform: optional — warn and skip if not installed.
-	terraformAvailable := true
-	if _, ok := has[KindTerraform]; ok {
-		if _, err := exec.LookPath("terraform"); err != nil {
-			terraformAvailable = false
-		}
 	}
 
 	// Add separator between validate and gen steps.
@@ -145,20 +136,6 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 	if d, ok := has[KindFunc]; ok {
 		modulePath := determineModulePath(specsDir, artifactsDir)
 		report.Steps = append(report.Steps, genFunc(d.Path, specsDir, artifactsDir, modulePath))
-	}
-
-	// 13. terraform fmt (외부 도구, 선택)
-	if _, ok := has[KindTerraform]; ok {
-		if terraformAvailable {
-			report.Steps = append(report.Steps, genTerraform(specsDir))
-		} else {
-			report.Steps = append(report.Steps, reporter.StepResult{
-				Name:    "terraform",
-				Status:  reporter.Skip,
-				Summary: "terraform 미설치, 스킵",
-				Errors:  []string{"[WARN] terraform이 설치되어 있지 않습니다 — HCL 포맷팅을 건너뜁니다"},
-			})
-		}
 	}
 
 	// Post-gen: restore preserved function bodies.
@@ -730,19 +707,3 @@ func scanFuncImports(specsDir, modulePath string) (map[string]string, error) {
 	return result, nil
 }
 
-func genTerraform(specsDir string) reporter.StepResult {
-	step := reporter.StepResult{Name: "terraform"}
-	tfDir := filepath.Join(specsDir, "terraform")
-	res := RunExec("terraform", "fmt", tfDir)
-	if res.Err != nil {
-		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, res.Err.Error())
-		if res.Stderr != "" {
-			step.Errors = append(step.Errors, res.Stderr)
-		}
-		return step
-	}
-	step.Status = reporter.Pass
-	step.Summary = "HCL formatted"
-	return step
-}

@@ -51,8 +51,6 @@ func Status(root string, detected []DetectedSSOT) []StatusLine {
 			lines = append(lines, statusScenario(relPath, d.Path))
 		case KindFunc:
 			lines = append(lines, statusFunc(relPath, d.Path))
-		case KindTerraform:
-			lines = append(lines, statusTerraform(relPath, d.Path))
 		case KindModel:
 			// Model is auxiliary; skip in status display.
 		}
@@ -174,8 +172,3 @@ func statusFunc(relPath, dir string) StatusLine {
 	return StatusLine{Kind: KindFunc, Path: relPath, Summary: summary}
 }
 
-func statusTerraform(relPath, dir string) StatusLine {
-	matches, _ := filepath.Glob(filepath.Join(dir, "*.tf"))
-	summary := fmt.Sprintf("%d files", len(matches))
-	return StatusLine{Kind: KindTerraform, Path: relPath, Summary: summary}
-}

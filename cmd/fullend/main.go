@@ -33,7 +33,7 @@ Commands:
   history    <file|dir> [--all] [--format yaml|json]       Show file change history
   version                                                  Show version
 
-Skip kinds: openapi, ddl, ssac, model, stml, states, policy, scenario, func, terraform
+Skip kinds: openapi, ddl, ssac, model, stml, states, policy, scenario, func
 `
 
 func main() {
@@ -143,7 +143,7 @@ func parseSkipFlag(args []string) (map[orchestrator.SSOTKind]bool, []string) {
 				s = strings.TrimSpace(s)
 				kind, ok := orchestrator.KindFromString(s)
 				if !ok {
-					fmt.Fprintf(os.Stderr, "unknown SSOT kind: %q\nvalid kinds: openapi, ddl, ssac, model, stml, states, policy, scenario, func, terraform\n", s)
+					fmt.Fprintf(os.Stderr, "unknown SSOT kind: %q\nvalid kinds: openapi, ddl, ssac, model, stml, states, policy, scenario, func\n", s)
 					os.Exit(2)
 				}
 				skipKinds[kind] = true

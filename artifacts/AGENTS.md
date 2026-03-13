@@ -7,7 +7,7 @@ This manual is the single source of truth for SSOT authoring. Do not reference o
 
 ## 2. Write SSOTs
 
-Create 10 SSOTs in `specs/<project>/`:
+Create 9 SSOTs in `specs/<project>/`:
 
 | Order | SSOT | Path | Notes |
 |---|---|---|---|
@@ -21,7 +21,6 @@ Create 10 SSOTs in `specs/<project>/`:
 | 8 | OPA Rego | `policy/*.rego` | @ownership, allow rules |
 | 9 | Gherkin Scenario | `scenario/*.feature` | @scenario, @invariant |
 | 10 | STML | `frontend/*.html` | data-fetch, data-action, data-bind |
-| 11 | Terraform | `terraform/*.tf` | HCL infrastructure |
 | Optional | Func Spec | `func/<pkg>/*.go` | @func, Request/Response struct |
 
 ### fullend.yaml Optional Config
