@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"io/fs"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -27,8 +28,9 @@ type FuncSpec struct {
 
 // Field represents a struct field.
 type Field struct {
-	Name string
-	Type string
+	Name     string
+	Type     string
+	JSONName string // json tag name (empty = use Name)
 }
 
 // ParseDir parses all .go files under dir (recursively by package subdirectory).
@@ -138,8 +140,18 @@ func extractFields(st *ast.StructType) []Field {
 	var fields []Field
 	for _, f := range st.Fields.List {
 		typeName := exprToString(f.Type)
+		var jsonName string
+		if f.Tag != nil {
+			tag := reflect.StructTag(strings.Trim(f.Tag.Value, "`"))
+			if jn, ok := tag.Lookup("json"); ok {
+				jn = strings.Split(jn, ",")[0]
+				if jn != "" && jn != "-" {
+					jsonName = jn
+				}
+			}
+		}
 		for _, name := range f.Names {
-			fields = append(fields, Field{Name: name.Name, Type: typeName})
+			fields = append(fields, Field{Name: name.Name, Type: typeName, JSONName: jsonName})
 		}
 	}
 	return fields

@@ -46,7 +46,8 @@ func Run(input *CrossValidateInput) []CrossError {
 
 	// SSaC ↔ OpenAPI (function name ↔ operationId + @response fields ↔ response schema)
 	if input.ServiceFuncs != nil && input.SymbolTable != nil {
-		errs = append(errs, CheckSSaCOpenAPI(input.ServiceFuncs, input.SymbolTable, input.OpenAPIDoc)...)
+		allFuncSpecs := append(input.FullendPkgSpecs, input.ProjectFuncSpecs...)
+		errs = append(errs, CheckSSaCOpenAPI(input.ServiceFuncs, input.SymbolTable, input.OpenAPIDoc, allFuncSpecs)...)
 	}
 
 	// States ↔ SSaC/DDL/OpenAPI

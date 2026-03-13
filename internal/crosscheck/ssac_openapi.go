@@ -3,16 +3,18 @@ package crosscheck
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 
+	"github.com/geul-org/fullend/internal/funcspec"
 	ssacparser "github.com/geul-org/ssac/parser"
 	ssacvalidator "github.com/geul-org/ssac/validator"
 )
 
 // CheckSSaCOpenAPI validates SSaC function names match OpenAPI operationIds and vice versa,
 // and SSaC @response fields match OpenAPI response schema properties.
-func CheckSSaCOpenAPI(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable, doc *openapi3.T) []CrossError {
+func CheckSSaCOpenAPI(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable, doc *openapi3.T, funcSpecs []funcspec.FuncSpec) []CrossError {
 	var errs []CrossError
 
 	funcNames := make(map[string]string) // funcName → fileName
@@ -46,7 +48,7 @@ func CheckSSaCOpenAPI(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTa
 	}
 
 	// Rule 5 & 6: SSaC @response fields ↔ OpenAPI response schema properties.
-	errs = append(errs, checkResponseFields(funcs, st, doc)...)
+	errs = append(errs, checkResponseFields(funcs, st, doc, funcSpecs)...)
 
 	// Rule 7: SSaC ErrStatus → OpenAPI error response defined.
 	if doc != nil {
@@ -62,7 +64,7 @@ func CheckSSaCOpenAPI(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTa
 }
 
 // checkResponseFields validates that SSaC @response field keys match OpenAPI response schema properties.
-func checkResponseFields(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable, doc *openapi3.T) []CrossError {
+func checkResponseFields(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable, doc *openapi3.T, funcSpecs []funcspec.FuncSpec) []CrossError {
 	var errs []CrossError
 
 	// Build OpenAPI response properties per operationId.
@@ -71,8 +73,49 @@ func checkResponseFields(funcs []ssacparser.ServiceFunc, st *ssacvalidator.Symbo
 	for _, fn := range funcs {
 		// Find @response sequence with explicit fields.
 		responseFields := extractResponseFieldKeys(fn)
+
 		if responseFields == nil {
-			continue // shorthand (@response varName) or no @response — skip
+			// shorthand (@response varName) — resolve fields from variable type.
+			shorthandFields := resolveShorthandResponseFields(fn, funcSpecs, st)
+			if shorthandFields == nil {
+				continue // no @response or type tracking failed — skip
+			}
+
+			opProps, hasOp := opResponseProps[fn.Name]
+			if !hasOp {
+				continue
+			}
+
+			shorthandSet := make(map[string]bool, len(shorthandFields))
+			for _, f := range shorthandFields {
+				shorthandSet[f] = true
+			}
+
+			// Rule 5: shorthand field → OpenAPI property (ERROR).
+			for _, jf := range shorthandFields {
+				if !opProps[jf] {
+					errs = append(errs, CrossError{
+						Rule:       "SSaC @response → OpenAPI",
+						Context:    fmt.Sprintf("%s:%s", fn.FileName, fn.Name),
+						Message:    fmt.Sprintf("shorthand @response 변수의 JSON 필드 %q가 OpenAPI %s 응답 스키마에 없습니다", jf, fn.Name),
+						Suggestion: fmt.Sprintf("OpenAPI %s 응답 스키마의 property명을 %q로 변경하세요", fn.Name, jf),
+					})
+				}
+			}
+
+			// Rule 6: OpenAPI property → shorthand field (WARNING).
+			for prop := range opProps {
+				if !shorthandSet[prop] {
+					errs = append(errs, CrossError{
+						Rule:       "OpenAPI → SSaC @response",
+						Context:    fmt.Sprintf("%s:%s", fn.FileName, fn.Name),
+						Message:    fmt.Sprintf("OpenAPI %s 응답 필드 %q가 shorthand @response 변수 타입에 없습니다", fn.Name, prop),
+						Level:      "WARNING",
+						Suggestion: fmt.Sprintf("OpenAPI에서 %q를 제거하거나 변수 타입에 해당 필드를 추가하세요", prop),
+					})
+				}
+			}
+			continue
 		}
 
 		opProps, hasOp := opResponseProps[fn.Name]
@@ -111,6 +154,104 @@ func checkResponseFields(funcs []ssacparser.ServiceFunc, st *ssacvalidator.Symbo
 	}
 
 	return errs
+}
+
+// resolveShorthandResponseFields resolves the JSON field names for a shorthand @response varName.
+// It traces the variable back to its origin (@call or @get/@put/@post/@delete) and returns
+// the JSON field names that would be serialized.
+func resolveShorthandResponseFields(
+	fn ssacparser.ServiceFunc,
+	funcSpecs []funcspec.FuncSpec,
+	st *ssacvalidator.SymbolTable,
+) []string {
+	// Find @response sequence with shorthand (Target != "").
+	var varName string
+	for _, seq := range fn.Sequences {
+		if seq.Type == "response" && seq.Target != "" {
+			varName = seq.Target
+			break
+		}
+	}
+	if varName == "" {
+		return nil
+	}
+
+	// Trace variable origin: find the sequence that assigned this variable.
+	for _, seq := range fn.Sequences {
+		if seq.Result == nil || seq.Result.Var != varName {
+			continue
+		}
+
+		// Wrapper types (Page, Cursor) have fixed structure — skip.
+		if seq.Result.Wrapper != "" {
+			return nil
+		}
+
+		switch seq.Type {
+		case "call":
+			// @call — resolve from funcspec ResponseFields.
+			// Result.Type may include package prefix (e.g., "auth.IssueTokenResponse").
+			typeName := seq.Result.Type
+			if idx := strings.LastIndex(typeName, "."); idx >= 0 {
+				typeName = typeName[idx+1:]
+			}
+			for _, fs := range funcSpecs {
+				expectedResp := ucFirst(fs.Name) + "Response"
+				if expectedResp != typeName {
+					continue
+				}
+				var keys []string
+				for _, f := range fs.ResponseFields {
+					if f.JSONName != "" {
+						keys = append(keys, f.JSONName)
+					} else {
+						keys = append(keys, f.Name)
+					}
+				}
+				return keys
+			}
+
+		case "get", "put", "post", "delete":
+			// @get/@put/@post/@delete — resolve from DDL columns.
+			if st == nil {
+				return nil
+			}
+			tableName := seq.Result.Type
+			// DDL table names are lowercase plural (e.g., Type="Gig" → table="gigs").
+			// Try symbol table lookup with various conventions.
+			for tbl, ddl := range st.DDLTables {
+				// Match: type name matches table name (case-insensitive singular).
+				if matchTableType(tbl, tableName) {
+					var keys []string
+					for col := range ddl.Columns {
+						keys = append(keys, col)
+					}
+					sort.Strings(keys)
+					return keys
+				}
+			}
+		}
+		break
+	}
+
+	return nil
+}
+
+// matchTableType checks if a DDL table name corresponds to a type name.
+// e.g., "gigs" matches "Gig", "users" matches "User".
+func matchTableType(tableName, typeName string) bool {
+	tn := strings.ToLower(typeName)
+	tbl := strings.ToLower(tableName)
+	// Exact match or simple plural (type + "s" == table).
+	return tbl == tn || tbl == tn+"s" || tbl == tn+"es"
+}
+
+// ucFirst converts first letter to uppercase (PascalCase).
+func ucFirst(s string) string {
+	if s == "" {
+		return s
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
 }
 
 // extractResponseFieldKeys returns the @response field keys for a function,

@@ -1,4 +1,4 @@
-# Phase012: shorthand @response varName 교차 검증
+# Phase012: shorthand @response varName 교차 검증 ✅ 완료
 
 ## 목표
 
@@ -107,8 +107,9 @@ func resolveShorthandResponseFields(
 로직:
 1. `@response`의 `seq.Target`으로 변수명 획득
 2. 시퀀스 역추적: `seq.Result.Var == varName`인 시퀀스 찾기
-3. `@call` → funcspec에서 `ResponseFields` 조회, `JSONName` 우선 사용
-4. `@get`/`@put`/`@post`/`@delete` → DDL symbol table에서 컬럼명 조회
+3. **Wrapper 타입 스킵**: `seq.Result.Wrapper != ""`(Page, Cursor)이면 `nil` 반환 — wrapper 구조(`items`/`total`)는 고정이라 json 태그 불일치 위험 없음
+4. `@call` → funcspec에서 `ResponseFields` 조회, `JSONName` 우선 사용
+5. `@get`/`@put`/`@post`/`@delete` → DDL symbol table에서 컬럼명 조회
 
 ### 4. `internal/crosscheck/crosscheck.go` — `CrossValidateInput`에 funcspec 전달
 
