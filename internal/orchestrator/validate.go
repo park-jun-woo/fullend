@@ -78,11 +78,12 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 					Summary: "no func/ directory",
 				})
 			} else if kind == KindScenario {
-				// Scenario is optional — user writes .hurl files directly.
+				// Scenario: warn if missing, user can --skip to suppress.
 				report.Steps = append(report.Steps, reporter.StepResult{
 					Name:    string(kind),
-					Status:  reporter.Skip,
-					Summary: "no tests/scenario-*.hurl files",
+					Status:  reporter.Pass,
+					Summary: "no scenario tests",
+					Errors:  []string{"[WARN] tests/scenario-*.hurl 파일이 없습니다 — 시나리오 테스트를 작성하세요 (--skip scenario로 억제 가능)"},
 				})
 			} else {
 				report.Steps = append(report.Steps, reporter.StepResult{
