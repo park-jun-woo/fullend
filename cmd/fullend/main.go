@@ -17,6 +17,9 @@ import (
 	"github.com/geul-org/fullend/internal/reporter"
 )
 
+// Version is set at build time via -ldflags.
+var Version = "dev"
+
 const usage = `Usage: fullend <command> [arguments]
 
 Commands:
@@ -28,6 +31,7 @@ Commands:
   chain      <operationId> <specs-dir>                     Trace feature chain for an operation
   map        [path]                                        Generate keyword map
   history    <file|dir> [--all] [--format yaml|json]       Show file change history
+  version                                                  Show version
 
 Skip kinds: openapi, ddl, ssac, model, stml, states, policy, scenario, func, terraform
 `
@@ -39,6 +43,8 @@ func main() {
 	}
 
 	switch os.Args[1] {
+	case "version":
+		fmt.Printf("fullend %s\n", Version)
 	case "validate":
 		skipKinds, args := parseSkipFlag(os.Args[2:])
 		if len(args) < 1 {
