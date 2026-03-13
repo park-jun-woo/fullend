@@ -746,3 +746,43 @@ ON CONFLICT DO NOTHING;
 
 **Advantage:** Go struct stays `int64` — no `*int64`/`sql.NullInt64` needed, no nil checks.
 **Caution:** Missing sentinel record causes FK violation errors. `fullend validate` detects this pattern and shows a WARNING.
+
+## CLI Commands
+
+### fullend validate [--skip kind,...] \<specs-dir\>
+SSOT 개별 검증 + 교차 정합성 검증. 10개 SSOT 전체 파싱 후 11개 cross-validation 규칙 실행.
+
+### fullend gen [--skip kind,...] \<specs-dir\> \<artifacts-dir\>
+검증 통과 후 전체 코드 산출 (Go backend, React frontend, Hurl 테스트 등).
+
+### fullend status \<specs-dir\>
+SSOT 현황 요약 출력.
+
+### fullend chain \<operationId\> \<specs-dir\>
+Feature Chain 추출 — operationId 하나로 연결된 모든 SSOT의 파일:라인을 출력.
+
+```bash
+$ fullend chain AcceptProposal specs/gigbridge/
+
+── Feature Chain: AcceptProposal ──
+
+  OpenAPI    api/openapi.yaml:296                          POST /proposals/{id}/accept
+  SSaC       service/proposal/accept_proposal.ssac:19      @get @empty @auth @state @put @call @post @response
+  DDL        db/gigs.sql:1                                 CREATE TABLE gigs
+  DDL        db/proposals.sql:1                            CREATE TABLE proposals
+  DDL        db/transactions.sql:1                         CREATE TABLE transactions
+  Rego       policy/authz.rego:3                           resource: gig
+  StateDiag  states/gig.md:7                               diagram: gig → AcceptProposal
+  StateDiag  states/proposal.md:6                          diagram: proposal → AcceptProposal
+  FuncSpec   func/billing/hold_escrow.go:8                 @func billing.HoldEscrow
+  Gherkin    scenario/gig_lifecycle.feature:4              Scenario: Happy Path - Full Gig Lifecycle
+```
+
+탐색 경로: OpenAPI operationId → SSaC 함수 → `@get`/`@post` Model.Method → DDL 테이블 | `@auth` → Rego 정책 | `@state` → Mermaid stateDiagram | `@call` → Func Spec | Gherkin steps → 시나리오 | STML endpoint → 프론트엔드.
+
+### fullend gen-model \<openapi-source\> \<output-dir\>
+외부 OpenAPI에서 Go model 생성.
+
+### --skip flag
+`--skip openapi,stml` 등으로 특정 SSOT 검증/생성 제외.
+유효값: openapi, ddl, ssac, model, stml, states, policy, scenario, func, terraform

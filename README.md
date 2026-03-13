@@ -72,6 +72,29 @@ fullend gen-model https://api.stripe.com/openapi.yaml ./external/
 fullend gen-model specs/my-project/external/escrow.openapi.yaml specs/my-project/external/
 ```
 
+### chain
+
+Traces all SSOT nodes connected to a single API operation. One operationId in, full cross-layer file:line map out.
+
+```bash
+fullend chain <operationId> <specs-dir>
+```
+
+```
+── Feature Chain: AcceptProposal ──
+
+  OpenAPI    api/openapi.yaml:296                          POST /proposals/{id}/accept
+  SSaC       service/proposal/accept_proposal.ssac:19      @get @empty @auth @state @put @call @post @response
+  DDL        db/gigs.sql:1                                 CREATE TABLE gigs
+  DDL        db/proposals.sql:1                            CREATE TABLE proposals
+  DDL        db/transactions.sql:1                         CREATE TABLE transactions
+  Rego       policy/authz.rego:3                           resource: gig
+  StateDiag  states/gig.md:7                               diagram: gig → AcceptProposal
+  StateDiag  states/proposal.md:6                          diagram: proposal → AcceptProposal
+  FuncSpec   func/billing/hold_escrow.go:8                 @func billing.HoldEscrow
+  Gherkin    scenario/gig_lifecycle.feature:4              Scenario: Happy Path - Full Gig Lifecycle
+```
+
 ### status
 
 Shows a summary of detected SSOTs and their stats.
