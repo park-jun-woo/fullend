@@ -6,17 +6,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/getkin/kin-openapi/openapi3"
-
 	"github.com/geul-org/fullend/internal/contract"
 	"github.com/geul-org/fullend/internal/funcspec"
 	"github.com/geul-org/fullend/internal/gluegen"
 	"github.com/geul-org/fullend/internal/policy"
 	"github.com/geul-org/fullend/internal/projectconfig"
 	"github.com/geul-org/fullend/internal/reporter"
-	"github.com/geul-org/fullend/internal/statemachine"
 	ssacgenerator "github.com/geul-org/fullend/internal/ssac/generator"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
 	stmlgenerator "github.com/geul-org/fullend/internal/stml/generator"
 	stmlparser "github.com/geul-org/fullend/internal/stml/parser"
@@ -44,8 +40,16 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 		return report, false
 	}
 
-	// 1. Validate first.
-	report := Validate(specsDir, detected, skipKinds)
+	skip := skipKinds
+	if skip == nil {
+		skip = make(map[SSOTKind]bool)
+	}
+
+	// Parse all SSOTs once.
+	parsed := ParseAll(specsDir, detected, skip)
+
+	// 1. Validate first (reuse parsed data).
+	report := ValidateWith(specsDir, detected, parsed, skip)
 	if report.HasFailure() {
 		return report, false
 	}
@@ -91,22 +95,22 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 
 	// 4. SSaC Generate → backend/internal/service/
 	// 5. SSaC GenerateModelInterfaces → backend/internal/model/
-	if d, ok := has[KindSSaC]; ok {
-		report.Steps = append(report.Steps, genSSaC(profile, specsDir, d.Path, artifactsDir)...)
+	if _, ok := has[KindSSaC]; ok {
+		report.Steps = append(report.Steps, genSSaC(profile, specsDir, artifactsDir, parsed)...)
 	}
 
 	// 6. STML Generate → frontend/src/pages/
 	var stmlDeps map[string]string
 	var stmlPages []string
 	var stmlPageOps map[string]string
-	if d, ok := has[KindSTML]; ok {
+	if _, ok := has[KindSTML]; ok {
 		var step reporter.StepResult
-		step, stmlDeps, stmlPages, stmlPageOps = genSTML(profile, specsDir, d.Path, artifactsDir)
+		step, stmlDeps, stmlPages, stmlPageOps = genSTML(profile, specsDir, artifactsDir, parsed.STMLPages)
 		report.Steps = append(report.Steps, step)
 	}
 
 	// 7. Glue code generation (Server struct + main.go + frontend setup)
-	report.Steps = append(report.Steps, genGlue(specsDir, artifactsDir, has, stmlDeps, stmlPages, stmlPageOps))
+	report.Steps = append(report.Steps, genGlue(specsDir, artifactsDir, has, parsed, stmlDeps, stmlPages, stmlPageOps))
 
 	// 8. Hurl smoke test generation (part of glue-gen, report separately)
 	{
@@ -121,20 +125,20 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 	}
 
 	// 9. State machine code generation.
-	if d, ok := has[KindStates]; ok {
-		report.Steps = append(report.Steps, genStateMachines(d.Path, specsDir, artifactsDir))
+	if _, ok := has[KindStates]; ok {
+		report.Steps = append(report.Steps, genStateMachines(specsDir, artifactsDir, parsed))
 	}
 
 	// 10. OPA Authorizer code generation.
-	if d, ok := has[KindPolicy]; ok {
-		report.Steps = append(report.Steps, genAuthz(d.Path, specsDir, artifactsDir))
+	if _, ok := has[KindPolicy]; ok {
+		report.Steps = append(report.Steps, genAuthz(artifactsDir, parsed))
 	}
 
 	// 11. Scenario: user writes .hurl directly, no generation needed.
 
 	// 12. Func copy (custom func specs → artifacts).
 	if d, ok := has[KindFunc]; ok {
-		modulePath := determineModulePath(specsDir, artifactsDir)
+		modulePath := determineModulePath(specsDir, artifactsDir, parsed.Config)
 		report.Steps = append(report.Steps, genFunc(d.Path, specsDir, artifactsDir, modulePath))
 	}
 
@@ -252,31 +256,33 @@ func genOpenAPI(specsDir, artifactsDir string) reporter.StepResult {
 	return step
 }
 
-func genSSaC(profile *TargetProfile, specsDir, serviceDir, artifactsDir string) []reporter.StepResult {
+func genSSaC(profile *TargetProfile, specsDir, artifactsDir string, parsed *ParsedSSOTs) []reporter.StepResult {
 	var steps []reporter.StepResult
 
-	funcs, err := ssacparser.ParseDir(serviceDir)
-	if err != nil {
+	funcs := parsed.ServiceFuncs
+	if funcs == nil {
 		steps = append(steps, reporter.StepResult{
 			Name:   "ssac-gen",
 			Status: reporter.Fail,
-			Errors: []string{fmt.Sprintf("SSaC parse error: %v", err)},
+			Errors: []string{"SSaC parse failed"},
 		})
 		return steps
 	}
 
-	st, err := ssacvalidator.LoadSymbolTable(specsDir)
-	if err != nil {
+	if parsed.SymbolTable == nil {
 		steps = append(steps, reporter.StepResult{
 			Name:   "ssac-gen",
 			Status: reporter.Fail,
-			Errors: []string{fmt.Sprintf("SSaC symbol table error: %v", err)},
+			Errors: []string{"SSaC symbol table not available"},
 		})
 		return steps
 	}
 
-	// Inject @error annotations from func specs into SSaC symbol table.
-	injectFuncErrStatus(st, specsDir)
+	// Clone SymbolTable for gen path — injectFuncErrStatus mutates Models.
+	genST := parsed.SymbolTable.Clone()
+
+	// Inject @error annotations from func specs into the cloned symbol table.
+	injectFuncErrStatusFromParsed(genST, parsed)
 
 	// Generate service functions → backend/internal/service/
 	serviceOutDir := filepath.Join(artifactsDir, "backend", "internal", "service")
@@ -290,7 +296,7 @@ func genSSaC(profile *TargetProfile, specsDir, serviceDir, artifactsDir string) 
 	}
 
 	step := reporter.StepResult{Name: "ssac-gen"}
-	if err := ssacgenerator.GenerateWith(profile.Backend, funcs, serviceOutDir, st); err != nil {
+	if err := ssacgenerator.GenerateWith(profile.Backend, funcs, serviceOutDir, genST); err != nil {
 		step.Status = reporter.Fail
 		step.Errors = append(step.Errors, fmt.Sprintf("SSaC generate error: %v", err))
 	} else {
@@ -312,7 +318,7 @@ func genSSaC(profile *TargetProfile, specsDir, serviceDir, artifactsDir string) 
 	}
 
 	modelStep := reporter.StepResult{Name: "ssac-model"}
-	if err := profile.Backend.GenerateModelInterfaces(funcs, st, modelOutDir); err != nil {
+	if err := profile.Backend.GenerateModelInterfaces(funcs, genST, modelOutDir); err != nil {
 		modelStep.Status = reporter.Fail
 		modelStep.Errors = append(modelStep.Errors, fmt.Sprintf("SSaC model interface error: %v", err))
 	} else {
@@ -324,24 +330,11 @@ func genSSaC(profile *TargetProfile, specsDir, serviceDir, artifactsDir string) 
 	return steps
 }
 
-// injectFuncErrStatus loads func specs from both fullend pkg/ and project func/,
-// then registers @error annotations into the SSaC symbol table so that
-// @call codegen uses the correct HTTP error status code.
-func injectFuncErrStatus(st *ssacvalidator.SymbolTable, specsDir string) {
+// injectFuncErrStatusFromParsed uses pre-parsed func specs to inject @error annotations.
+func injectFuncErrStatusFromParsed(st *ssacvalidator.SymbolTable, parsed *ParsedSSOTs) {
 	var allSpecs []funcspec.FuncSpec
-
-	// fullend default pkg/
-	if pkgRoot := findFullendPkgRoot(); pkgRoot != "" {
-		if specs, err := funcspec.ParseDir(pkgRoot); err == nil {
-			allSpecs = append(allSpecs, specs...)
-		}
-	}
-
-	// project custom func/
-	funcDir := filepath.Join(specsDir, "func")
-	if specs, err := funcspec.ParseDir(funcDir); err == nil {
-		allSpecs = append(allSpecs, specs...)
-	}
+	allSpecs = append(allSpecs, parsed.PkgFuncSpecs...)
+	allSpecs = append(allSpecs, parsed.FuncSpecs...)
 
 	for _, fs := range allSpecs {
 		if fs.ErrStatus == 0 || fs.Package == "" {
@@ -361,13 +354,12 @@ func injectFuncErrStatus(st *ssacvalidator.SymbolTable, specsDir string) {
 	}
 }
 
-func genSTML(profile *TargetProfile, specsDir, frontendDir, artifactsDir string) (reporter.StepResult, map[string]string, []string, map[string]string) {
+func genSTML(profile *TargetProfile, specsDir, artifactsDir string, pages []stmlparser.PageSpec) (reporter.StepResult, map[string]string, []string, map[string]string) {
 	step := reporter.StepResult{Name: "stml-gen"}
 
-	pages, err := stmlparser.ParseDir(frontendDir)
-	if err != nil {
+	if pages == nil {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("STML parse error: %v", err))
+		step.Errors = append(step.Errors, "STML parse failed")
 		return step, nil, nil, nil
 	}
 
@@ -394,8 +386,6 @@ func genSTML(profile *TargetProfile, specsDir, frontendDir, artifactsDir string)
 	pageOps := make(map[string]string)
 	for _, p := range pages {
 		pageNames = append(pageNames, p.Name)
-		// Determine primary operationID from first fetch or first action.
-		// PageSpec.Name already includes "-page" suffix (e.g. "login-page").
 		if len(p.Fetches) > 0 {
 			pageOps[p.Name] = p.Fetches[0].OperationID
 		} else if len(p.Actions) > 0 {
@@ -408,25 +398,25 @@ func genSTML(profile *TargetProfile, specsDir, frontendDir, artifactsDir string)
 	return step, result.Dependencies, pageNames, pageOps
 }
 
-func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, stmlDeps map[string]string, stmlPages []string, stmlPageOps map[string]string) reporter.StepResult {
+func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, parsed *ParsedSSOTs, stmlDeps map[string]string, stmlPages []string, stmlPageOps map[string]string) reporter.StepResult {
 	step := reporter.StepResult{Name: "glue-gen"}
 
 	// Determine module path from fullend.yaml, fallback to directory-based.
-	modulePath := determineModulePath(specsDir, artifactsDir)
+	modulePath := determineModulePath(specsDir, artifactsDir, parsed.Config)
 
-	// Load claims, queue, and authz config from fullend.yaml.
+	// Extract claims, queue, and authz config from pre-parsed config.
 	var claims map[string]string
 	var queueBackend string
 	var authzPackage string
-	if cfg, err := projectconfig.Load(specsDir); err == nil {
-		if cfg.Backend.Auth != nil {
-			claims = cfg.Backend.Auth.Claims
+	if parsed.Config != nil {
+		if parsed.Config.Backend.Auth != nil {
+			claims = parsed.Config.Backend.Auth.Claims
 		}
-		if cfg.Queue != nil {
-			queueBackend = cfg.Queue.Backend
+		if parsed.Config.Queue != nil {
+			queueBackend = parsed.Config.Queue.Backend
 		}
-		if cfg.Authz != nil {
-			authzPackage = cfg.Authz.Package
+		if parsed.Config.Authz != nil {
+			authzPackage = parsed.Config.Authz.Package
 		}
 	}
 
@@ -442,44 +432,12 @@ func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, stmlD
 		AuthzPackage: authzPackage,
 	}
 
-	// Load OpenAPI doc.
-	if _, ok := has[KindOpenAPI]; ok {
-		apiPath := filepath.Join(specsDir, "api", "openapi.yaml")
-		doc, err := openapi3.NewLoader().LoadFromFile(apiPath)
-		if err == nil {
-			input.OpenAPIDoc = doc
-		}
-	}
-
-	// Load service funcs.
-	if d, ok := has[KindSSaC]; ok {
-		funcs, err := ssacparser.ParseDir(d.Path)
-		if err == nil {
-			input.ServiceFuncs = funcs
-		}
-	}
-
-	// Load symbol table.
-	st, err := ssacvalidator.LoadSymbolTable(specsDir)
-	if err == nil {
-		input.SymbolTable = st
-	}
-
-	// Load state diagrams for smoke test ordering.
-	if d, ok := has[KindStates]; ok {
-		diagrams, err := statemachine.ParseDir(d.Path)
-		if err == nil {
-			input.StateDiagrams = diagrams
-		}
-	}
-
-	// Load OPA policies for hurl role detection.
-	if d, ok := has[KindPolicy]; ok {
-		policies, err := policy.ParseDir(d.Path)
-		if err == nil {
-			input.Policies = policies
-		}
-	}
+	// Use pre-parsed data.
+	input.OpenAPIDoc = parsed.OpenAPIDoc
+	input.ServiceFuncs = parsed.ServiceFuncs
+	input.SymbolTable = parsed.SymbolTable
+	input.StateDiagrams = parsed.States
+	input.Policies = parsed.Policies
 
 	if err := gluegen.Generate(input); err != nil {
 		step.Status = reporter.Fail
@@ -492,10 +450,9 @@ func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, stmlD
 	return step
 }
 
-func determineModulePath(specsDir, artifactsDir string) string {
-	// 1. Try fullend.yaml first.
-	cfg, err := projectconfig.Load(specsDir)
-	if err == nil && cfg.Backend.Module != "" {
+func determineModulePath(specsDir, artifactsDir string, cfg *projectconfig.ProjectConfig) string {
+	// 1. Try pre-parsed config first.
+	if cfg != nil && cfg.Backend.Module != "" {
 		return cfg.Backend.Module
 	}
 
@@ -514,13 +471,13 @@ func determineModulePath(specsDir, artifactsDir string) string {
 	return base + "/backend"
 }
 
-func genStateMachines(statesDir, specsDir, artifactsDir string) reporter.StepResult {
+func genStateMachines(specsDir, artifactsDir string, parsed *ParsedSSOTs) reporter.StepResult {
 	step := reporter.StepResult{Name: "state-gen"}
 
-	diagrams, err := statemachine.ParseDir(statesDir)
-	if err != nil {
+	diagrams := parsed.States
+	if diagrams == nil {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("States parse error: %v", err))
+		step.Errors = append(step.Errors, "States parse failed")
 		return step
 	}
 	if len(diagrams) == 0 {
@@ -529,7 +486,7 @@ func genStateMachines(statesDir, specsDir, artifactsDir string) reporter.StepRes
 		return step
 	}
 
-	modulePath := determineModulePath(specsDir, artifactsDir)
+	modulePath := determineModulePath(specsDir, artifactsDir, parsed.Config)
 	if err := gluegen.GenerateStateMachines(diagrams, artifactsDir, modulePath); err != nil {
 		step.Status = reporter.Fail
 		step.Errors = append(step.Errors, fmt.Sprintf("state-gen error: %v", err))
@@ -541,13 +498,13 @@ func genStateMachines(statesDir, specsDir, artifactsDir string) reporter.StepRes
 	return step
 }
 
-func genAuthz(policyDir, specsDir, artifactsDir string) reporter.StepResult {
+func genAuthz(artifactsDir string, parsed *ParsedSSOTs) reporter.StepResult {
 	step := reporter.StepResult{Name: "authz-gen"}
 
-	policies, err := policy.ParseDir(policyDir)
-	if err != nil {
+	policies := parsed.Policies
+	if policies == nil {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("Policy parse error: %v", err))
+		step.Errors = append(step.Errors, "Policy parse failed")
 		return step
 	}
 	if len(policies) == 0 {
@@ -578,9 +535,6 @@ func countPolicyRules(policies []*policy.Policy) int {
 func genFunc(funcDir, specsDir, artifactsDir, modulePath string) reporter.StepResult {
 	step := reporter.StepResult{Name: "func-gen"}
 
-	// Copy custom func files from specs/<project>/func/<pkg>/ → artifacts/<project>/backend/<importSub>/.
-	// The destination is determined by scanning SSaC imports for the func package.
-	// Import path must be under internal/ or pkg/ within the module.
 	entries, err := os.ReadDir(funcDir)
 	if err != nil {
 		step.Status = reporter.Skip
@@ -612,7 +566,7 @@ func genFunc(funcDir, specsDir, artifactsDir, modulePath string) reporter.StepRe
 			return step
 		}
 
-		// Extract relative path within module (e.g., "internal/billing" from "github.com/org/proj/internal/billing").
+		// Extract relative path within module.
 		relPath := strings.TrimPrefix(importPath, modulePath+"/")
 		if relPath == importPath {
 			step.Status = reporter.Fail
@@ -675,8 +629,6 @@ func scanFuncImports(specsDir, modulePath string) (map[string]string, error) {
 		}
 		for _, line := range strings.Split(string(data), "\n") {
 			line = strings.TrimSpace(line)
-			// Match: import "github.com/org/proj/internal/billing"
-			// or:    // import "..."  (commented imports in SSaC are Go comments)
 			if !strings.HasPrefix(line, "import ") {
 				continue
 			}
@@ -706,4 +658,3 @@ func scanFuncImports(specsDir, modulePath string) (map[string]string, error) {
 
 	return result, nil
 }
-

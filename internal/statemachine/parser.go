@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -63,6 +64,7 @@ func Parse(id, content string) (*StateDiagram, error) {
 	for s := range stateSet {
 		d.States = append(d.States, s)
 	}
+	sort.Strings(d.States)
 
 	if len(d.Transitions) == 0 {
 		return nil, fmt.Errorf("no transitions found in stateDiagram %s", id)

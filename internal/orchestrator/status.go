@@ -4,15 +4,6 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
-
-	"github.com/getkin/kin-openapi/openapi3"
-
-	"github.com/geul-org/fullend/internal/funcspec"
-	"github.com/geul-org/fullend/internal/policy"
-	"github.com/geul-org/fullend/internal/statemachine"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
-	stmlparser "github.com/geul-org/fullend/internal/stml/parser"
 )
 
 // StatusLine holds one SSOT's status info.
@@ -24,6 +15,9 @@ type StatusLine struct {
 
 // Status collects SSOT stats and returns lines to display.
 func Status(root string, detected []DetectedSSOT) []StatusLine {
+	// Parse all SSOTs once.
+	parsed := ParseAll(root, detected, nil)
+
 	var lines []StatusLine
 
 	absRoot, _ := filepath.Abs(root)
@@ -36,21 +30,81 @@ func Status(root string, detected []DetectedSSOT) []StatusLine {
 
 		switch d.Kind {
 		case KindOpenAPI:
-			lines = append(lines, statusOpenAPI(relPath, d.Path))
+			summary := "?"
+			if parsed.OpenAPIDoc != nil {
+				count := 0
+				for _, pi := range parsed.OpenAPIDoc.Paths.Map() {
+					for range pi.Operations() {
+						count++
+					}
+				}
+				summary = fmt.Sprintf("%d endpoints", count)
+			}
+			lines = append(lines, StatusLine{Kind: KindOpenAPI, Path: relPath, Summary: summary})
 		case KindDDL:
-			lines = append(lines, statusDDL(relPath, root))
+			summary := "?"
+			if parsed.SymbolTable != nil {
+				tables := len(parsed.SymbolTable.DDLTables)
+				cols := 0
+				for _, t := range parsed.SymbolTable.DDLTables {
+					cols += len(t.Columns)
+				}
+				summary = fmt.Sprintf("%d tables, %d columns", tables, cols)
+			}
+			lines = append(lines, StatusLine{Kind: KindDDL, Path: relPath, Summary: summary})
 		case KindSSaC:
-			lines = append(lines, statusSSaC(relPath, d.Path))
+			summary := "?"
+			if parsed.ServiceFuncs != nil {
+				summary = fmt.Sprintf("%d functions", len(parsed.ServiceFuncs))
+			}
+			lines = append(lines, StatusLine{Kind: KindSSaC, Path: relPath, Summary: summary})
 		case KindSTML:
-			lines = append(lines, statusSTML(relPath, d.Path))
+			summary := "?"
+			if parsed.STMLPages != nil {
+				summary = fmt.Sprintf("%d pages", len(parsed.STMLPages))
+			}
+			lines = append(lines, StatusLine{Kind: KindSTML, Path: relPath, Summary: summary})
 		case KindStates:
-			lines = append(lines, statusStates(relPath, d.Path))
+			summary := "?"
+			if parsed.States != nil {
+				totalTransitions := 0
+				for _, d := range parsed.States {
+					totalTransitions += len(d.Transitions)
+				}
+				summary = fmt.Sprintf("%d diagrams, %d transitions", len(parsed.States), totalTransitions)
+			}
+			lines = append(lines, StatusLine{Kind: KindStates, Path: relPath, Summary: summary})
 		case KindPolicy:
-			lines = append(lines, statusPolicy(relPath, d.Path))
+			summary := "?"
+			if parsed.Policies != nil {
+				totalRules := 0
+				for _, p := range parsed.Policies {
+					totalRules += len(p.Rules)
+				}
+				summary = fmt.Sprintf("%d files, %d rules", len(parsed.Policies), totalRules)
+			}
+			lines = append(lines, StatusLine{Kind: KindPolicy, Path: relPath, Summary: summary})
 		case KindScenario:
-			lines = append(lines, statusScenario(relPath, d.Path))
+			scenarioHurls, _ := filepath.Glob(filepath.Join(d.Path, "scenario-*.hurl"))
+			invariantHurls, _ := filepath.Glob(filepath.Join(d.Path, "invariant-*.hurl"))
+			total := len(scenarioHurls) + len(invariantHurls)
+			lines = append(lines, StatusLine{Kind: KindScenario, Path: relPath, Summary: fmt.Sprintf("%d hurl files", total)})
 		case KindFunc:
-			lines = append(lines, statusFunc(relPath, d.Path))
+			summary := "?"
+			if parsed.FuncSpecs != nil {
+				stubs := 0
+				for _, s := range parsed.FuncSpecs {
+					if !s.HasBody {
+						stubs++
+					}
+				}
+				if stubs > 0 {
+					summary = fmt.Sprintf("%d funcs (%d TODO)", len(parsed.FuncSpecs), stubs)
+				} else {
+					summary = fmt.Sprintf("%d funcs", len(parsed.FuncSpecs))
+				}
+			}
+			lines = append(lines, StatusLine{Kind: KindFunc, Path: relPath, Summary: summary})
 		case KindModel:
 			// Model is auxiliary; skip in status display.
 		}
@@ -71,104 +125,3 @@ func PrintStatus(w io.Writer, lines []StatusLine) {
 		fmt.Fprintf(w, "  %-12s %-30s %s\n", l.Kind, l.Path, l.Summary)
 	}
 }
-
-func statusOpenAPI(relPath, absPath string) StatusLine {
-	summary := "?"
-	doc, err := openapi3.NewLoader().LoadFromFile(absPath)
-	if err == nil {
-		count := 0
-		for _, pi := range doc.Paths.Map() {
-			for range pi.Operations() {
-				count++
-			}
-		}
-		summary = fmt.Sprintf("%d endpoints", count)
-	}
-	return StatusLine{Kind: KindOpenAPI, Path: relPath, Summary: summary}
-}
-
-func statusDDL(relPath, root string) StatusLine {
-	summary := "?"
-	st, err := ssacvalidator.LoadSymbolTable(root)
-	if err == nil {
-		tables := len(st.DDLTables)
-		cols := 0
-		for _, t := range st.DDLTables {
-			cols += len(t.Columns)
-		}
-		summary = fmt.Sprintf("%d tables, %d columns", tables, cols)
-	}
-	return StatusLine{Kind: KindDDL, Path: relPath, Summary: summary}
-}
-
-func statusSSaC(relPath, dir string) StatusLine {
-	summary := "?"
-	funcs, err := ssacparser.ParseDir(dir)
-	if err == nil {
-		summary = fmt.Sprintf("%d functions", len(funcs))
-	}
-	return StatusLine{Kind: KindSSaC, Path: relPath, Summary: summary}
-}
-
-func statusSTML(relPath, dir string) StatusLine {
-	summary := "?"
-	pages, err := stmlparser.ParseDir(dir)
-	if err == nil {
-		summary = fmt.Sprintf("%d pages", len(pages))
-	}
-	return StatusLine{Kind: KindSTML, Path: relPath, Summary: summary}
-}
-
-func statusStates(relPath, dir string) StatusLine {
-	summary := "?"
-	diagrams, err := statemachine.ParseDir(dir)
-	if err == nil {
-		totalTransitions := 0
-		for _, d := range diagrams {
-			totalTransitions += len(d.Transitions)
-		}
-		summary = fmt.Sprintf("%d diagrams, %d transitions", len(diagrams), totalTransitions)
-	}
-	return StatusLine{Kind: KindStates, Path: relPath, Summary: summary}
-}
-
-func statusPolicy(relPath, dir string) StatusLine {
-	summary := "?"
-	policies, err := policy.ParseDir(dir)
-	if err == nil {
-		totalRules := 0
-		for _, p := range policies {
-			totalRules += len(p.Rules)
-		}
-		summary = fmt.Sprintf("%d files, %d rules", len(policies), totalRules)
-	}
-	return StatusLine{Kind: KindPolicy, Path: relPath, Summary: summary}
-}
-
-func statusScenario(relPath, dir string) StatusLine {
-	scenarioHurls, _ := filepath.Glob(filepath.Join(dir, "scenario-*.hurl"))
-	invariantHurls, _ := filepath.Glob(filepath.Join(dir, "invariant-*.hurl"))
-	total := len(scenarioHurls) + len(invariantHurls)
-	summary := fmt.Sprintf("%d hurl files", total)
-	return StatusLine{Kind: KindScenario, Path: relPath, Summary: summary}
-}
-
-func statusFunc(relPath, dir string) StatusLine {
-	summary := "?"
-	specs, err := funcspec.ParseDir(dir)
-	if err == nil {
-		stubs := 0
-		for _, s := range specs {
-			if !s.HasBody {
-				stubs++
-			}
-		}
-		if stubs > 0 {
-			summary = fmt.Sprintf("%d funcs (%d TODO)", len(specs), stubs)
-		} else {
-			summary = fmt.Sprintf("%d funcs", len(specs))
-		}
-	}
-	return StatusLine{Kind: KindFunc, Path: relPath, Summary: summary}
-}
-

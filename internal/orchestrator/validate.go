@@ -30,28 +30,25 @@ var allKinds = []SSOTKind{KindConfig, KindOpenAPI, KindDDL, KindSSaC, KindModel,
 // then runs cross-validation if OpenAPI + DDL + SSaC are all present.
 // skipKinds specifies SSOT kinds to explicitly skip (via --skip flag).
 func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bool) *reporter.Report {
-	report := &reporter.Report{}
-
 	skip := make(map[SSOTKind]bool)
 	if len(skipKinds) > 0 && skipKinds[0] != nil {
 		skip = skipKinds[0]
 	}
 
+	// Parse all SSOTs once.
+	parsed := ParseAll(root, detected, skip)
+
+	return ValidateWith(root, detected, parsed, skip)
+}
+
+// ValidateWith runs validation using pre-parsed SSOTs.
+func ValidateWith(root string, detected []DetectedSSOT, parsed *ParsedSSOTs, skip map[SSOTKind]bool) *reporter.Report {
+	report := &reporter.Report{}
+
 	has := make(map[SSOTKind]DetectedSSOT)
 	for _, d := range detected {
 		has[d.Kind] = d
 	}
-
-	// Intermediate results for cross-validation.
-	var openAPIDoc *openapi3.T
-	var symTable *ssacvalidator.SymbolTable
-	var serviceFuncs []ssacparser.ServiceFunc
-	var stateDiagrams []*statemachine.StateDiagram
-	var parsedPolicies []*policy.Policy
-	var hurlFiles []string
-	var projectFuncSpecs []funcspec.FuncSpec
-	var projConfig *projectconfig.ProjectConfig
-	var modelDir string
 
 	done := make(map[SSOTKind]bool)
 
@@ -74,29 +71,24 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 		d, ok := has[kind]
 		if !ok {
 			if kind == KindFunc {
-				// Func is optional — no func/ dir is not an error.
-				// SSaC @func references with missing implementations are caught by crosscheck.
 				report.Steps = append(report.Steps, reporter.StepResult{
 					Name:    string(kind),
 					Status:  reporter.Skip,
 					Summary: "no func/ directory",
 				})
 			} else if kind == KindStates {
-				// States is optional — only required if SSaC uses @state.
 				report.Steps = append(report.Steps, reporter.StepResult{
 					Name:    string(kind),
 					Status:  reporter.Skip,
 					Summary: "no states/ directory",
 				})
 			} else if kind == KindPolicy {
-				// Policy is optional — only required if SSaC uses @auth.
 				report.Steps = append(report.Steps, reporter.StepResult{
 					Name:    string(kind),
 					Status:  reporter.Skip,
 					Summary: "no policy/ directory",
 				})
 			} else if kind == KindScenario {
-				// Scenario: warn if missing, user can --skip to suppress.
 				report.Steps = append(report.Steps, reporter.StepResult{
 					Name:    string(kind),
 					Status:  reporter.Pass,
@@ -115,54 +107,37 @@ func Validate(root string, detected []DetectedSSOT, skipKinds ...map[SSOTKind]bo
 
 		switch kind {
 		case KindConfig:
-			step, cfg := validateConfig(d.Path)
-			report.Steps = append(report.Steps, step)
-			projConfig = cfg
+			report.Steps = append(report.Steps, validateConfig(d.Path, parsed.Config))
 		case KindOpenAPI:
-			step, doc := validateOpenAPI(d.Path)
-			report.Steps = append(report.Steps, step)
-			openAPIDoc = doc
+			report.Steps = append(report.Steps, validateOpenAPI(d.Path, parsed.OpenAPIDoc))
 		case KindDDL:
-			step, st := validateDDL(root)
-			report.Steps = append(report.Steps, step)
-			symTable = st
+			report.Steps = append(report.Steps, validateDDL(root, parsed.SymbolTable))
 			// Run SSaC right after DDL to reuse symbol table.
-			if ssacD, ok := has[KindSSaC]; ok {
-				step, funcs := validateSSaC(root, ssacD.Path, st)
-				report.Steps = append(report.Steps, step)
-				serviceFuncs = funcs
+			if _, ok := has[KindSSaC]; ok {
+				report.Steps = append(report.Steps, validateSSaC(root, parsed.ServiceFuncs, parsed.SymbolTable))
 				done[KindSSaC] = true
 			}
 		case KindSSaC:
-			step, funcs := validateSSaC(root, d.Path, nil)
-			report.Steps = append(report.Steps, step)
-			serviceFuncs = funcs
+			report.Steps = append(report.Steps, validateSSaC(root, parsed.ServiceFuncs, parsed.SymbolTable))
 		case KindSTML:
-			report.Steps = append(report.Steps, validateSTML(root, d.Path))
+			report.Steps = append(report.Steps, validateSTML(root, parsed.STMLPages))
 		case KindStates:
-			step, diagrams := validateStates(d.Path)
-			report.Steps = append(report.Steps, step)
-			stateDiagrams = diagrams
+			report.Steps = append(report.Steps, validateStates(parsed.States))
 		case KindPolicy:
-			step, policies := validatePolicy(d.Path)
-			report.Steps = append(report.Steps, step)
-			parsedPolicies = policies
+			report.Steps = append(report.Steps, validatePolicy(parsed.Policies))
 		case KindScenario:
 			step, files := validateScenarioHurl(d.Path, root)
 			report.Steps = append(report.Steps, step)
-			hurlFiles = files
+			parsed.HurlFiles = files
 		case KindFunc:
-			step, specs := validateFunc(d.Path)
-			report.Steps = append(report.Steps, step)
-			projectFuncSpecs = specs
+			report.Steps = append(report.Steps, validateFunc(parsed.FuncSpecs))
 		case KindModel:
 			report.Steps = append(report.Steps, validateModel(d.Path))
-			modelDir = d.Path
 		}
 	}
 
 	// Cross-validation step.
-	report.Steps = append(report.Steps, runCrossValidate(root, openAPIDoc, symTable, serviceFuncs, stateDiagrams, parsedPolicies, hurlFiles, projectFuncSpecs, modelDir, projConfig))
+	report.Steps = append(report.Steps, runCrossValidate(root, parsed))
 
 	// Contract validation step (if artifacts exist).
 	report.Steps = append(report.Steps, runContractValidate(root))
@@ -229,35 +204,27 @@ func runContractValidate(specsDir string) reporter.StepResult {
 	return step
 }
 
-func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, policies []*policy.Policy, hurlFiles []string, projectFuncSpecs []funcspec.FuncSpec, modelDir string, projConfig *projectconfig.ProjectConfig) reporter.StepResult {
+func runCrossValidate(root string, parsed *ParsedSSOTs) reporter.StepResult {
 	step := reporter.StepResult{Name: "Cross"}
 
 	// Require OpenAPI + DDL + SSaC for cross-validation.
-	if doc == nil || st == nil || funcs == nil {
+	if parsed.OpenAPIDoc == nil || parsed.SymbolTable == nil || parsed.ServiceFuncs == nil {
 		step.Status = reporter.Skip
 		step.Summary = "skipped (incomplete SSOT)"
 		return step
 	}
 
-	// Try to load fullend pkg/ specs from the module root.
-	var fullendPkgSpecs []funcspec.FuncSpec
-	if pkgRoot := findFullendPkgRoot(); pkgRoot != "" {
-		if specs, err := funcspec.ParseDir(pkgRoot); err == nil {
-			fullendPkgSpecs = specs
-		}
-	}
-
 	// Load @dto types from model files.
-	dtoTypes := loadDTOTypes(modelDir)
+	dtoTypes := loadDTOTypes(parsed.ModelDir)
 
 	var middleware []string
 	var claims map[string]string
 	var roles []string
-	if projConfig != nil {
-		middleware = projConfig.Backend.Middleware
-		if projConfig.Backend.Auth != nil {
-			claims = projConfig.Backend.Auth.Claims
-			roles = projConfig.Backend.Auth.Roles
+	if parsed.Config != nil {
+		middleware = parsed.Config.Backend.Middleware
+		if parsed.Config.Backend.Auth != nil {
+			claims = parsed.Config.Backend.Auth.Claims
+			roles = parsed.Config.Backend.Auth.Roles
 		}
 	}
 
@@ -268,24 +235,24 @@ func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTabl
 	sensitiveCols, noSensitiveCols, _ := crosscheck.ParseSensitive(filepath.Join(root, "db"))
 
 	var queueBackend string
-	if projConfig != nil && projConfig.Queue != nil {
-		queueBackend = projConfig.Queue.Backend
+	if parsed.Config != nil && parsed.Config.Queue != nil {
+		queueBackend = parsed.Config.Queue.Backend
 	}
 
 	var authzPackage string
-	if projConfig != nil && projConfig.Authz != nil {
-		authzPackage = projConfig.Authz.Package
+	if parsed.Config != nil && parsed.Config.Authz != nil {
+		authzPackage = parsed.Config.Authz.Package
 	}
 
 	input := &crosscheck.CrossValidateInput{
-		OpenAPIDoc:       doc,
-		SymbolTable:      st,
-		ServiceFuncs:     funcs,
-		StateDiagrams:    diagrams,
-		Policies:         policies,
-		HurlFiles:        hurlFiles,
-		ProjectFuncSpecs: projectFuncSpecs,
-		FullendPkgSpecs:  fullendPkgSpecs,
+		OpenAPIDoc:       parsed.OpenAPIDoc,
+		SymbolTable:      parsed.SymbolTable,
+		ServiceFuncs:     parsed.ServiceFuncs,
+		StateDiagrams:    parsed.States,
+		Policies:         parsed.Policies,
+		HurlFiles:        parsed.HurlFiles,
+		ProjectFuncSpecs: parsed.FuncSpecs,
+		FullendPkgSpecs:  parsed.PkgFuncSpecs,
 		DTOTypes:         dtoTypes,
 		Middleware:       middleware,
 		Archived:         archived,
@@ -336,13 +303,17 @@ func runCrossValidate(root string, doc *openapi3.T, st *ssacvalidator.SymbolTabl
 	return step
 }
 
-func validateOpenAPI(path string) (reporter.StepResult, *openapi3.T) {
+func validateOpenAPI(path string, doc *openapi3.T) reporter.StepResult {
 	step := reporter.StepResult{Name: string(KindOpenAPI)}
-	doc, err := openapi3.NewLoader().LoadFromFile(path)
-	if err != nil {
-		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("OpenAPI load error: %v", err))
-		return step, nil
+	if doc == nil {
+		// Parse failed in ParseAll; try again for error message.
+		var err error
+		doc, err = openapi3.NewLoader().LoadFromFile(path)
+		if err != nil {
+			step.Status = reporter.Fail
+			step.Errors = append(step.Errors, fmt.Sprintf("OpenAPI load error: %v", err))
+			return step
+		}
 	}
 	count := 0
 	for _, pi := range doc.Paths.Map() {
@@ -364,16 +335,20 @@ func validateOpenAPI(path string) (reporter.StepResult, *openapi3.T) {
 		step.Status = reporter.Pass
 	}
 	step.Summary = fmt.Sprintf("%d endpoints", count)
-	return step, doc
+	return step
 }
 
-func validateDDL(root string) (reporter.StepResult, *ssacvalidator.SymbolTable) {
+func validateDDL(root string, st *ssacvalidator.SymbolTable) reporter.StepResult {
 	step := reporter.StepResult{Name: string(KindDDL)}
-	st, err := ssacvalidator.LoadSymbolTable(root)
-	if err != nil {
-		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("DDL/SymbolTable load error: %v", err))
-		return step, nil
+	if st == nil {
+		// Parse failed in ParseAll; try again for error message.
+		var err error
+		st, err = ssacvalidator.LoadSymbolTable(root)
+		if err != nil {
+			step.Status = reporter.Fail
+			step.Errors = append(step.Errors, fmt.Sprintf("DDL/SymbolTable load error: %v", err))
+			return step
+		}
 	}
 	tables := len(st.DDLTables)
 	cols := 0
@@ -401,7 +376,7 @@ func validateDDL(root string) (reporter.StepResult, *ssacvalidator.SymbolTable) 
 		step.Status = reporter.Pass
 	}
 	step.Summary = fmt.Sprintf("%d tables, %d columns", tables, cols)
-	return step, st
+	return step
 }
 
 // checkSqlcQueryDuplicates scans db/queries/*.sql for duplicate -- name: entries.
@@ -444,13 +419,12 @@ func checkSqlcQueryDuplicates(root string) []string {
 	return errs
 }
 
-func validateSSaC(root, serviceDir string, st *ssacvalidator.SymbolTable) (reporter.StepResult, []ssacparser.ServiceFunc) {
+func validateSSaC(root string, funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable) reporter.StepResult {
 	step := reporter.StepResult{Name: string(KindSSaC)}
-	funcs, err := ssacparser.ParseDir(serviceDir)
-	if err != nil {
+	if funcs == nil {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("SSaC parse error: %v", err))
-		return step, nil
+		step.Errors = append(step.Errors, "SSaC parse failed")
+		return step
 	}
 
 	if st == nil {
@@ -459,7 +433,7 @@ func validateSSaC(root, serviceDir string, st *ssacvalidator.SymbolTable) (repor
 		if stErr != nil {
 			step.Status = reporter.Fail
 			step.Errors = append(step.Errors, fmt.Sprintf("SSaC symbol table load error: %v", stErr))
-			return step, funcs
+			return step
 		}
 	}
 
@@ -485,21 +459,20 @@ func validateSSaC(root, serviceDir string, st *ssacvalidator.SymbolTable) (repor
 		step.Status = reporter.Pass
 	}
 	step.Summary = fmt.Sprintf("%d service functions", len(funcs))
-	return step, funcs
+	return step
 }
 
-func validateStates(statesDir string) (reporter.StepResult, []*statemachine.StateDiagram) {
+func validateStates(diagrams []*statemachine.StateDiagram) reporter.StepResult {
 	step := reporter.StepResult{Name: string(KindStates)}
-	diagrams, err := statemachine.ParseDir(statesDir)
-	if err != nil {
+	if diagrams == nil {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("States parse error: %v", err))
-		return step, nil
+		step.Errors = append(step.Errors, "States parse failed")
+		return step
 	}
 	if len(diagrams) == 0 {
 		step.Status = reporter.Skip
 		step.Summary = "no state diagrams found"
-		return step, nil
+		return step
 	}
 
 	totalTransitions := 0
@@ -508,21 +481,20 @@ func validateStates(statesDir string) (reporter.StepResult, []*statemachine.Stat
 	}
 	step.Status = reporter.Pass
 	step.Summary = fmt.Sprintf("%d diagrams, %d transitions", len(diagrams), totalTransitions)
-	return step, diagrams
+	return step
 }
 
-func validatePolicy(policyDir string) (reporter.StepResult, []*policy.Policy) {
+func validatePolicy(policies []*policy.Policy) reporter.StepResult {
 	step := reporter.StepResult{Name: string(KindPolicy)}
-	policies, err := policy.ParseDir(policyDir)
-	if err != nil {
+	if policies == nil {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("Policy parse error: %v", err))
-		return step, nil
+		step.Errors = append(step.Errors, "Policy parse failed")
+		return step
 	}
 	if len(policies) == 0 {
 		step.Status = reporter.Skip
 		step.Summary = "no policy files found"
-		return step, nil
+		return step
 	}
 
 	totalRules := 0
@@ -533,7 +505,7 @@ func validatePolicy(policyDir string) (reporter.StepResult, []*policy.Policy) {
 	}
 	step.Status = reporter.Pass
 	step.Summary = fmt.Sprintf("%d files, %d rules, %d ownership mappings", len(policies), totalRules, totalOwnerships)
-	return step, policies
+	return step
 }
 
 func validateModel(modelDir string) reporter.StepResult {
@@ -579,18 +551,17 @@ func validateScenarioHurl(testsDir string, specsRoot string) (reporter.StepResul
 	return step, allHurls
 }
 
-func validateFunc(funcDir string) (reporter.StepResult, []funcspec.FuncSpec) {
+func validateFunc(specs []funcspec.FuncSpec) reporter.StepResult {
 	step := reporter.StepResult{Name: string(KindFunc)}
-	specs, err := funcspec.ParseDir(funcDir)
-	if err != nil {
+	if specs == nil {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("Func parse error: %v", err))
-		return step, nil
+		step.Errors = append(step.Errors, "Func parse failed")
+		return step
 	}
 	if len(specs) == 0 {
 		step.Status = reporter.Skip
 		step.Summary = "no func spec files found"
-		return step, nil
+		return step
 	}
 
 	// Count stubs.
@@ -607,7 +578,7 @@ func validateFunc(funcDir string) (reporter.StepResult, []funcspec.FuncSpec) {
 	} else {
 		step.Summary = fmt.Sprintf("%d funcs", len(specs))
 	}
-	return step, specs
+	return step
 }
 
 // findFullendPkgRoot locates the fullend pkg/ directory.
@@ -673,12 +644,11 @@ func loadDTOTypes(modelDir string) map[string]bool {
 	return dtoTypes
 }
 
-func validateSTML(root, frontendDir string) reporter.StepResult {
+func validateSTML(root string, pages []stmlparser.PageSpec) reporter.StepResult {
 	step := reporter.StepResult{Name: string(KindSTML)}
-	pages, err := stmlparser.ParseDir(frontendDir)
-	if err != nil {
+	if pages == nil {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, fmt.Sprintf("STML parse error: %v", err))
+		step.Errors = append(step.Errors, "STML parse failed")
 		return step
 	}
 
@@ -701,13 +671,17 @@ func validateSTML(root, frontendDir string) reporter.StepResult {
 	return step
 }
 
-func validateConfig(path string) (reporter.StepResult, *projectconfig.ProjectConfig) {
+func validateConfig(path string, cfg *projectconfig.ProjectConfig) reporter.StepResult {
 	step := reporter.StepResult{Name: string(KindConfig)}
-	cfg, err := projectconfig.Load(filepath.Dir(path))
-	if err != nil {
-		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, err.Error())
-		return step, nil
+	if cfg == nil {
+		// Parse failed in ParseAll; try again for error message.
+		var err error
+		cfg, err = projectconfig.Load(filepath.Dir(path))
+		if err != nil {
+			step.Status = reporter.Fail
+			step.Errors = append(step.Errors, err.Error())
+			return step
+		}
 	}
 	step.Status = reporter.Pass
 	parts := []string{cfg.Metadata.Name}
@@ -718,7 +692,7 @@ func validateConfig(path string) (reporter.StepResult, *projectconfig.ProjectCon
 		parts = append(parts, cfg.Frontend.Lang+"/"+cfg.Frontend.Framework)
 	}
 	step.Summary = strings.Join(parts, ", ")
-	return step, cfg
+	return step
 }
 
 // checkDDLNullableColumns scans DDL files for columns missing NOT NULL.

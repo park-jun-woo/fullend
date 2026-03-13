@@ -10,18 +10,18 @@ import (
 func (h *Handler) Register(c *gin.Context) {
 	var req struct {
 		Password string `json:"password"`
+		Role     string `json:"role"`
 		Name     string `json:"name"`
 		Email    string `json:"email"`
-		Role     string `json:"role"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 	password := req.Password
+	role := req.Role
 	name := req.Name
 	email := req.Email
-	role := req.Role
 
 	tx, err := h.DB.BeginTx(c.Request.Context(), nil)
 	if err != nil {

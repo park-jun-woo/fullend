@@ -45,66 +45,17 @@ func Chain(specsDir string, operationID string) ([]ChainLink, error) {
 		has[d.Kind] = d
 	}
 
-	// Parse all available SSOTs.
-	var openAPIDoc *openapi3.T
-	var symTable *ssacvalidator.SymbolTable
-	var serviceFuncs []ssacparser.ServiceFunc
-	var stateDiagrams []*statemachine.StateDiagram
-	var parsedPolicies []*policy.Policy
-	var projectFuncSpecs []funcspec.FuncSpec
+	// Parse all available SSOTs once.
+	parsed := ParseAll(abs, detected, nil)
 
-	if d, ok := has[KindOpenAPI]; ok {
-		doc, loadErr := openapi3.NewLoader().LoadFromFile(d.Path)
-		if loadErr == nil {
-			openAPIDoc = doc
-		}
-	}
-	if _, ok := has[KindDDL]; ok {
-		st, loadErr := ssacvalidator.LoadSymbolTable(abs)
-		if loadErr == nil {
-			symTable = st
-		}
-	}
-	if d, ok := has[KindSSaC]; ok {
-		funcs, parseErr := ssacparser.ParseDir(d.Path)
-		if parseErr == nil {
-			serviceFuncs = funcs
-		}
-	}
-	if d, ok := has[KindStates]; ok {
-		diagrams, parseErr := statemachine.ParseDir(d.Path)
-		if parseErr == nil {
-			stateDiagrams = diagrams
-		}
-	}
-	if d, ok := has[KindPolicy]; ok {
-		policies, parseErr := policy.ParseDir(d.Path)
-		if parseErr == nil {
-			parsedPolicies = policies
-		}
-	}
-	if d, ok := has[KindFunc]; ok {
-		specs, parseErr := funcspec.ParseDir(d.Path)
-		if parseErr == nil {
-			projectFuncSpecs = specs
-		}
-	}
-
-	// Also load fullend built-in pkg specs.
-	var fullendPkgSpecs []funcspec.FuncSpec
-	if pkgRoot := findFullendPkgRoot(); pkgRoot != "" {
-		if specs, parseErr := funcspec.ParseDir(pkgRoot); parseErr == nil {
-			fullendPkgSpecs = specs
-		}
-	}
-	allFuncSpecs := append(projectFuncSpecs, fullendPkgSpecs...)
+	allFuncSpecs := append(parsed.FuncSpecs, parsed.PkgFuncSpecs...)
 
 	// Trace the chain.
 	var links []ChainLink
 
 	// 1. OpenAPI
-	if openAPIDoc != nil {
-		link := traceOpenAPI(openAPIDoc, operationID, abs)
+	if parsed.OpenAPIDoc != nil {
+		link := traceOpenAPI(parsed.OpenAPIDoc, operationID, abs)
 		if link != nil {
 			links = append(links, *link)
 		} else {
@@ -114,9 +65,9 @@ func Chain(specsDir string, operationID string) ([]ChainLink, error) {
 
 	// Find the matching SSaC function.
 	var matchedFunc *ssacparser.ServiceFunc
-	for i := range serviceFuncs {
-		if serviceFuncs[i].Name == operationID {
-			matchedFunc = &serviceFuncs[i]
+	for i := range parsed.ServiceFuncs {
+		if parsed.ServiceFuncs[i].Name == operationID {
+			matchedFunc = &parsed.ServiceFuncs[i]
 			break
 		}
 	}
@@ -127,20 +78,20 @@ func Chain(specsDir string, operationID string) ([]ChainLink, error) {
 	}
 
 	// 3. DDL — trace tables referenced by SSaC sequences
-	if matchedFunc != nil && symTable != nil {
-		ddlLinks := traceDDL(matchedFunc, symTable, abs)
+	if matchedFunc != nil && parsed.SymbolTable != nil {
+		ddlLinks := traceDDL(matchedFunc, parsed.SymbolTable, abs)
 		links = append(links, ddlLinks...)
 	}
 
 	// 4. Rego — trace policies referenced by @auth sequences
-	if matchedFunc != nil && parsedPolicies != nil {
-		regoLinks := tracePolicy(matchedFunc, parsedPolicies, abs)
+	if matchedFunc != nil && parsed.Policies != nil {
+		regoLinks := tracePolicy(matchedFunc, parsed.Policies, abs)
 		links = append(links, regoLinks...)
 	}
 
 	// 5. StateDiagram — trace diagrams referenced by @state sequences
-	if matchedFunc != nil && stateDiagrams != nil {
-		stateLinks := traceStates(matchedFunc, stateDiagrams, abs)
+	if matchedFunc != nil && parsed.States != nil {
+		stateLinks := traceStates(matchedFunc, parsed.States, abs)
 		links = append(links, stateLinks...)
 	}
 
@@ -152,14 +103,14 @@ func Chain(specsDir string, operationID string) ([]ChainLink, error) {
 
 	// 7. Hurl scenario — trace .hurl files referencing this endpoint
 	if d, ok := has[KindScenario]; ok {
-		hurlLinks := traceHurlScenarios(operationID, openAPIDoc, d.Path, abs)
+		hurlLinks := traceHurlScenarios(operationID, parsed.OpenAPIDoc, d.Path, abs)
 		links = append(links, hurlLinks...)
 	}
 
 	// 8. STML — trace frontend files referencing this endpoint
-	if openAPIDoc != nil {
+	if parsed.OpenAPIDoc != nil {
 		if d, ok := has[KindSTML]; ok {
-			stmlLinks := traceSTML(openAPIDoc, operationID, d.Path, abs)
+			stmlLinks := traceSTML(parsed.OpenAPIDoc, operationID, d.Path, abs)
 			links = append(links, stmlLinks...)
 		}
 	}

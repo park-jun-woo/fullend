@@ -27,6 +27,27 @@ type SymbolTable struct {
 	DTOs map[string]bool // "Token" → true (DDL 테이블 없는 순수 DTO)
 }
 
+// Clone returns a shallow copy of the SymbolTable with a deep-copied Models map.
+// Other maps (Operations, Funcs, DDLTables, DTOs) share the original data
+// since only Models is mutated by injectFuncErrStatus in the gen path.
+func (st *SymbolTable) Clone() *SymbolTable {
+	clone := &SymbolTable{
+		Operations: st.Operations,
+		Funcs:      st.Funcs,
+		DDLTables:  st.DDLTables,
+		DTOs:       st.DTOs,
+		Models:     make(map[string]ModelSymbol, len(st.Models)),
+	}
+	for k, ms := range st.Models {
+		methods := make(map[string]MethodInfo, len(ms.Methods))
+		for mk, mi := range ms.Methods {
+			methods[mk] = mi
+		}
+		clone.Models[k] = ModelSymbol{Methods: methods}
+	}
+	return clone
+}
+
 // ModelSymbol은 모델의 메서드 목록이다.
 type ModelSymbol struct {
 	Methods map[string]MethodInfo
