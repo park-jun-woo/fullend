@@ -192,17 +192,6 @@ func resolveSchemaRef(ref *openapi3.SchemaRef) *openapi3.Schema {
 	return ref.Value
 }
 
-func codeToInt(code string) int {
-	switch code {
-	case "200":
-		return 200
-	case "201":
-		return 201
-	default:
-		return 0
-	}
-}
-
 // checkResponseSuccessCode validates that SSaC functions with @response have an explicit 2xx response code in OpenAPI.
 // "default"-only responses are not accepted — the OpenAPI spec must explicitly declare 200, 201, 204, etc.
 func checkResponseSuccessCode(funcs []ssacparser.ServiceFunc, doc *openapi3.T) []CrossError {

@@ -411,7 +411,7 @@ type OwnershipMapping struct {
 ```
 
 - SSaC `@auth` generates `authz.Check(authz.CheckRequest{...})` calls
-- `Role: currentUser.Role` is auto-injected when `@auth` uses `currentUser`
+- `UserID: currentUser.ID, Role: currentUser.Role` is always injected in `@auth` template (unconditional)
 - `authz.Init(conn, ownerships)` is auto-generated in `main.go` with ownership mappings from Rego `@ownership` annotations
 - OPA input structure: `input.claims.user_id`, `input.claims.role`, `input.action`, `input.resource`, `input.resource_id`
 - `data.owners` is loaded from DB per request based on `@ownership` mappings
@@ -797,16 +797,102 @@ ON CONFLICT DO NOTHING;
 **Advantage:** Go struct stays `int64` — no `*int64`/`sql.NullInt64` needed, no nil checks.
 **Caution:** Missing sentinel record causes FK violation errors. `fullend validate` detects this pattern and shows a WARNING.
 
+## Contract-Based Code Generation
+
+생성된 코드의 **함수 단위 소유권 관리**. 입출력 계약(contract)만 유지하면 내부 구현(body)은 수동 수정 가능.
+
+### 소유권 디렉티브: `//fullend:`
+
+생성된 Go/TSX 코드에 메타 정보를 내장. 외부 lock 파일 불필요.
+
+```go
+//fullend:<ownership> ssot=<path> contract=<hash>
+```
+
+| 필드 | 값 | 의미 |
+|---|---|---|
+| ownership | `gen` | fullend 소유 — gen 시 덮어씀 |
+| ownership | `preserve` | 개발자 소유 — gen 시 body 보존 |
+| `ssot=` | SSOT 파일 상대경로 | 이 함수의 출처 |
+| `contract=` | SHA256 앞 7자리 | SSOT 파생 계약의 변경 감지용 해시 |
+
+**함수 레벨** — 함수 doc comment 위치:
+```go
+//fullend:gen ssot=service/gig/create_gig.ssac contract=a3f8c1
+func (h *Handler) CreateGig(c *gin.Context) { ... }
+```
+
+**파일 레벨** — package 선언 위 (state machine 등):
+```go
+//fullend:gen ssot=states/gig.md contract=f5b3a9
+package gigstate
+```
+
+**TSX** — 모듈 최상위:
+```tsx
+// fullend:gen ssot=frontend/gig_list.html contract=d4e5f6
+export function GigListPage() { ... }
+```
+
+### Contract Hash 계산
+
+각 SSOT 종류별로 해싱 대상이 다름:
+
+| 대상 | 해싱 대상 |
+|---|---|
+| Service Handler | operationId + 시퀀스 타입 목록 + request fields + response fields |
+| Model Implementation | 함수명 + 파라미터 타입 + 반환 타입 |
+| State Machine | state 목록 + transition 목록 |
+| Middleware | CurrentUser struct fields |
+
+모두 SHA256 → 앞 7자리 hex.
+
+### Preserve 모드
+
+`gen` → `preserve`로 변경하면 소유권 전환. `fullend gen` 시 preserve 함수의 body를 보존.
+
+| 디렉티브 | contract 변경 | gen 동작 |
+|---|---|---|
+| 없음 (새 파일) | — | 생성 + `//fullend:gen` 부착 |
+| `gen` | — | 덮어씀 |
+| `preserve` | 없음 | **스킵 (body 보존)** |
+| `preserve` | 있음 | **body 보존 + 충돌 경고 + `.new` 파일 생성** |
+
+충돌 시 `.new` 파일을 참고해 수동 머지 후, 원본의 `contract=` 해시를 새 값으로 갱신.
+
+한 파일에 gen/preserve 혼재 가능 — Go AST 함수 단위 splice로 처리.
+
+### Contract 상태 분류
+
+| Status | 조건 |
+|---|---|
+| `gen` | fullend 소유, gen 시 덮어씀 |
+| `preserve` | 개발자 소유, 계약 유지 |
+| `broken` | SSOT 변경으로 계약 불일치 |
+| `orphan` | SSOT 파일 삭제됨 |
+
 ## CLI Commands
 
 ### fullend validate [--skip kind,...] \<specs-dir\>
-SSOT 개별 검증 + 교차 정합성 검증. 10개 SSOT 전체 파싱 후 11개 cross-validation 규칙 실행.
+SSOT 개별 검증 + 교차 정합성 검증 + 계약 검증. artifacts 디렉토리가 있으면 Contract 행도 출력.
 
-### fullend gen [--skip kind,...] \<specs-dir\> \<artifacts-dir\>
+### fullend gen [--skip kind,...] [--reset] \<specs-dir\> \<artifacts-dir\>
 검증 통과 후 전체 코드 산출 (Go backend, React frontend, Hurl 테스트 등).
+- `--reset`: 모든 `//fullend:preserve` 함수를 `//fullend:gen`으로 되돌리고 body 재생성 (Y/n 확인 프롬프트).
 
 ### fullend status \<specs-dir\>
 SSOT 현황 요약 출력.
+
+### fullend contract \<specs-dir\> \<artifacts-dir\>
+SSOT ↔ artifacts 계약 상태 확인. gen/preserve/broken/orphan 분류 출력.
+
+```
+Contract Status:
+  gen       service/gig/list_gigs.go      ListGigs         fullend 소유
+  preserve  service/gig/create_gig.go     CreateGig        계약 유지 ✓
+  broken    service/gig/update_gig.go     UpdateGig        계약 위반 ✗ (arg added)
+  orphan    service/gig/old_feature.go    OldFeature       SSOT 삭제됨 ⚠
+```
 
 ### fullend chain \<operationId\> \<specs-dir\>
 Feature Chain 추출 — operationId 하나로 연결된 모든 SSOT의 파일:라인을 출력.
@@ -826,6 +912,11 @@ $ fullend chain AcceptProposal specs/gigbridge/
   StateDiag  states/proposal.md:6                          diagram: proposal → AcceptProposal
   FuncSpec   func/billing/hold_escrow.go:8                 @func billing.HoldEscrow
   Hurl       tests/scenario-gig-lifecycle.hurl:10          scenario: scenario-gig-lifecycle.hurl
+
+  ── Artifacts ──
+  Handler    internal/service/proposal/accept_proposal.go:AcceptProposal   preserve ✎
+  Model      internal/model/gig.go:Create                                  gen
+  Authz      internal/authz/authz.go                                       gen
 ```
 
 탐색 경로: OpenAPI operationId → SSaC 함수 → `@get`/`@post` Model.Method → DDL 테이블 | `@auth` → Rego 정책 | `@state` → Mermaid stateDiagram | `@call` → Func Spec | Hurl → 시나리오 | STML endpoint → 프론트엔드.
