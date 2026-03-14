@@ -1,8 +1,0 @@
-package service
-
-// @get User me = User.FindByID({ID: currentUser.ID})
-// @empty me "User not found"
-// @auth "ListWorkflows" "workflow" {UserID: currentUser.ID, ResourceID: me.OrgID} "Forbidden"
-// @get []Workflow workflows = Workflow.ListByOrgID({OrgID: me.OrgID})
-// @response { workflows: workflows }
-func ListWorkflows() {}
