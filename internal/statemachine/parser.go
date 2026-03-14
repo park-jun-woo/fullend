@@ -61,6 +61,16 @@ func Parse(id, content string) (*StateDiagram, error) {
 		stateSet[to] = true
 	}
 
+	// 상태명 대소문자 일관성 검증: case-insensitive로 같은 이름이면 에러
+	lowerMap := make(map[string]string) // lowercase → first seen form
+	for s := range stateSet {
+		low := strings.ToLower(s)
+		if prev, exists := lowerMap[low]; exists && prev != s {
+			return nil, fmt.Errorf("state name conflict in %s: %q and %q differ only in case", id, prev, s)
+		}
+		lowerMap[low] = s
+	}
+
 	for s := range stateSet {
 		d.States = append(d.States, s)
 	}

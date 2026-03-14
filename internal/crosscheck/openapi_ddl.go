@@ -15,7 +15,7 @@ import (
 
 // CheckOpenAPIDDL validates x-sort, x-filter, x-include against DDL tables,
 // and checks for ghost properties (OpenAPI schema properties not in DDL).
-func CheckOpenAPIDDL(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc) []CrossError {
+func CheckOpenAPIDDL(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssacparser.ServiceFunc, sensitiveCols map[string]map[string]bool) []CrossError {
 	var errs []CrossError
 
 	if doc.Paths == nil {
@@ -42,6 +42,9 @@ func CheckOpenAPIDDL(doc *openapi3.T, st *ssacvalidator.SymbolTable, funcs []ssa
 
 	// Ghost property check: OpenAPI schema properties → DDL columns.
 	errs = append(errs, checkGhostProperties(doc, st)...)
+
+	// Missing property check: DDL columns → OpenAPI schema properties.
+	errs = append(errs, checkMissingProperties(doc, st, sensitiveCols)...)
 
 	return errs
 }
@@ -248,6 +251,66 @@ func checkGhostProperties(doc *openapi3.T, st *ssacvalidator.SymbolTable) []Cros
 	}
 
 	return errs
+}
+
+// checkMissingProperties checks DDL columns → OpenAPI schema properties (reverse of checkGhostProperties).
+func checkMissingProperties(doc *openapi3.T, st *ssacvalidator.SymbolTable, sensitiveCols map[string]map[string]bool) []CrossError {
+	var errs []CrossError
+	if doc.Components == nil || doc.Components.Schemas == nil {
+		return errs
+	}
+
+	xIncludeFields := collectXIncludeLocalFields(doc)
+
+	for schemaName, schemaRef := range doc.Components.Schemas {
+		if schemaRef == nil || schemaRef.Value == nil {
+			continue
+		}
+		schema := schemaRef.Value
+		tableName := modelToTable(schemaName)
+		table, ok := st.DDLTables[tableName]
+		if !ok {
+			continue
+		}
+
+		for colName, colType := range table.Columns {
+			// @sensitive 칼럼은 의도적 비노출 — 스킵
+			if sensitiveCols != nil {
+				if cols, ok := sensitiveCols[tableName]; ok && cols[colName] {
+					continue
+				}
+			}
+			// sensitivePatterns 매칭 칼럼도 스킵
+			if matchesSensitivePattern(colName) {
+				continue
+			}
+			// x-include FK 칼럼 스킵
+			if xIncludeFields[colName] {
+				continue
+			}
+			if _, exists := schema.Properties[colName]; !exists {
+				errs = append(errs, CrossError{
+					Rule:       "DDL ↔ OpenAPI",
+					Context:    fmt.Sprintf("table %s.%s", tableName, colName),
+					Message:    fmt.Sprintf("DDL column %q (%s) — OpenAPI %s schema에 해당 property 없음", colName, colType, schemaName),
+					Level:      "WARNING",
+					Suggestion: fmt.Sprintf("OpenAPI %s schema에 %s property를 추가하거나, DDL에서 제거하세요", schemaName, colName),
+				})
+			}
+		}
+	}
+	return errs
+}
+
+// matchesSensitivePattern checks if a column name matches any sensitive pattern.
+func matchesSensitivePattern(colName string) bool {
+	lower := strings.ToLower(colName)
+	for _, p := range sensitivePatterns {
+		if strings.Contains(lower, p) {
+			return true
+		}
+	}
+	return false
 }
 
 // collectXIncludeLocalFields collects local column names from x-include across all operations.

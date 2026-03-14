@@ -122,7 +122,7 @@ func ValidateWith(root string, detected []DetectedSSOT, parsed *ParsedSSOTs, ski
 		case KindSTML:
 			report.Steps = append(report.Steps, validateSTML(root, parsed.STMLPages))
 		case KindStates:
-			report.Steps = append(report.Steps, validateStates(parsed.States))
+			report.Steps = append(report.Steps, validateStates(parsed.States, parsed.StatesErr))
 		case KindPolicy:
 			report.Steps = append(report.Steps, validatePolicy(parsed.Policies))
 		case KindScenario:
@@ -462,11 +462,15 @@ func validateSSaC(root string, funcs []ssacparser.ServiceFunc, st *ssacvalidator
 	return step
 }
 
-func validateStates(diagrams []*statemachine.StateDiagram) reporter.StepResult {
+func validateStates(diagrams []*statemachine.StateDiagram, parseErr error) reporter.StepResult {
 	step := reporter.StepResult{Name: string(KindStates)}
 	if diagrams == nil {
 		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, "States parse failed")
+		if parseErr != nil {
+			step.Errors = append(step.Errors, parseErr.Error())
+		} else {
+			step.Errors = append(step.Errors, "States parse failed")
+		}
 		return step
 	}
 	if len(diagrams) == 0 {

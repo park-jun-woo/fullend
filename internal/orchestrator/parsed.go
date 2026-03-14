@@ -26,6 +26,7 @@ type ParsedSSOTs struct {
 	PkgFuncSpecs []funcspec.FuncSpec // fullend pkg/
 	HurlFiles    []string
 	ModelDir     string
+	StatesErr    error // parse error from statemachine.ParseDir
 }
 
 // ParseAll parses all detected SSOTs once and returns the cached results.
@@ -78,6 +79,8 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Par
 		diagrams, err := statemachine.ParseDir(d.Path)
 		if err == nil {
 			p.States = diagrams
+		} else {
+			p.StatesErr = err
 		}
 	}
 

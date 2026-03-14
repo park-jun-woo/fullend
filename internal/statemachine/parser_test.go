@@ -73,3 +73,19 @@ func TestParseNoTransitions(t *testing.T) {
 		t.Error("expected error for no transitions")
 	}
 }
+
+func TestParseCaseConflict(t *testing.T) {
+	content := "```mermaid\nstateDiagram-v2\n    [*] --> draft\n    Draft --> open: PublishGig\n    open --> closed: CloseGig\n```"
+	_, err := Parse("test", content)
+	if err == nil {
+		t.Error("expected error for case-conflicting state names draft/Draft")
+	}
+}
+
+func TestParseCaseNoConflict(t *testing.T) {
+	content := "```mermaid\nstateDiagram-v2\n    [*] --> draft\n    draft --> open: PublishGig\n    open --> closed: CloseGig\n```"
+	_, err := Parse("test", content)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+}

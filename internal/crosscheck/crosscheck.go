@@ -37,7 +37,7 @@ func Run(input *CrossValidateInput) []CrossError {
 
 	// OpenAPI x-extensions ↔ DDL
 	if input.OpenAPIDoc != nil && input.SymbolTable != nil {
-		errs = append(errs, CheckOpenAPIDDL(input.OpenAPIDoc, input.SymbolTable, input.ServiceFuncs)...)
+		errs = append(errs, CheckOpenAPIDDL(input.OpenAPIDoc, input.SymbolTable, input.ServiceFuncs, input.SensitiveCols)...)
 	}
 
 	// SSaC ↔ DDL
