@@ -15,7 +15,7 @@ DDL ←── OpenAPI ←── Config (middleware → securitySchemes)
  └── DDL → SSaC (coverage)
 
 Scenario → OpenAPI
-STML → OpenAPI (검증 미구현)
+STML → OpenAPI (stml/validator에서 수행, Phase029에서 crosscheck 이동 예정)
 ```
 
 ### 단방향
@@ -41,6 +41,7 @@ STML → OpenAPI (검증 미구현)
 |---|---|---|---|
 | SSaC ↔ OpenAPI | `CheckSSaCOpenAPI` | func name→operationId, @response→response schema, @empty/@exists→error response | operationId→SSaC func 존재 |
 | SSaC ↔ States | `CheckStates` | @state diagramID→diagram 존재, func name→유효 전이 | transition event→SSaC func 존재, event without @state→WARNING |
+| Func → SSaC | `CheckFuncCoverage` | func spec→SSaC @call 참조 존재 (coverage) | — |
 | SSaC ↔ DDL | `CheckDDLCoverage` | (CheckSSaCDDL에서 커버) | DDL table→SSaC에서 사용됨 (coverage) |
 | States ↔ DDL | `CheckStates` | @state input field→DDL column | (역방향 없음) |
 
@@ -56,32 +57,15 @@ STML → OpenAPI (검증 미구현)
 
 ## 개선안
 
-### 제거 후보 (1건)
+### 완료된 개선 (Phase027)
 
-**States → OpenAPI** (`CheckStates` #4: transition event → operationId)
+- ~~**States → OpenAPI 제거**~~ — 전이적 중복 제거 완료 (CheckStates #4 삭제)
+- ~~**Func → SSaC 커버리지**~~ — `CheckFuncCoverage` 추가 완료 (WARNING 수준)
 
-전이적 중복이다:
-- States → SSaC (`CheckStates` #1): event → SSaC func 존재
-- SSaC → OpenAPI (`CheckSSaCOpenAPI` Rule 3): func name → operationId 존재
+### 추가 후보 (1건)
 
-두 검증의 합성으로 States event → operationId는 보장된다. 독자적으로 잡아내는 에러 없음.
+**STML → OpenAPI 크로스체크 (Phase029)**
 
-제거 시 효과: States event에 SSaC func이 없을 때 ERROR 1건(States→SSaC)만 출력. 현재는 2건(+States→OpenAPI) 중복 출력.
+현황: STML validator가 내부에서 OpenAPI 교차 검증을 수행 중. crosscheck에 중복 구현하면 이중 출력.
 
-### 추가 후보 (2건)
-
-**1. Func → SSaC 커버리지 (`CheckFuncCoverage`)**
-
-현황: DDL → SSaC 커버리지는 `CheckDDLCoverage`로 구현됨. Func은 없음.
-
-문제: 프로젝트 `func/` 디렉토리에 함수 스펙을 작성했지만 아무 SSaC `@call`도 참조하지 않으면 죽은 코드. 현재 미검출.
-
-제안: WARNING 수준. `func/` 파서 결과와 SSaC @call 참조 목록 대조.
-
-**2. STML → OpenAPI 크로스체크 (`CheckSTMLOpenAPI`)**
-
-현황: STML 파서·validator는 있으나, STML이 참조하는 API endpoint의 OpenAPI 존재 여부를 검증하는 crosscheck 없음.
-
-문제: STML 페이지가 `POST /api/gigs`를 호출하는데 OpenAPI에 해당 path/method가 없으면 현재 미검출.
-
-제안: ERROR 수준. STML API call의 path/method → OpenAPI endpoint 존재 확인.
+계획: STML validator의 OpenAPI 의존성을 crosscheck로 이동 (Phase029-STMLCrosscheck).

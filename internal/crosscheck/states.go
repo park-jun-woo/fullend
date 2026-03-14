@@ -32,17 +32,6 @@ func CheckStates(diagrams []*statemachine.StateDiagram, funcs []ssacparser.Servi
 		funcNames[fn.Name] = true
 	}
 
-	opIDs := make(map[string]bool)
-	if doc != nil && doc.Paths != nil {
-		for _, pi := range doc.Paths.Map() {
-			for _, op := range pi.Operations() {
-				if op != nil && op.OperationID != "" {
-					opIDs[op.OperationID] = true
-				}
-			}
-		}
-	}
-
 	// 1. Transition events → SSaC function exists.
 	for _, d := range diagrams {
 		for _, event := range d.Events() {
@@ -114,22 +103,7 @@ func CheckStates(diagrams []*statemachine.StateDiagram, funcs []ssacparser.Servi
 		}
 	}
 
-	// 4. Transition events → OpenAPI operationId exists.
-	if doc != nil {
-		for _, d := range diagrams {
-			for _, event := range d.Events() {
-				if !opIDs[event] {
-					errs = append(errs, CrossError{
-						Rule:       "States ↔ OpenAPI",
-						Context:    fmt.Sprintf("%s.%s", d.ID, event),
-						Message:    fmt.Sprintf("transition event %q has no matching OpenAPI operationId", event),
-						Level:      "ERROR",
-						Suggestion: fmt.Sprintf("Add operationId: %s to OpenAPI spec", event),
-					})
-				}
-			}
-		}
-	}
+	// 4. (removed — transitive duplicate of #1 + SSaC↔OpenAPI)
 
 	// 5. @state Inputs field → DDL column exists.
 	if st != nil {

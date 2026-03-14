@@ -1,4 +1,4 @@
-# Phase027: Validate Rule 개선 — 중복 제거 + 신규 규칙 + mutest 정리
+# Phase027: Validate Rule 개선 — 중복 제거 + 신규 규칙 + mutest 정리 ✅ 완료
 
 ## 목표
 
@@ -101,7 +101,7 @@ STML 페이지가 참조하는 API endpoint가 OpenAPI에 존재하는지 검증
 
 STML 파서가 API call 정보를 추출하는지 확인 필요. `stmlparser.PageSpec`에 API endpoint 참조 정보가 있으면 구현 가능. 없으면 STML 파서 확장이 선행되어야 한다.
 
-**선행 조건 확인 후 구현 여부 결정.** STML 파서에 API 참조 정보가 없으면 이 항목은 별도 Phase로 분리한다.
+**결정: Phase029로 분리.** STML validator가 이미 OpenAPI 교차 검증을 수행 중이므로, crosscheck에 중복 구현하면 같은 에러가 이중 출력된다. STML validator의 OpenAPI 의존성을 crosscheck로 이동하는 작업은 범위가 크므로 Phase029-STMLCrosscheck으로 분리한다.
 
 ---
 
@@ -130,7 +130,7 @@ phase1.md, phase2.md 인덱스 테이블도 업데이트.
 | 파일 | 변경 |
 |---|---|
 | `internal/crosscheck/states.go` | #4 블록(States→OpenAPI) 삭제 |
-| `internal/crosscheck/rules.go` | States rule Name 변경, CheckFuncCoverage rule 추가, (조건부) CheckSTMLOpenAPI rule 추가 |
+| `internal/crosscheck/rules.go` | States rule Name 변경, CheckFuncCoverage rule 추가 |
 | `internal/crosscheck/func_coverage.go` | 신규 |
 | `internal/crosscheck/func_coverage_test.go` | 신규 |
 | `files/mutests/policy-config.md` | MUT-POLICY-CONFIG-002 추가 |

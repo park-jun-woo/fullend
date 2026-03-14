@@ -15,7 +15,7 @@ Phase 1에서 주요 경로를 커버했다. Phase 2는 아직 안 건드린 cro
 
 | 구 ID | 신 ID | 파일 |
 |---|---|---|
-| MUT-16 | MUT-CONFIG-POLICY-001 | config-policy.md |
+| MUT-16 | MUT-POLICY-CONFIG-002 | policy-config.md |
 | MUT-17 | MUT-CONFIG-OPENAPI-001 | config-openapi.md |
 | MUT-18 | MUT-SSAC-OPENAPI-005 | ssac-openapi.md |
 | MUT-19 | MUT-POLICY-DDL-001 | policy-ddl.md |

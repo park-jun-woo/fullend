@@ -1,115 +1,25 @@
 package crosscheck
 
-import (
-	"github.com/getkin/kin-openapi/openapi3"
-
-	"github.com/geul-org/fullend/internal/funcspec"
-	"github.com/geul-org/fullend/internal/policy"
-	"github.com/geul-org/fullend/internal/statemachine"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
-)
-
-// CrossValidateInput holds the pre-loaded data from individual validations.
-type CrossValidateInput struct {
-	OpenAPIDoc       *openapi3.T
-	SymbolTable      *ssacvalidator.SymbolTable
-	ServiceFuncs     []ssacparser.ServiceFunc
-	StateDiagrams    []*statemachine.StateDiagram
-	Policies         []*policy.Policy
-	HurlFiles        []string // scenario .hurl file paths for crosscheck
-	ProjectFuncSpecs []funcspec.FuncSpec
-	FullendPkgSpecs  []funcspec.FuncSpec
-	DTOTypes         map[string]bool   // model types marked with @dto (skip DDL matching)
-	Middleware       []string          // from fullend.yaml backend.middleware
-	Archived         *ArchivedInfo     // @archived tables/columns from DDL
-	Claims           map[string]string // from fullend.yaml backend.auth.claims (FieldName → claim key)
-	QueueBackend     string            // from fullend.yaml queue.backend ("postgres", "memory", "")
-	AuthzPackage     string            // from fullend.yaml authz.package ("" = default pkg/authz)
-	SensitiveCols    map[string]map[string]bool // @sensitive columns per table (table → column → true)
-	NoSensitiveCols  map[string]map[string]bool // @nosensitive columns per table (suppress WARNING)
-	Roles            []string                   // from fullend.yaml auth.roles
-}
-
 // Run executes all cross-validation rules and returns collected errors.
 func Run(input *CrossValidateInput) []CrossError {
+	return RunRules(input, nil)
+}
+
+// RunRules executes rules, skipping names in skipRules.
+func RunRules(input *CrossValidateInput, skipRules map[string]bool) []CrossError {
 	var errs []CrossError
-
-	// OpenAPI x-extensions ↔ DDL
-	if input.OpenAPIDoc != nil && input.SymbolTable != nil {
-		errs = append(errs, CheckOpenAPIDDL(input.OpenAPIDoc, input.SymbolTable, input.ServiceFuncs, input.SensitiveCols)...)
+	for _, r := range rules {
+		if skipRules[r.Name] {
+			continue
+		}
+		if r.Requires(input) {
+			errs = append(errs, r.Check(input)...)
+		}
 	}
-
-	// SSaC ↔ DDL
-	if input.ServiceFuncs != nil && input.SymbolTable != nil {
-		errs = append(errs, CheckSSaCDDL(input.ServiceFuncs, input.SymbolTable, input.DTOTypes)...)
-	}
-
-	// SSaC ↔ OpenAPI (function name ↔ operationId + @response fields ↔ response schema)
-	if input.ServiceFuncs != nil && input.SymbolTable != nil {
-		allFuncSpecs := append(input.FullendPkgSpecs, input.ProjectFuncSpecs...)
-		errs = append(errs, CheckSSaCOpenAPI(input.ServiceFuncs, input.SymbolTable, input.OpenAPIDoc, allFuncSpecs)...)
-	}
-
-	// States ↔ SSaC/DDL/OpenAPI
-	if len(input.StateDiagrams) > 0 {
-		errs = append(errs, CheckStates(input.StateDiagrams, input.ServiceFuncs, input.SymbolTable, input.OpenAPIDoc)...)
-	}
-
-	// Policy ↔ SSaC/DDL/States
-	if len(input.Policies) > 0 {
-		errs = append(errs, CheckPolicy(input.Policies, input.ServiceFuncs, input.SymbolTable, input.StateDiagrams)...)
-	}
-
-	// Hurl scenario → OpenAPI (단방향 크로스체크)
-	if len(input.HurlFiles) > 0 && input.OpenAPIDoc != nil {
-		errs = append(errs, CheckHurlFiles(input.HurlFiles, input.OpenAPIDoc)...)
-	}
-
-	// Func ↔ SSaC
-	if input.ServiceFuncs != nil {
-		errs = append(errs, CheckFuncs(input.ServiceFuncs, input.FullendPkgSpecs, input.ProjectFuncSpecs, input.SymbolTable, input.OpenAPIDoc)...)
-	}
-
-	// Middleware ↔ OpenAPI securitySchemes
-	if input.OpenAPIDoc != nil {
-		errs = append(errs, CheckMiddleware(input.Middleware, input.OpenAPIDoc)...)
-	}
-
-	// Claims ↔ SSaC currentUser
-	if input.ServiceFuncs != nil {
-		errs = append(errs, CheckClaims(input.ServiceFuncs, input.Claims)...)
-	}
-
-	// Claims ↔ Rego input.claims references
-	if len(input.Policies) > 0 && input.Claims != nil {
-		errs = append(errs, CheckClaimsRego(input.Policies, input.Claims)...)
-	}
-
-	// DDL → SSaC coverage
-	if input.SymbolTable != nil && input.ServiceFuncs != nil {
-		errs = append(errs, CheckDDLCoverage(input.SymbolTable, input.ServiceFuncs, input.Archived)...)
-	}
-
-	// Queue: publish ↔ subscribe
-	if input.ServiceFuncs != nil {
-		errs = append(errs, CheckQueue(input.ServiceFuncs, input.QueueBackend)...)
-	}
-
-	// Authz: @auth inputs ↔ CheckRequest fields
-	if input.ServiceFuncs != nil {
-		errs = append(errs, CheckAuthz(input.ServiceFuncs, input.AuthzPackage)...)
-	}
-
-	// DDL: sensitive column name pattern without @sensitive annotation
-	if input.SymbolTable != nil {
-		errs = append(errs, CheckSensitiveColumns(input.SymbolTable, input.SensitiveCols, input.NoSensitiveCols)...)
-	}
-
-	// Roles ↔ Policy
-	if len(input.Policies) > 0 && len(input.Roles) > 0 {
-		errs = append(errs, CheckRoles(input.Policies, input.Roles)...)
-	}
-
 	return errs
+}
+
+// Rules returns the registered rule list (for status/reporting).
+func Rules() []Rule {
+	return rules
 }
