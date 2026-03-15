@@ -1,3 +1,6 @@
+//ff:func feature=gen-gogin type=generator
+//ff:what copies .rego files to artifacts directory for runtime loading
+
 package gogin
 
 import (

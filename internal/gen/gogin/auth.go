@@ -1,3 +1,6 @@
+//ff:func feature=gen-gogin type=generator
+//ff:what creates service/auth.go with CurrentUser type and extraction stub
+
 package gogin
 
 import (

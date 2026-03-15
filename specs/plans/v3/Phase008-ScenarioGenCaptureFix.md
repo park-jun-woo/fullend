@@ -1,3 +1,5 @@
+✅ 완료
+
 # Phase008: scenario-gen 캡처 변수 불일치 수정 (BUG013)
 
 ## 목표

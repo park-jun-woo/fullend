@@ -1,3 +1,5 @@
+✅ 완료
+
 # Phase029: STML ↔ OpenAPI 검증을 crosscheck로 분리
 
 ## 목표

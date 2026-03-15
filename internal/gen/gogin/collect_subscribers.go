@@ -1,0 +1,17 @@
+//ff:func feature=gen-gogin type=util
+//ff:what returns service functions that have @subscribe
+
+package gogin
+
+import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+
+// collectSubscribers returns service functions that have @subscribe.
+func collectSubscribers(funcs []ssacparser.ServiceFunc) []ssacparser.ServiceFunc {
+	var subs []ssacparser.ServiceFunc
+	for _, fn := range funcs {
+		if fn.Subscribe != nil {
+			subs = append(subs, fn)
+		}
+	}
+	return subs
+}

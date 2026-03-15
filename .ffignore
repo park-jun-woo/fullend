@@ -2,7 +2,7 @@ artifacts/
 pkg/
 cmd/
 
-# Non-split packages
+# Non-filefunc packages
 internal/crosscheck/
 internal/funcspec/
 internal/genmodel/
@@ -17,26 +17,3 @@ internal/stml/
 internal/ssac/parser/
 internal/ssac/generator/
 internal/gen/react/
-
-# Pre-existing files in split packages (Phase031 1차 분해 대상 외)
-internal/ssac/validator/errors.go
-internal/gen/gogin/gogin.go
-internal/gen/gogin/server.go
-internal/gen/gogin/main_go.go
-internal/gen/gogin/auth.go
-internal/gen/gogin/attach.go
-internal/gen/gogin/queryopts.go
-internal/gen/gogin/state.go
-internal/gen/gogin/authz.go
-internal/gen/gogin/middleware.go
-internal/gen/gogin/domain.go
-internal/gen/hurl/ddl.go
-internal/gen/hurl/hurl_util.go
-internal/orchestrator/detect.go
-internal/orchestrator/exec.go
-internal/orchestrator/gen.go
-internal/orchestrator/chain.go
-internal/orchestrator/parsed.go
-internal/orchestrator/status.go
-internal/orchestrator/sqlc_config.go
-internal/orchestrator/target_profile.go

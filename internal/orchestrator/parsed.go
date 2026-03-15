@@ -1,3 +1,6 @@
+//ff:func feature=orchestrator type=command
+//ff:what ParseAll parses all detected SSOTs once and returns the cached results.
+
 package orchestrator
 
 import (

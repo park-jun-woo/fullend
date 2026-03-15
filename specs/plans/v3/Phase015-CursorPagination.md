@@ -1,3 +1,5 @@
+✅ 완료
+
 # Phase015: cursor pagination 코드젠 구현
 
 ## 목표

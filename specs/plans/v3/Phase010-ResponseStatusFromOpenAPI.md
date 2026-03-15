@@ -1,3 +1,5 @@
+✅ 완료
+
 # Phase010: @response HTTP 상태 코드 — OpenAPI 기준 치환
 
 ## 목표
