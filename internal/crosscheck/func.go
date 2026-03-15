@@ -12,6 +12,14 @@ import (
 	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
 )
 
+// jwtBuiltinFuncs are claims-dependent functions that are generated into internal/auth/
+// (not in pkg/auth) when auth.type is jwt. Skip funcspec lookup for these.
+var jwtBuiltinFuncs = map[string]bool{
+	"auth.issueToken":   true,
+	"auth.verifyToken":  true,
+	"auth.refreshToken": true,
+}
+
 // CheckFuncs validates SSaC @func references against parsed func specs.
 // Checks: existence, stub, param count, positional type match, result/response match, source variable definition.
 func CheckFuncs(
@@ -66,6 +74,11 @@ func CheckFuncs(
 
 			spec, found := specMap[key]
 			if !found {
+				// JWT built-in functions are generated into internal/auth/ (not in pkg/auth).
+				// They won't be in FullendPkgSpecs after deletion, so skip the "not found" error.
+				if jwtBuiltinFuncs[key] {
+					continue
+				}
 				skeleton := generateSkeleton(pkg, camelName, seq)
 				errs = append(errs, CrossError{
 					Rule:       "Func ↔ SSaC",

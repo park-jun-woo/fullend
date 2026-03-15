@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/geul-org/fullend/internal/policy"
+	"github.com/geul-org/fullend/internal/projectconfig"
 )
 
 func TestCheckClaimsRego_AllMatch(t *testing.T) {
@@ -12,7 +13,10 @@ func TestCheckClaimsRego_AllMatch(t *testing.T) {
 		File:       "authz.rego",
 		ClaimsRefs: []string{"user_id", "role"},
 	}}
-	claims := map[string]string{"ID": "user_id", "Role": "role"}
+	claims := map[string]projectconfig.ClaimDef{
+		"ID":   {Key: "user_id", GoType: "int64"},
+		"Role": {Key: "role", GoType: "string"},
+	}
 
 	errs := CheckClaimsRego(policies, claims)
 	for _, e := range errs {
@@ -28,7 +32,10 @@ func TestCheckClaimsRego_MismatchKey(t *testing.T) {
 		ClaimsRefs: []string{"user_id", "role"},
 	}}
 	// user_id → userId: Rego still references user_id
-	claims := map[string]string{"ID": "userId", "Role": "role"}
+	claims := map[string]projectconfig.ClaimDef{
+		"ID":   {Key: "userId", GoType: "int64"},
+		"Role": {Key: "role", GoType: "string"},
+	}
 
 	errs := CheckClaimsRego(policies, claims)
 	hasError := false
@@ -47,7 +54,11 @@ func TestCheckClaimsRego_UnusedClaim(t *testing.T) {
 		File:       "authz.rego",
 		ClaimsRefs: []string{"user_id", "role"},
 	}}
-	claims := map[string]string{"ID": "user_id", "Role": "role", "Email": "email"}
+	claims := map[string]projectconfig.ClaimDef{
+		"ID":    {Key: "user_id", GoType: "int64"},
+		"Role":  {Key: "role", GoType: "string"},
+		"Email": {Key: "email", GoType: "string"},
+	}
 
 	errs := CheckClaimsRego(policies, claims)
 	hasWarning := false

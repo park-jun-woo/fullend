@@ -1,29 +1,22 @@
 apiVersion: fullend/v1
 kind: Project
-
 metadata:
-  name: gigbridge
-
+  name: zenflow
 backend:
   lang: go
   framework: gin
-  module: github.com/gigbridge/api
+  module: github.com/zenflow/zenflow
   middleware:
     - bearerAuth
   auth:
+    type: jwt
     secret_env: JWT_SECRET
     claims:
-      ID: user_id
+      ID: user_id:int64
       Email: email
       Role: role
-    roles: [client, freelancer]
-
 frontend:
   lang: typescript
   framework: react
   bundler: vite
-  name: gigbridge-web
-
-deploy:
-  image: ghcr.io/gigbridge/api
-  domain: gigbridge.example.com
+  name: zenflow-web

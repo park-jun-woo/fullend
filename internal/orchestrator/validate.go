@@ -219,7 +219,7 @@ func runCrossValidate(root string, parsed *genapi.ParsedSSOTs) reporter.StepResu
 	dtoTypes := loadDTOTypes(parsed.ModelDir)
 
 	var middleware []string
-	var claims map[string]string
+	var claims map[string]projectconfig.ClaimDef
 	var roles []string
 	if parsed.Config != nil {
 		middleware = parsed.Config.Backend.Middleware

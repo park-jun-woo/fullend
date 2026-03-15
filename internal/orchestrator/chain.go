@@ -500,42 +500,45 @@ func traceHurlScenarios(opID string, doc *openapi3.T, testsDir string, specsDir 
 }
 
 func traceSTML(doc *openapi3.T, opID string, stmlDir string, specsDir string) []ChainLink {
-	// Find the endpoint path for this operationId.
-	var endpointPath, endpointMethod string
-	if doc.Paths != nil {
-		for path, pi := range doc.Paths.Map() {
-			for method, op := range pi.Operations() {
-				if op.OperationID == opID {
-					endpointPath = path
-					endpointMethod = strings.ToUpper(method)
-					break
-				}
-			}
-			if endpointPath != "" {
-				break
-			}
-		}
-	}
-	if endpointPath == "" {
-		return nil
-	}
-
-	// Grep STML files for the endpoint path.
+	// STML references operationId via data-fetch="OpID" or data-action="OpID".
+	// Search for the operationId directly in STML files.
 	var links []ChainLink
 	matches, _ := filepath.Glob(filepath.Join(stmlDir, "*.html"))
 	for _, m := range matches {
-		line := grepLine(m, endpointPath)
+		line := grepLine(m, opID)
 		if line > 0 {
 			relPath, _ := filepath.Rel(specsDir, m)
+			// Determine if it's fetch or action from the matched line.
+			attr := stmlMatchAttr(m, opID)
 			links = append(links, ChainLink{
 				Kind:    "STML",
 				File:    relPath,
 				Line:    line,
-				Summary: endpointMethod + " " + endpointPath,
+				Summary: attr + "=\"" + opID + "\"",
 			})
 		}
 	}
 	return links
+}
+
+// stmlMatchAttr returns the STML attribute that references the operationId (e.g. "data-fetch", "data-action").
+func stmlMatchAttr(filePath, opID string) string {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return "data-fetch"
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, opID) {
+			if strings.Contains(line, "data-action") {
+				return "data-action"
+			}
+			return "data-fetch"
+		}
+	}
+	return "data-fetch"
 }
 
 // --- helpers ---

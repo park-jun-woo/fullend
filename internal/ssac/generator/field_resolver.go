@@ -45,7 +45,7 @@ func (r *FieldTypeResolver) ResolveFieldType(target string) string {
 		}
 	case "func":
 		for _, spec := range r.fs {
-			if spec.Name == src.ModelName {
+			if strings.EqualFold(spec.Name, src.ModelName) {
 				for _, f := range spec.ResponseFields {
 					if f.Name == fieldName {
 						return f.Type

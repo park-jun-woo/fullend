@@ -18,6 +18,11 @@ Thumbs.db
 
 # Generated artifacts (fullend gen output)
 artifacts/dummy-*/
+artifacts/fullend/
+artifacts/zenflow/
+
+# Compiled binaries in artifacts
+artifacts/*/backend/server
 
 # Local config
 .clari/

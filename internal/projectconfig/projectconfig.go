@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -40,10 +41,18 @@ type Backend struct {
 	Auth       *Auth    `yaml:"auth"`
 }
 
+// ClaimDef describes a single JWT claim with its key and Go type.
+type ClaimDef struct {
+	Key    string // JWT claim key (e.g. "org_id")
+	GoType string // Go type (e.g. "int64"), default "string"
+}
+
 type Auth struct {
-	SecretEnv string            `yaml:"secret_env"`
-	Claims    map[string]string `yaml:"claims"` // FieldName → claim key (e.g. "ID" → "user_id")
-	Roles     []string          `yaml:"roles"`  // valid role names (e.g. ["client", "freelancer"])
+	Type      string              `yaml:"type"`       // "jwt" (required when auth is present)
+	SecretEnv string              `yaml:"secret_env"`
+	RawClaims map[string]string   `yaml:"claims"`     // YAML original: FieldName → "claim_key" or "claim_key:go_type"
+	Claims    map[string]ClaimDef `yaml:"-"`           // Parsed from RawClaims after Load()
+	Roles     []string            `yaml:"roles"`       // valid role names (e.g. ["client", "freelancer"])
 }
 
 type Frontend struct {
@@ -97,11 +106,37 @@ func Load(specsDir string) (*ProjectConfig, error) {
 		return nil, fmt.Errorf("fullend.yaml parse error: %w", err)
 	}
 
+	// Post-process: convert RawClaims → Claims (ClaimDef).
+	if cfg.Backend.Auth != nil && len(cfg.Backend.Auth.RawClaims) > 0 {
+		cfg.Backend.Auth.Claims = make(map[string]ClaimDef, len(cfg.Backend.Auth.RawClaims))
+		for field, raw := range cfg.Backend.Auth.RawClaims {
+			parts := strings.SplitN(raw, ":", 2)
+			def := ClaimDef{Key: parts[0], GoType: "string"}
+			if len(parts) == 2 && parts[1] != "" {
+				def.GoType = parts[1]
+			}
+			cfg.Backend.Auth.Claims[field] = def
+		}
+	}
+
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
 
 	return &cfg, nil
+}
+
+// allowedClaimTypes is the set of Go types allowed in claims definitions.
+var allowedClaimTypes = map[string]bool{
+	"string": true,
+	"int64":  true,
+	"bool":   true,
+}
+
+// jwtReservedKeys are standard JWT claim keys that must not be used as custom claim keys.
+var jwtReservedKeys = map[string]bool{
+	"exp": true, "iat": true, "sub": true, "iss": true,
+	"aud": true, "nbf": true, "jti": true,
 }
 
 // Validate checks required fields.
@@ -118,5 +153,34 @@ func (c *ProjectConfig) Validate() error {
 	if c.Backend.Module == "" {
 		return fmt.Errorf("fullend.yaml: backend.module is required")
 	}
+
+	// Auth section validation.
+	if c.Backend.Auth != nil {
+		auth := c.Backend.Auth
+		if auth.Type == "" {
+			return fmt.Errorf("fullend.yaml: auth.type is required (supported: jwt)")
+		}
+		if auth.Type != "jwt" {
+			return fmt.Errorf("fullend.yaml: auth.type %q is not supported (supported: jwt)", auth.Type)
+		}
+		if len(auth.Claims) == 0 {
+			return fmt.Errorf("fullend.yaml: auth.claims must have at least 1 entry")
+		}
+		// Check each claim.
+		usedKeys := make(map[string]string) // claim_key → field_name (for duplicate detection)
+		for field, def := range auth.Claims {
+			if !allowedClaimTypes[def.GoType] {
+				return fmt.Errorf("fullend.yaml: auth.claims.%s — type %q is not allowed (allowed: string, int64, bool)", field, def.GoType)
+			}
+			if jwtReservedKeys[def.Key] {
+				return fmt.Errorf("fullend.yaml: auth.claims.%s — claim key %q is a reserved JWT key", field, def.Key)
+			}
+			if prev, dup := usedKeys[def.Key]; dup {
+				return fmt.Errorf("fullend.yaml: auth.claims — duplicate claim key %q (used by %s and %s)", def.Key, prev, field)
+			}
+			usedKeys[def.Key] = field
+		}
+	}
+
 	return nil
 }

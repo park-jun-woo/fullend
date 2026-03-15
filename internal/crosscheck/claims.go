@@ -5,12 +5,13 @@ import (
 	"strings"
 
 	"github.com/geul-org/fullend/internal/policy"
+	"github.com/geul-org/fullend/internal/projectconfig"
 	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
 // CheckClaims validates that all currentUser field references in SSaC specs
 // are defined in fullend.yaml backend.auth.claims.
-func CheckClaims(serviceFuncs []ssacparser.ServiceFunc, claims map[string]string) []CrossError {
+func CheckClaims(serviceFuncs []ssacparser.ServiceFunc, claims map[string]projectconfig.ClaimDef) []CrossError {
 	var errs []CrossError
 
 	// Collect all currentUser field usages with locations.
@@ -61,15 +62,15 @@ func CheckClaims(serviceFuncs []ssacparser.ServiceFunc, claims map[string]string
 }
 
 // CheckClaimsRego validates that Rego input.claims.xxx references match fullend.yaml claims values.
-func CheckClaimsRego(policies []*policy.Policy, claims map[string]string) []CrossError {
+func CheckClaimsRego(policies []*policy.Policy, claims map[string]projectconfig.ClaimDef) []CrossError {
 	if claims == nil {
 		return nil
 	}
 
-	// Build set of claim values (e.g., "user_id", "email", "role").
+	// Build set of claim keys (e.g., "user_id", "email", "role").
 	claimValues := make(map[string]bool)
-	for _, v := range claims {
-		claimValues[v] = true
+	for _, def := range claims {
+		claimValues[def.Key] = true
 	}
 
 	// Collect all Rego claims refs across policies.
@@ -96,13 +97,13 @@ func CheckClaimsRego(policies []*policy.Policy, claims map[string]string) []Cros
 		}
 	}
 
-	// Reverse: fullend.yaml claims value → Rego (WARNING if unused)
-	for _, v := range claims {
-		if _, used := regoRefs[v]; !used {
+	// Reverse: fullend.yaml claim keys → Rego (WARNING if unused)
+	for _, def := range claims {
+		if _, used := regoRefs[def.Key]; !used {
 			errs = append(errs, CrossError{
 				Rule:    "Claims ↔ Rego",
 				Context: "fullend.yaml",
-				Message: fmt.Sprintf("claims 값 %q — Rego에서 미참조", v),
+				Message: fmt.Sprintf("claims 값 %q — Rego에서 미참조", def.Key),
 				Level:   "WARNING",
 			})
 		}

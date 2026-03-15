@@ -3,6 +3,7 @@ package contract
 import (
 	"testing"
 
+	"github.com/geul-org/fullend/internal/projectconfig"
 	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 
 	"github.com/geul-org/fullend/internal/statemachine"
@@ -103,7 +104,11 @@ func TestHashStateDiagram_OrderIndependent(t *testing.T) {
 }
 
 func TestHashClaims(t *testing.T) {
-	claims := map[string]string{"user_id": "int64", "email": "string", "role": "string"}
+	claims := map[string]projectconfig.ClaimDef{
+		"ID":    {Key: "user_id", GoType: "int64"},
+		"Email": {Key: "email", GoType: "string"},
+		"Role":  {Key: "role", GoType: "string"},
+	}
 	h1 := HashClaims(claims)
 	h2 := HashClaims(claims)
 	if h1 != h2 {

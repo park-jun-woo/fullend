@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/geul-org/fullend/internal/policy"
+	"github.com/geul-org/fullend/internal/projectconfig"
 	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
@@ -73,8 +73,8 @@ func transformServiceFilesWithDomains(intDir string, serviceFuncs []ssacparser.S
 }
 
 // generateAuthStubWithDomains creates model/auth.go with CurrentUser type and Authorizer interface.
-// CurrentUser fields are derived from fullend.yaml claims config if available.
-func generateAuthStubWithDomains(intDir string, modulePath string, claims map[string]string) error {
+// CurrentUser fields are derived from fullend.yaml claims config.
+func generateAuthStubWithDomains(intDir string, modulePath string, claims map[string]projectconfig.ClaimDef) error {
 	modelDir := filepath.Join(intDir, "model")
 	if err := os.MkdirAll(modelDir, 0755); err != nil {
 		return err
@@ -83,27 +83,15 @@ func generateAuthStubWithDomains(intDir string, modulePath string, claims map[st
 	var b strings.Builder
 	b.WriteString("package model\n\n")
 
-	if claims != nil && len(claims) > 0 {
-		// Generate CurrentUser from claims config — no imports needed.
-		b.WriteString("// CurrentUser is the authenticated user extracted by JWT middleware.\n")
-		b.WriteString("type CurrentUser struct {\n")
-		// Maintain deterministic field order.
-		var fields []string
-		for field := range claims {
-			fields = append(fields, field)
-		}
-		sort.Strings(fields)
-		for _, field := range fields {
-			goType := inferClaimGoType(field)
-			b.WriteString(fmt.Sprintf("\t%s %s\n", field, goType))
-		}
-		b.WriteString("}\n\n")
-	} else {
-		// Fallback: alias to pkg/middleware.CurrentUser.
-		b.WriteString("import \"github.com/geul-org/fullend/pkg/middleware\"\n\n")
-		b.WriteString("// CurrentUser is the authenticated user extracted by JWT middleware.\n")
-		b.WriteString("type CurrentUser = middleware.CurrentUser\n\n")
+	// Generate CurrentUser from claims config — claims are required when auth is present.
+	b.WriteString("// CurrentUser is the authenticated user extracted by JWT middleware.\n")
+	b.WriteString("type CurrentUser struct {\n")
+	fields := sortedClaimFields(claims)
+	for _, field := range fields {
+		def := claims[field]
+		b.WriteString(fmt.Sprintf("\t%s %s\n", field, def.GoType))
 	}
+	b.WriteString("}\n\n")
 
 	b.WriteString("// Authorizer checks permissions.\n")
 	b.WriteString("type Authorizer interface {\n")
@@ -113,17 +101,8 @@ func generateAuthStubWithDomains(intDir string, modulePath string, claims map[st
 	return os.WriteFile(filepath.Join(modelDir, "auth.go"), []byte(b.String()), 0644)
 }
 
-// inferClaimGoType infers Go type from claim field name convention.
-func inferClaimGoType(fieldName string) string {
-	lower := strings.ToLower(fieldName)
-	if strings.HasSuffix(lower, "id") {
-		return "int64"
-	}
-	return "string"
-}
-
 // generateServerStructWithDomains creates per-domain handler.go files and central server.go.
-func generateServerStructWithDomains(intDir string, serviceFuncs []ssacparser.ServiceFunc, modulePath string, doc *openapi3.T, claims map[string]string) error {
+func generateServerStructWithDomains(intDir string, serviceFuncs []ssacparser.ServiceFunc, modulePath string, doc *openapi3.T) error {
 	serviceDir := filepath.Join(intDir, "service")
 	domains := uniqueDomains(serviceFuncs)
 

@@ -1,0 +1,8 @@
+package service
+
+// @auth "CreateWorkflow" "workflow" {ResourceID: request.id} "Only admins can add actions" 403
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "Workflow not found" 404
+// @post Action action = Action.Create({WorkflowID: request.id, ActionType: request.action_type, PayloadTemplate: request.payload_template, SequenceOrder: request.sequence_order})
+// @response { action: action }
+func AddAction() {}

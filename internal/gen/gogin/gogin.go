@@ -12,6 +12,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/geul-org/fullend/internal/genapi"
+	"github.com/geul-org/fullend/internal/projectconfig"
 	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 )
 
@@ -31,11 +32,13 @@ func (g *GoGin) Generate(parsed *genapi.ParsedSSOTs, cfg *genapi.GenConfig) erro
 	}
 
 	// Extract config values.
-	var claims map[string]string
+	var claims map[string]projectconfig.ClaimDef
+	var secretEnv string
 	var queueBackend string
 	if parsed.Config != nil {
 		if parsed.Config.Backend.Auth != nil {
 			claims = parsed.Config.Backend.Auth.Claims
+			secretEnv = parsed.Config.Backend.Auth.SecretEnv
 		}
 		if parsed.Config.Queue != nil {
 			queueBackend = parsed.Config.Queue.Backend
@@ -63,11 +66,14 @@ func (g *GoGin) Generate(parsed *genapi.ParsedSSOTs, cfg *genapi.GenConfig) erro
 			return fmt.Errorf("auth (domain): %w", err)
 		}
 		if len(claims) > 0 {
+			if err := generateAuthPackage(intDir, cfg.ModulePath, claims, secretEnv); err != nil {
+				return fmt.Errorf("auth package (domain): %w", err)
+			}
 			if err := generateMiddleware(intDir, cfg.ModulePath, claims); err != nil {
 				return fmt.Errorf("middleware (domain): %w", err)
 			}
 		}
-		if err := generateServerStructWithDomains(intDir, parsed.ServiceFuncs, cfg.ModulePath, parsed.OpenAPIDoc, claims); err != nil {
+		if err := generateServerStructWithDomains(intDir, parsed.ServiceFuncs, cfg.ModulePath, parsed.OpenAPIDoc); err != nil {
 			return fmt.Errorf("server.go (domain): %w", err)
 		}
 		if err := generateMainWithDomains(cfg.ArtifactsDir, parsed.ServiceFuncs, cfg.ModulePath, queueBackend, parsed.Policies); err != nil {
@@ -247,6 +253,12 @@ func transformSource(src string, models, funcs []string, modulePath string, isDo
 	// Fix config import: "config" → "github.com/geul-org/fullend/pkg/config"
 	if strings.Contains(src, "\t\"config\"\n") {
 		src = strings.ReplaceAll(src, "\t\"config\"\n", "\t\"github.com/geul-org/fullend/pkg/config\"\n")
+	}
+
+	// Fix auth import: pkg/auth → project internal/auth (reexport.go bridges pkg/auth utilities)
+	if strings.Contains(src, "\"github.com/geul-org/fullend/pkg/auth\"") {
+		src = strings.ReplaceAll(src, "\"github.com/geul-org/fullend/pkg/auth\"",
+			fmt.Sprintf("\"%s/internal/auth\"", modulePath))
 	}
 
 	// Remove bare "model" import (already added as full path above)

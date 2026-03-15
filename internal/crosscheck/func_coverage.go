@@ -2,6 +2,7 @@ package crosscheck
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/geul-org/fullend/internal/funcspec"
 	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
@@ -12,12 +13,12 @@ func CheckFuncCoverage(
 	funcs []ssacparser.ServiceFunc,
 	projectFuncSpecs []funcspec.FuncSpec,
 ) []CrossError {
-	// Collect pkg.Function names referenced by SSaC @call sequences.
+	// Collect pkg.Function names referenced by SSaC @call sequences (lowercased for case-insensitive match).
 	referenced := make(map[string]bool)
 	for _, fn := range funcs {
 		for _, seq := range fn.Sequences {
 			if seq.Type == "call" && seq.Model != "" {
-				referenced[seq.Model] = true
+				referenced[strings.ToLower(seq.Model)] = true
 			}
 		}
 	}
@@ -25,7 +26,7 @@ func CheckFuncCoverage(
 	var errs []CrossError
 	for _, spec := range projectFuncSpecs {
 		key := spec.Package + "." + spec.Name
-		if !referenced[key] {
+		if !referenced[strings.ToLower(key)] {
 			errs = append(errs, CrossError{
 				Rule:       "Func → SSaC",
 				Context:    key,

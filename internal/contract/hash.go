@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/geul-org/fullend/internal/projectconfig"
 	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 
 	"github.com/geul-org/fullend/internal/statemachine"
@@ -85,8 +86,8 @@ func HashStateDiagram(sd *statemachine.StateDiagram) string {
 }
 
 // HashClaims computes a contract hash for middleware claims (CurrentUser).
-// Based on: sorted claim name:type pairs.
-func HashClaims(claims map[string]string) string {
+// Based on: sorted field:key:type triples.
+func HashClaims(claims map[string]projectconfig.ClaimDef) string {
 	keys := make([]string, 0, len(claims))
 	for k := range claims {
 		keys = append(keys, k)
@@ -95,7 +96,8 @@ func HashClaims(claims map[string]string) string {
 
 	var parts []string
 	for _, k := range keys {
-		parts = append(parts, k+":"+claims[k])
+		def := claims[k]
+		parts = append(parts, k+":"+def.Key+":"+def.GoType)
 	}
 	return Hash7(strings.Join(parts, ","))
 }

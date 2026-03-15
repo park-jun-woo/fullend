@@ -1,0 +1,16 @@
+package service
+
+import "github.com/zenflow/zenflow/internal/billing"
+
+// @auth "ActivateWorkflow" "workflow" {ResourceID: request.id} "Only admins can activate workflows" 403
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "Workflow not found" 404
+// @get Organization org = Organization.FindByID({ID: workflow.OrgID})
+// @empty org "Organization not found" 404
+// @call billing.CheckCreditsResponse credits = billing.CheckCredits({OrgID: org.ID})
+// @state workflow {Status: workflow.Status} "ActivateWorkflow" "Cannot activate workflow" 409
+// @put Workflow.UpdateStatus({ID: workflow.ID, Status: "active"})
+// @get Workflow updated = Workflow.FindByID({ID: workflow.ID})
+// @empty updated "Workflow not found" 404
+// @response { workflow: updated }
+func ActivateWorkflow() {}

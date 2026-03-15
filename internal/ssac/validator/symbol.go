@@ -328,7 +328,7 @@ func stripModelPrefix(queryName, modelName string) string {
 func sqlFileToModel(filename string) string {
 	name := strings.TrimSuffix(filename, ".sql")
 	singular := inflection.Singular(name)
-	return strings.ToUpper(singular[:1]) + singular[1:]
+	return strcase.ToGoPascal(singular)
 }
 
 // loadOpenAPI는 openapi.yaml에서 operationId별 request/response 필드를 추출한다.
