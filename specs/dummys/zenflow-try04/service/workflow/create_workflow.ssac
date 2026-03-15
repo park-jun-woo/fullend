@@ -1,0 +1,7 @@
+package service
+
+// @auth "CreateWorkflow" "workflow" {} "Not authorized" 403
+// @get User creator = User.FindByID({ID: currentUser.UserID})
+// @post Workflow wf = Workflow.Create({OrgID: creator.OrgID, Title: request.title, TriggerEvent: request.trigger_event})
+// @response { workflow: wf }
+func CreateWorkflow() {}

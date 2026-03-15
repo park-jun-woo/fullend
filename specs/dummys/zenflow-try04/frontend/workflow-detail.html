@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><title>Workflow Detail</title></head>
+<body>
+  <section data-fetch="GetWorkflow" data-param-id="route.id">
+    <div data-state=".loading">Loading...</div>
+    <h1 data-bind="workflow.title"></h1>
+    <p data-bind="workflow.status"></p>
+    <p data-bind="workflow.trigger_event"></p>
+  </section>
+  <form data-action="ActivateWorkflow" data-param-id="route.id">
+    <button type="submit">Activate</button>
+  </form>
+  <form data-action="PauseWorkflow" data-param-id="route.id">
+    <button type="submit">Pause</button>
+  </form>
+  <form data-action="ExecuteWorkflow" data-param-id="route.id">
+    <button type="submit">Execute</button>
+  </form>
+</body>
+</html>

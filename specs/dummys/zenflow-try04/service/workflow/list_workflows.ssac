@@ -1,0 +1,7 @@
+package service
+
+// @auth "ListWorkflows" "workflow" {} "Not authorized" 403
+// @get User viewer = User.FindByID({ID: currentUser.UserID})
+// @get []Workflow workflows = Workflow.ListByOrgID({OrgID: viewer.OrgID})
+// @response { workflows: workflows }
+func ListWorkflows() {}

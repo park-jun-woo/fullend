@@ -18,6 +18,7 @@ Thumbs.db
 
 # Generated artifacts (fullend gen output)
 artifacts/dummy-*/
+artifacts/dummys/
 artifacts/fullend/
 artifacts/zenflow/
 
