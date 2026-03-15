@@ -1,11 +1,11 @@
+//ff:func feature=genapi type=command
+//ff:what parsed SSOT에서 backend + frontend + hurl 전체 코드를 생성한다
 package gen
 
 import (
-	"github.com/geul-org/fullend/internal/gen/gogin"
 	"github.com/geul-org/fullend/internal/gen/hurl"
 	"github.com/geul-org/fullend/internal/gen/react"
 	"github.com/geul-org/fullend/internal/genapi"
-	"github.com/geul-org/fullend/internal/projectconfig"
 )
 
 // Generate creates all artifacts from parsed SSOTs.
@@ -24,9 +24,4 @@ func Generate(parsed *genapi.ParsedSSOTs, cfg *genapi.GenConfig, stmlOut *genapi
 		return err
 	}
 	return nil
-}
-
-func selectBackend(cfg *projectconfig.ProjectConfig) genapi.Backend {
-	// Future: branch on cfg.Backend field.
-	return &gogin.GoGin{}
 }

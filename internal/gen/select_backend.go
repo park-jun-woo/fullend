@@ -1,0 +1,14 @@
+//ff:func feature=genapi type=util
+//ff:what 설정에 따라 백엔드 코드젠 구현체를 선택한다
+package gen
+
+import (
+	"github.com/geul-org/fullend/internal/gen/gogin"
+	"github.com/geul-org/fullend/internal/genapi"
+	"github.com/geul-org/fullend/internal/projectconfig"
+)
+
+func selectBackend(cfg *projectconfig.ProjectConfig) genapi.Backend {
+	// Future: branch on cfg.Backend field.
+	return &gogin.GoGin{}
+}
