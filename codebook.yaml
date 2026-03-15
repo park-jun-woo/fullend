@@ -1,0 +1,50 @@
+required:
+  feature:
+    - orchestrator
+    - crosscheck
+    - ssac-parse
+    - ssac-validate
+    - ssac-gen
+    - stml-parse
+    - stml-validate
+    - stml-gen
+    - funcspec
+    - gen-gogin
+    - gen-hurl
+    - gen-react
+    - genmodel
+    - genapi
+    - projectconfig
+    - statemachine
+    - policy
+    - scenario
+    - reporter
+    - contract
+    - symbol
+    - cli
+  type:
+    - command
+    - rule
+    - parser
+    - generator
+    - model
+    - formatter
+    - loader
+    - util
+    - walker
+
+optional:
+  ssot:
+    - openapi
+    - ddl
+    - ssac
+    - stml
+    - states
+    - policy
+    - scenario
+    - funcspec
+    - config
+  pattern:
+    - error-collection
+    - early-return
+    - symbol-table

@@ -24,17 +24,17 @@ func SetupRouter(s *Server) *gin.Engine {
 	auth := r.Group("/")
 	auth.Use(middleware.BearerAuth(s.JWTSecret))
 
+	auth.POST("/workflows/:id/pause", s.Workflow.PauseWorkflow)
+	auth.GET("/workflows/:id", s.Workflow.GetWorkflow)
+	auth.POST("/workflows/:id/actions", s.Workflow.AddAction)
+	auth.POST("/workflows/:id/execute", s.Workflow.ExecuteWorkflow)
+	r.POST("/auth/register", s.Auth.Register)
 	auth.GET("/execution-logs", s.Log.ListExecutionLogs)
 	auth.GET("/workflows", s.Workflow.ListWorkflows)
 	auth.POST("/workflows", s.Workflow.CreateWorkflow)
-	auth.POST("/workflows/:id/pause", s.Workflow.PauseWorkflow)
-	r.POST("/auth/register", s.Auth.Register)
-	auth.POST("/workflows/:id/actions", s.Workflow.AddAction)
-	auth.GET("/workflows/:id", s.Workflow.GetWorkflow)
 	auth.POST("/workflows/:id/activate", s.Workflow.ActivateWorkflow)
 	r.POST("/auth/login", s.Auth.Login)
 	auth.POST("/workflows/:id/archive", s.Workflow.ArchiveWorkflow)
-	auth.POST("/workflows/:id/execute", s.Workflow.ExecuteWorkflow)
 
 	return r
 }
