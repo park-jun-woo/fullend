@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=request-params
 //ff:what 여러 요청 파라미터를 JSON body 바인딩 코드로 변환
 package generator
 
@@ -7,18 +7,20 @@ import (
 	"fmt"
 
 	"github.com/ettle/strcase"
+	"github.com/geul-org/fullend/internal/ssac/validator"
 )
 
-func buildJSONBodyParams(rawParams []rawParam) []typedRequestParam {
+func buildJSONBodyParams(rawParams []rawParam, rs *validator.RequestSchema) []typedRequestParam {
 	var buf bytes.Buffer
 
 	buf.WriteString("\tvar req struct {\n")
 	for _, rp := range rawParams {
-		buf.WriteString(fmt.Sprintf("\t\t%s %s `json:\"%s\"`\n", strcase.ToGoPascal(rp.name), rp.goType, rp.name))
+		tag := buildFieldTag(rp.name, rs)
+		buf.WriteString(fmt.Sprintf("\t\t%s %s `%s`\n", strcase.ToGoPascal(rp.name), rp.goType, tag))
 	}
 	buf.WriteString("\t}\n")
 	buf.WriteString("\tif err := c.ShouldBindJSON(&req); err != nil {\n")
-	buf.WriteString("\t\tc.JSON(http.StatusBadRequest, gin.H{\"error\": \"invalid request body\"})\n")
+	buf.WriteString("\t\tc.JSON(http.StatusBadRequest, gin.H{\"error\": err.Error()})\n")
 	buf.WriteString("\t\treturn\n")
 	buf.WriteString("\t}\n")
 	for _, rp := range rawParams {

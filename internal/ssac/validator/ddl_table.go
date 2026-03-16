@@ -1,4 +1,4 @@
-//ff:type feature=symbol type=model
+//ff:type feature=symbol type=model topic=ddl
 //ff:what DDL에서 파싱한 테이블 컬럼 정보
 package validator
 
@@ -9,4 +9,6 @@ type DDLTable struct {
 	ForeignKeys []ForeignKey      // FK 관계 목록
 	Indexes     []Index           // 인덱스 목록
 	PrimaryKey  []string          // PK 컬럼명 목록 (e.g. ["id"])
+	VarcharLen  map[string]int    // col → VARCHAR(N)의 N
+	CheckEnums  map[string][]string // col → CHECK IN 값 목록
 }

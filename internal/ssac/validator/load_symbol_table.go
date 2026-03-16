@@ -19,7 +19,8 @@ func LoadSymbolTable(root string) (*SymbolTable, error) {
 		Operations: make(map[string]OperationSymbol),
 		Funcs:      make(map[string]bool),
 		DDLTables:  make(map[string]DDLTable),
-		DTOs:       make(map[string]bool),
+		DTOs:           make(map[string]bool),
+		RequestSchemas: make(map[string]RequestSchema),
 	}
 
 	if err := st.loadDDL(filepath.Join(root, "db")); err != nil {

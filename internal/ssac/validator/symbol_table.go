@@ -8,7 +8,8 @@ type SymbolTable struct {
 	Operations map[string]OperationSymbol // "Login" → {RequestFields, PathParams, ...}
 	Funcs      map[string]bool            // "calculateRefund" → true
 	DDLTables  map[string]DDLTable        // "users" → {Columns: {"id": "int64", ...}}
-	DTOs map[string]bool // "Token" → true (DDL 테이블 없는 순수 DTO)
+	DTOs           map[string]bool              // "Token" → true (DDL 테이블 없는 순수 DTO)
+	RequestSchemas map[string]RequestSchema     // operationId → requestBody 필드 제약
 }
 
 // Clone returns a shallow copy of the SymbolTable with a deep-copied Models map.
@@ -16,10 +17,11 @@ type SymbolTable struct {
 // since only Models is mutated by injectFuncErrStatus in the gen path.
 func (st *SymbolTable) Clone() *SymbolTable {
 	clone := &SymbolTable{
-		Operations: st.Operations,
-		Funcs:      st.Funcs,
-		DDLTables:  st.DDLTables,
-		DTOs:       st.DTOs,
+		Operations:     st.Operations,
+		Funcs:          st.Funcs,
+		DDLTables:      st.DDLTables,
+		DTOs:           st.DTOs,
+		RequestSchemas: st.RequestSchemas,
 		Models:     make(map[string]ModelSymbol, len(st.Models)),
 	}
 	for k, ms := range st.Models {

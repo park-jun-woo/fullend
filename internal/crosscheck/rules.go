@@ -146,4 +146,13 @@ var rules = []Rule{
 			return CheckRoles(in.Policies, in.Roles)
 		},
 	},
+	{
+		Name: "OpenAPI Constraints", Source: "OpenAPI", Target: "DDL",
+		Requires: func(in *CrossValidateInput) bool {
+			return in.SymbolTable != nil && in.SymbolTable.RequestSchemas != nil && in.ServiceFuncs != nil
+		},
+		Check: func(in *CrossValidateInput) []CrossError {
+			return CheckOpenAPIConstraints(in)
+		},
+	},
 }

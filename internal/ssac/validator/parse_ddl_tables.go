@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=parser control=iteration dimension=1
+//ff:func feature=symbol type=parser control=iteration dimension=1 topic=ddl
 //ff:what CREATE TABLE 문에서 컬럼명, 타입, FK, 인덱스를 추출한다
 package validator
 
@@ -53,8 +53,13 @@ func parseDDLTables(content string, tables map[string]DDLTable) {
 			continue
 		}
 
-		// CHECK → skip
-		if strings.HasPrefix(upper, "CHECK") || line == "" {
+		if line == "" {
+			continue
+		}
+
+		// CHECK → parse enum values if present
+		if strings.HasPrefix(upper, "CHECK") {
+			applyCheckEnum(line, "", currentTable, tables)
 			continue
 		}
 
@@ -76,6 +81,10 @@ func parseDDLTables(content string, tables map[string]DDLTable) {
 		t.Columns[colName] = goType
 		t.ColumnOrder = append(t.ColumnOrder, colName)
 		applyInlineConstraints(&t, upper, colName, parts)
+		applyVarcharLen(&t, colName, colType)
+		if strings.Contains(upper, "CHECK") {
+			applyCheckEnum(line, colName, currentTable, tables)
+		}
 		tables[currentTable] = t
 	}
 }
