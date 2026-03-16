@@ -1,3 +1,5 @@
+//ff:func feature=pkg-crypto type=util control=sequence
+//ff:what 평문을 AES-256-GCM으로 암호화한다
 package crypto
 
 import (
@@ -11,15 +13,6 @@ import (
 
 // @func encrypt
 // @description 평문을 AES-256-GCM으로 암호화한다
-
-type EncryptRequest struct {
-	Plaintext string
-	Key       string // 32바이트 hex
-}
-
-type EncryptResponse struct {
-	Ciphertext string // base64 인코딩
-}
 
 func Encrypt(req EncryptRequest) (EncryptResponse, error) {
 	keyBytes, err := hex.DecodeString(req.Key)

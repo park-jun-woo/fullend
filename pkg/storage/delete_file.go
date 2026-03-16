@@ -1,3 +1,5 @@
+//ff:func feature=pkg-storage type=util control=sequence
+//ff:what S3 호환 스토리지에서 파일을 삭제한다
 package storage
 
 import (
@@ -9,15 +11,6 @@ import (
 
 // @func deleteFile
 // @description S3 호환 스토리지에서 파일을 삭제한다
-
-type DeleteFileRequest struct {
-	Bucket   string
-	Key      string
-	Endpoint string
-	Region   string
-}
-
-type DeleteFileResponse struct{}
 
 func DeleteFile(req DeleteFileRequest) (DeleteFileResponse, error) {
 	client, err := newS3Client(req.Endpoint, req.Region)

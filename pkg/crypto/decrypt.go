@@ -1,3 +1,5 @@
+//ff:func feature=pkg-crypto type=util control=sequence
+//ff:what AES-256-GCM 암호문을 복호화한다
 package crypto
 
 import (
@@ -10,15 +12,6 @@ import (
 
 // @func decrypt
 // @description AES-256-GCM 암호문을 복호화한다
-
-type DecryptRequest struct {
-	Ciphertext string // base64 인코딩
-	Key        string // 32바이트 hex
-}
-
-type DecryptResponse struct {
-	Plaintext string
-}
 
 func Decrypt(req DecryptRequest) (DecryptResponse, error) {
 	data, err := base64.StdEncoding.DecodeString(req.Ciphertext)

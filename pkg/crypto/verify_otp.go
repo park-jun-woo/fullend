@@ -1,3 +1,5 @@
+//ff:func feature=pkg-crypto type=util control=sequence
+//ff:what TOTP 코드가 시크릿과 일치하는지 검증한다
 package crypto
 
 import (
@@ -8,13 +10,6 @@ import (
 
 // @func verifyOTP
 // @description TOTP 코드가 시크릿과 일치하는지 검증한다
-
-type VerifyOTPRequest struct {
-	Code   string
-	Secret string
-}
-
-type VerifyOTPResponse struct{}
 
 func VerifyOTP(req VerifyOTPRequest) (VerifyOTPResponse, error) {
 	if !totp.Validate(req.Code, req.Secret) {

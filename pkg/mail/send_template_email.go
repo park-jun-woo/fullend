@@ -1,3 +1,5 @@
+//ff:func feature=pkg-mail type=util control=sequence
+//ff:what Go 템플릿으로 HTML 이메일을 발송한다
 package mail
 
 import (
@@ -11,14 +13,6 @@ import (
 
 // @func sendTemplateEmail
 // @description Go 템플릿으로 HTML 이메일을 발송한다
-
-type SendTemplateEmailRequest struct {
-	To           string
-	Subject      string
-	TemplateName string
-}
-
-type SendTemplateEmailResponse struct{}
 
 func SendTemplateEmail(req SendTemplateEmailRequest) (SendTemplateEmailResponse, error) {
 	host := os.Getenv("SMTP_HOST")

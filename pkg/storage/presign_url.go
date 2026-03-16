@@ -1,3 +1,5 @@
+//ff:func feature=pkg-storage type=util control=sequence
+//ff:what 서명된 다운로드 URL을 생성한다
 package storage
 
 import (
@@ -10,18 +12,6 @@ import (
 
 // @func presignURL
 // @description 서명된 다운로드 URL을 생성한다
-
-type PresignURLRequest struct {
-	Bucket    string
-	Key       string
-	ExpiresIn int // 초 단위 (기본 3600)
-	Endpoint  string
-	Region    string
-}
-
-type PresignURLResponse struct {
-	URL string
-}
 
 func PresignURL(req PresignURLRequest) (PresignURLResponse, error) {
 	client, err := newS3Client(req.Endpoint, req.Region)

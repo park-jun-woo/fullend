@@ -22,6 +22,19 @@ required:
     - contract
     - symbol
     - cli
+    - pkg-auth
+    - pkg-authz
+    - pkg-cache
+    - pkg-config
+    - pkg-crypto
+    - pkg-file
+    - pkg-image
+    - pkg-mail
+    - pkg-pagination
+    - pkg-queue
+    - pkg-session
+    - pkg-storage
+    - pkg-text
   type:
     - command
     - rule

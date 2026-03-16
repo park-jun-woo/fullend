@@ -1,3 +1,5 @@
+//ff:func feature=pkg-auth type=util control=sequence
+//ff:what 비밀번호 리셋용 32바이트 랜덤 hex 토큰을 생성한다
 package auth
 
 import (
@@ -7,12 +9,6 @@ import (
 
 // @func generateResetToken
 // @description 비밀번호 리셋용 32바이트 랜덤 hex 토큰을 생성한다
-
-type GenerateResetTokenRequest struct{}
-
-type GenerateResetTokenResponse struct {
-	Token string
-}
 
 func GenerateResetToken(req GenerateResetTokenRequest) (GenerateResetTokenResponse, error) {
 	b := make([]byte, 32)

@@ -1,3 +1,5 @@
+//ff:func feature=pkg-image type=util control=sequence
+//ff:what 이미지를 OG 이미지 규격(1200x630)으로 크롭하여 PNG로 출력한다
 package image
 
 import (
@@ -8,14 +10,6 @@ import (
 
 // @func ogImage
 // @description 이미지를 OG 이미지 규격(1200x630)으로 크롭하여 PNG로 출력한다
-
-type OgImageRequest struct {
-	Data []byte
-}
-
-type OgImageResponse struct {
-	Data []byte
-}
 
 func OgImage(req OgImageRequest) (OgImageResponse, error) {
 	src, err := imaging.Decode(bytes.NewReader(req.Data))

@@ -1,3 +1,5 @@
+//ff:func feature=pkg-storage type=util control=sequence
+//ff:what S3 클라이언트를 생성한다
 package storage
 
 import (

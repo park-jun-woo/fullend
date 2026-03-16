@@ -1,3 +1,5 @@
+//ff:func feature=pkg-storage type=util control=sequence
+//ff:what S3 호환 스토리지에 파일을 업로드한다
 package storage
 
 import (
@@ -11,19 +13,6 @@ import (
 
 // @func uploadFile
 // @description S3 호환 스토리지에 파일을 업로드한다
-
-type UploadFileRequest struct {
-	Bucket      string
-	Key         string
-	Data        []byte
-	ContentType string
-	Endpoint    string // MinIO 등 커스텀 엔드포인트 (빈 문자열이면 AWS 기본)
-	Region      string
-}
-
-type UploadFileResponse struct {
-	URL string
-}
 
 func UploadFile(req UploadFileRequest) (UploadFileResponse, error) {
 	client, err := newS3Client(req.Endpoint, req.Region)
