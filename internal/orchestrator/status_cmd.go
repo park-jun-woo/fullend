@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=iteration
 //ff:what Status collects SSOT stats and returns lines to display.
 
 package orchestrator

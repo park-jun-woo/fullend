@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=model
+//ff:func feature=orchestrator type=model control=sequence
 //ff:what NotDirError.Error returns the error message for NotDirError.
 
 package orchestrator

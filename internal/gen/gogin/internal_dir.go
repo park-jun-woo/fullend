@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what returns the backend/internal/ base path for artifact output
 
 package gogin

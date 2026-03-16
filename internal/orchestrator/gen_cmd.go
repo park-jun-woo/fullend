@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=sequence
 //ff:what Gen runs validate first, then generates code from all detected SSOTs.
 
 package orchestrator

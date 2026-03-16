@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=iteration
 //ff:what Walks stateDiagrams BFS from initial state, returning event -> order index for sorting.
 package hurl
 

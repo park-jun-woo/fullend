@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=iteration
 //ff:what generates Go code for []authz.OwnershipMapping literal
 
 package gogin

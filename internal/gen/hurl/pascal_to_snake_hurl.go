@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=sequence
 //ff:what Converts PascalCase to snake_case for Hurl variable names.
 package hurl
 

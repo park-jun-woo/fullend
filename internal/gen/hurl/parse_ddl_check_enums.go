@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=parser
+//ff:func feature=gen-hurl type=parser control=iteration
 //ff:what Parses DDL CHECK constraints with IN (...) to extract enum values per column.
 package hurl
 

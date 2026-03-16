@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=iteration
 //ff:what resolves x-include specs against DDL FK relationships
 
 package gogin

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=iteration
 //ff:what creates model/auth.go with CurrentUser type and Authorizer interface from claims config
 
 package gogin

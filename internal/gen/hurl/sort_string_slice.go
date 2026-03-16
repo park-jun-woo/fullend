@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=iteration
 //ff:what 문자열 슬라이스를 정렬한다
 package hurl
 

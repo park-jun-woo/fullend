@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule
+//ff:func feature=orchestrator type=rule control=iteration
 //ff:what OPA Rego 정책 검증 — 파일 수, 규칙 수, 소유권 매핑 수 집계
 package orchestrator
 

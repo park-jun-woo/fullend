@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=iteration
 //ff:what returns sorted unique non-empty domain names from service functions
 
 package gogin

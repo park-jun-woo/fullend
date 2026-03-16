@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=generator
+//ff:func feature=orchestrator type=generator control=sequence
 //ff:what generateSqlcConfig creates sqlc.yaml from detected DDL files.
 
 package orchestrator

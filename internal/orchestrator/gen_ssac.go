@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=sequence
 //ff:what genSSaC generates service functions and model interfaces from SSaC specs.
 
 package orchestrator

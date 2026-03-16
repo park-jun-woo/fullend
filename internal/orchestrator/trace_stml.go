@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what traceSTML finds STML frontend files referencing the given operationId.
 
 package orchestrator

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=parser
+//ff:func feature=gen-gogin type=parser control=iteration
 //ff:what extracts param count, column names, and cleans up the SQL body
 
 package gogin

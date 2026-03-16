@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what tracePolicy finds Rego policies referenced by @auth sequences.
 
 package orchestrator

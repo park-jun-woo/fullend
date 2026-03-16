@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=sequence
 //ff:what SSOT 검증 메인 엔트리포인트 — 개별 검증 + 교차 검증 오케스트레이션
 package orchestrator
 

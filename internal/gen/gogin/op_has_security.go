@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what returns true if an OpenAPI operation has a non-empty security requirement
 
 package gogin

@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util
+//ff:func feature=symbol type=util control=iteration dimension=1
 //ff:what WHERE/SET 절에서 col = $N 패턴을 추출하여 $N 순서대로 반환한다
 package validator
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule
+//ff:func feature=ssac-validate type=rule control=iteration dimension=2
 //ff:what SSaC query 사용과 OpenAPI x-extensions 교차 검증
 
 package validator
@@ -18,13 +18,14 @@ func validateQueryUsage(sf parser.ServiceFunc, st *SymbolTable) []ValidationErro
 
 	specHasQuery := false
 	for _, seq := range sf.Sequences {
-		for _, val := range seq.Inputs {
-			if val == "query" {
-				specHasQuery = true
-				break
-			}
-		}
 		if specHasQuery {
+			break
+		}
+		for _, val := range seq.Inputs {
+			if val != "query" {
+				continue
+			}
+			specHasQuery = true
 			break
 		}
 	}

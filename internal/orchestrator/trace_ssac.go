@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what traceSSaC locates the SSaC service function and summarizes its sequence types.
 
 package orchestrator

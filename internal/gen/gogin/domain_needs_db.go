@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=iteration
 //ff:what checks if any service function in the domain has write sequences (post/put/delete)
 
 package gogin

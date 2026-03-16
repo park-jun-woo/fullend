@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util
+//ff:func feature=ssac-validate type=util control=sequence
 //ff:what Arg가 변수 참조인 경우 루트 변수명을 반환한다
 package validator
 

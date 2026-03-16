@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=parser
+//ff:func feature=gen-gogin type=parser control=iteration
 //ff:what parses query SQL files and extracts sqlc query annotations
 
 package gogin

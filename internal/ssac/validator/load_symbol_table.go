@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=loader
+//ff:func feature=symbol type=loader control=sequence
 //ff:what 프로젝트 디렉토리에서 심볼 테이블을 구성한다
 package validator
 

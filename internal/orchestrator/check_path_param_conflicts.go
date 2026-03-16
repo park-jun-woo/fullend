@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule
+//ff:func feature=orchestrator type=rule control=iteration
 //ff:what 경로 파라미터 이름 충돌 감지 — 같은 세그먼트 위치에서 다른 파라미터 이름 검출
 package orchestrator
 

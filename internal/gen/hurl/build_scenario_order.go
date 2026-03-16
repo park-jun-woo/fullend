@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=iteration
 //ff:what Scenario ordering logic — dependency-aware sorting of endpoints for smoke tests.
 package hurl
 

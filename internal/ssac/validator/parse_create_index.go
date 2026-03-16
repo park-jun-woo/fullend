@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util
+//ff:func feature=symbol type=util control=iteration dimension=1
 //ff:what CREATE INDEX 문을 파싱한다
 package validator
 

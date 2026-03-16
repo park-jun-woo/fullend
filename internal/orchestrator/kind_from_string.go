@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=sequence
 //ff:what KindFromString parses a CLI --skip value into a SSOTKind.
 
 package orchestrator

@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what traceArtifacts finds generated code artifacts connected to the operationId.
 
 package orchestrator

@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=iteration
 //ff:what genFunc copies custom func spec Go files to the artifacts directory.
 
 package orchestrator

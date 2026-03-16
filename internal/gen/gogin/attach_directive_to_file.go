@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=sequence
 //ff:what injects a //fullend:gen directive into a single service .go file
 
 package gogin

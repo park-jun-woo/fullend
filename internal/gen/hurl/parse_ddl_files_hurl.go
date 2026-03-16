@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=parser
+//ff:func feature=gen-hurl type=parser control=iteration
 //ff:what DDL 파일에서 FK 관계를 파싱한다
 package hurl
 

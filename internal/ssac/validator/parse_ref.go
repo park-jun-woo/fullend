@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util
+//ff:func feature=symbol type=util control=sequence
 //ff:what "users(id)" → ("users", "id") を파싱한다
 package validator
 

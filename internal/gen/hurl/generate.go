@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=sequence
 //ff:what Creates Hurl smoke tests from parsed SSOTs (public entry point).
 package hurl
 

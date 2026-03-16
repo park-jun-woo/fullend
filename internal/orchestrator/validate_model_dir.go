@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule
+//ff:func feature=orchestrator type=rule control=sequence
 //ff:what model 디렉토리 검증 — *.go 파일 존재 여부 확인
 package orchestrator
 

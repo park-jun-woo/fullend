@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=sequence
 //ff:what creates internal/auth/reexport.go that re-exports pkg/auth utilities
 
 package gogin

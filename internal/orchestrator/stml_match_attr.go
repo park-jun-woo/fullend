@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what stmlMatchAttr returns the STML attribute that references the operationId.
 
 package orchestrator

@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=iteration
 //ff:what GenWith runs code generation with the specified TargetProfile.
 
 package orchestrator

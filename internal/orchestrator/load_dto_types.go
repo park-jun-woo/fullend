@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=loader
+//ff:func feature=orchestrator type=loader control=iteration
 //ff:what 모델 파일에서 @dto 타입 로드 — model/*.go 스캔
 package orchestrator
 

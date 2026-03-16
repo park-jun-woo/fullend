@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=command
+//ff:func feature=ssac-validate type=command control=iteration dimension=1
 //ff:what SSaC 검증 메인 엔트리포인트 — []ServiceFunc의 내부 정합성을 검증한다
 package validator
 

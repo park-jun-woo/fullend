@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=iteration
 //ff:what 응답 스키마를 추출한다
 package hurl
 

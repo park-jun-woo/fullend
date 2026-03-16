@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=sequence
 //ff:what Returns sort order for auth operations (register before login).
 package hurl
 

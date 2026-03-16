@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule
+//ff:func feature=ssac-validate type=rule control=iteration dimension=2
 //ff:what @call inputs 필드 타입과 func Request struct 필드 타입 비교
 
 package validator
@@ -19,10 +19,11 @@ func validateCallInputTypes(sf parser.ServiceFunc, st *SymbolTable) []Validation
 	// result 변수 → 모델명 매핑 (DDL 타입 추적용)
 	resultModels := map[string]string{}
 	for _, seq := range sf.Sequences {
-		if seq.Result != nil && seq.Model != "" {
-			parts := strings.SplitN(seq.Model, ".", 2)
-			resultModels[seq.Result.Var] = parts[0]
+		if seq.Result == nil || seq.Model == "" {
+			continue
 		}
+		parts := strings.SplitN(seq.Model, ".", 2)
+		resultModels[seq.Result.Var] = parts[0]
 	}
 
 	var errs []ValidationError
@@ -59,9 +60,10 @@ func validateCallInputTypes(sf parser.ServiceFunc, st *SymbolTable) []Validation
 				continue // 필드가 Request struct에 없으면 다른 검증에서 처리
 			}
 			actualType := resolveCallInputType(val, resultModels, st)
-			if actualType != "" && actualType != expectedType {
-				errs = append(errs, ctx.err("@call", fmt.Sprintf("입력 %q의 타입 불일치: %s은 %s, Request 필드는 %s", key, val, actualType, expectedType)))
+			if actualType == "" || actualType == expectedType {
+				continue
 			}
+			errs = append(errs, ctx.err("@call", fmt.Sprintf("입력 %q의 타입 불일치: %s은 %s, Request 필드는 %s", key, val, actualType, expectedType)))
 		}
 	}
 	return errs

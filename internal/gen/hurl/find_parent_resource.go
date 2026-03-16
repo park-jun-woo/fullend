@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=iteration
 //ff:what Extracts the parent resource from a nested path.
 package hurl
 

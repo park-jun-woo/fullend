@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=iteration
 //ff:what Returns true if the resource name starts with any FK prefix.
 package hurl
 

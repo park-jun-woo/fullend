@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=sequence
 //ff:what genOpenAPI runs oapi-codegen to generate types and server from OpenAPI spec.
 
 package orchestrator

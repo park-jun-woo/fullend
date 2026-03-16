@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=iteration
 //ff:what Auth generation — Register + Login steps with role-specific tokens and FK resolution.
 package hurl
 

@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what injectFuncErrStatusFromParsed injects @error annotations from func specs into symbol table.
 
 package orchestrator

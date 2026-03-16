@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=iteration
 //ff:what transforms standalone service .go files by adding Server receiver and fixing imports
 
 package gogin

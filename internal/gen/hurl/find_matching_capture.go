@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=iteration
 //ff:what Finds a captured variable that matches an FK field name via direct or prefix match.
 package hurl
 

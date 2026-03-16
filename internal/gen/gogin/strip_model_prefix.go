@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what removes the model name prefix from a sqlc query name
 
 package gogin

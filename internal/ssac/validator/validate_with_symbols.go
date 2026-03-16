@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=command
+//ff:func feature=ssac-validate type=command control=iteration dimension=1
 //ff:what 내부 검증 + 외부 SSOT 교차 검증을 수행한다
 package validator
 

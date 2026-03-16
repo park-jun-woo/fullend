@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=sequence
 //ff:what 2xx 성공 상태 코드를 반환한다
 package hurl
 

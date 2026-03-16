@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=sequence
 //ff:what Builds query parameters from x- extensions (pagination, sort, filter).
 package hurl
 

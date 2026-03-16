@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what Go camelCase/PascalCase を snake_case に変換する
 
 package gogin

@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=iteration
 //ff:what pre-parsed SSOT를 사용하여 검증을 실행한다
 package orchestrator
 

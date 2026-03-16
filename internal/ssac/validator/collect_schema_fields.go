@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util
+//ff:func feature=symbol type=util control=iteration dimension=2
 //ff:what 인라인 properties와 $ref 모두에서 필드를 수집한다
 package validator
 
@@ -14,13 +14,16 @@ func collectSchemaFields(schema openAPISchema, schemas map[string]openAPISchema)
 	}
 
 	// $ref 해결
-	if schema.Ref != "" {
-		name := schema.Ref[strings.LastIndex(schema.Ref, "/")+1:]
-		if resolved, ok := schemas[name]; ok {
-			for k := range resolved.Properties {
-				fields = append(fields, k)
-			}
-		}
+	if schema.Ref == "" {
+		return fields
+	}
+	name := schema.Ref[strings.LastIndex(schema.Ref, "/")+1:]
+	resolved, ok := schemas[name]
+	if !ok {
+		return fields
+	}
+	for k := range resolved.Properties {
+		fields = append(fields, k)
 	}
 
 	return fields

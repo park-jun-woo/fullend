@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=selection
 //ff:what maps a SQL type to a Go type
 
 package gogin

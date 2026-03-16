@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=sequence
 //ff:what Contract 검증 — artifacts 디렉토리의 gen/preserve 계약 검사
 package orchestrator
 

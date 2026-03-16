@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=sequence
 //ff:what Checks if the OpenAPI doc has any security schemes defined.
 package hurl
 

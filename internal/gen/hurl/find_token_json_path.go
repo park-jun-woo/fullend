@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=iteration
 //ff:what 응답 스키마에서 토큰 필드 JSON path를 찾는다
 package hurl
 

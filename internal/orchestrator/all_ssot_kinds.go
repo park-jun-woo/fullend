@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=sequence
 //ff:what AllSSOTKinds returns all SSOT kinds that fullend manages.
 
 package orchestrator

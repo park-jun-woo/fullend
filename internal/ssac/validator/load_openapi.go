@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=loader
+//ff:func feature=symbol type=loader control=iteration dimension=2
 //ff:what openapi.yaml에서 operationId별 request/response 필드를 추출한다
 package validator
 
@@ -31,36 +31,7 @@ func (st *SymbolTable) loadOpenAPI(path string) error {
 			if op.OperationID == "" {
 				continue
 			}
-
-			opSym := OperationSymbol{
-				RequestFields: make(map[string]bool),
-				XPagination:   op.XPagination,
-				XSort:          op.XSort,
-				XFilter:        op.XFilter,
-				XInclude:       op.XInclude,
-			}
-
-			// path/query parameters
-			for _, param := range op.Parameters {
-				opSym.RequestFields[param.Name] = true
-				if param.In == "path" {
-					opSym.PathParams = append(opSym.PathParams, PathParam{
-						Name:   param.Name,
-						GoType: oaTypeToGo(param.Schema.Type, param.Schema.Format),
-					})
-				}
-			}
-
-			// request body fields
-			if op.RequestBody != nil {
-				if content, ok := op.RequestBody.Content["application/json"]; ok {
-					fields := collectSchemaFields(content.Schema, schemas)
-					for _, f := range fields {
-						opSym.RequestFields[f] = true
-					}
-				}
-			}
-
+			opSym := st.buildOperationSymbol(op, schemas)
 			st.Operations[op.OperationID] = opSym
 		}
 	}

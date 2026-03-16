@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=iteration
 //ff:what jsonpath 어설션을 생성한다
 package hurl
 

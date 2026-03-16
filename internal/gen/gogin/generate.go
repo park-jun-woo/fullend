@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=sequence
 //ff:what main entry point — orchestrates Go+Gin backend code generation from parsed SSOTs
 
 package gogin

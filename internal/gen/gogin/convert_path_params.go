@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what converts OpenAPI path params to Go 1.22 mux style (pass-through)
 
 package gogin

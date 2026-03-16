@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule
+//ff:func feature=ssac-validate type=rule control=iteration dimension=2
 //ff:what FK 참조 @get 후 @empty 가드 누락 검증
 
 package validator
@@ -21,48 +21,47 @@ func validateFKReferenceGuard(sf parser.ServiceFunc) []ValidationError {
 	}
 
 	for i, seq := range sf.Sequences {
-		if seq.Type == parser.SeqGet && seq.Result != nil {
-			// 슬라이스/래퍼 결과는 nil dereference 위험 없음
-			if strings.HasPrefix(seq.Result.Type, "[]") || seq.Result.Wrapper != "" {
+		if seq.Type != parser.SeqGet || seq.Result == nil {
+			if seq.Result != nil {
 				declared[seq.Result.Var] = true
+			}
+			continue
+		}
+
+		// 슬라이스/래퍼 결과는 nil dereference 위험 없음
+		if strings.HasPrefix(seq.Result.Type, "[]") || seq.Result.Wrapper != "" {
+			declared[seq.Result.Var] = true
+			continue
+		}
+
+		// input 중 이전 result 변수 참조가 있는지 확인
+		hasFKRef := false
+		for _, val := range seq.Inputs {
+			if strings.HasPrefix(val, `"`) {
 				continue
 			}
-
-			// input 중 이전 result 변수 참조가 있는지 확인
-			hasFKRef := false
-			for _, val := range seq.Inputs {
-				if strings.HasPrefix(val, `"`) {
-					continue
-				}
-				ref := rootVar(val)
-				if ref == "request" || ref == "currentUser" || ref == "query" || ref == "message" || ref == "config" || ref == "" {
-					continue
-				}
-				if declared[ref] {
-					hasFKRef = true
-					break
-				}
+			ref := rootVar(val)
+			if ref == "request" || ref == "currentUser" || ref == "query" || ref == "message" || ref == "config" || ref == "" {
+				continue
 			}
-
-			if hasFKRef {
-				// 이후 시퀀스에 @empty 가드가 있는지 확인
-				hasEmptyGuard := false
-				for _, laterSeq := range sf.Sequences[i+1:] {
-					if laterSeq.Type == parser.SeqEmpty && rootVar(laterSeq.Target) == seq.Result.Var {
-						hasEmptyGuard = true
-						break
-					}
-				}
-				if !hasEmptyGuard {
-					ctx := errCtx{sf.FileName, sf.Name, i}
-					errs = append(errs, ctx.err("@get", fmt.Sprintf("%q — FK 참조 조회 후 @empty 가드가 필요합니다", seq.Result.Var)))
-				}
+			if declared[ref] {
+				hasFKRef = true
+				break
 			}
 		}
 
 		if seq.Result != nil {
 			declared[seq.Result.Var] = true
 		}
+		if !hasFKRef {
+			continue
+		}
+		// 이후 시퀀스에 @empty 가드가 있는지 확인
+		if hasEmptyGuardFor(sf.Sequences[i+1:], seq.Result.Var) {
+			continue
+		}
+		ctx := errCtx{sf.FileName, sf.Name, i}
+		errs = append(errs, ctx.err("@get", fmt.Sprintf("%q — FK 참조 조회 후 @empty 가드가 필요합니다", seq.Result.Var)))
 	}
 
 	return errs

@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=iteration
 //ff:what 스키마에서 JSON 요청 본문을 빌드한다
 package hurl
 

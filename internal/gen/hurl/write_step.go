@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=sequence
 //ff:what Step generation — writes a single endpoint test step with auth, body, captures, assertions.
 package hurl
 

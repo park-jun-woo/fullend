@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=iteration
 //ff:what creates model/{model}.go with the implementation struct using *sql.DB
 
 package gogin

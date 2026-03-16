@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=iteration
 //ff:what Builds a login JSON body matching the registered email.
 package hurl
 

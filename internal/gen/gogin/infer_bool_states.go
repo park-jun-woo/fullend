@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=iteration
 //ff:what returns (trueState, falseState) for boolean state diagrams
 
 package gogin

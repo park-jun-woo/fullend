@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=parser
+//ff:func feature=gen-gogin type=parser control=iteration
 //ff:what extracts the WHERE clause from a SQL query string, stripping ORDER BY
 
 package gogin

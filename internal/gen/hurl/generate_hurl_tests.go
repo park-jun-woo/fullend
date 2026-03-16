@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=iteration
 //ff:what Main orchestrator — builds scenario order, writes auth + steps, outputs smoke.hurl.
 package hurl
 

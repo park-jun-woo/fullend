@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=iteration
 //ff:what creates internal/middleware/bearerauth.go with claims-based CurrentUser mapping
 
 package gogin

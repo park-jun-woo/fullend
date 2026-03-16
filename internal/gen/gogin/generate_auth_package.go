@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=sequence
 //ff:what creates internal/auth/ with claims-based JWT functions and reexport
 
 package gogin

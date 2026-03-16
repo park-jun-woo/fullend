@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=sequence
 //ff:what converts to camelCase by lowercasing the first character with Go initialism handling
 
 package gogin

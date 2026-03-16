@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=sequence
 //ff:what Writes a Register + Login pair for a specific role.
 package hurl
 

@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=sequence
 //ff:what map에서 기본값 포함 문자열을 추출한다
 package hurl
 

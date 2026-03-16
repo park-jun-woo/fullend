@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what traceFuncSpecs finds func specs referenced by @call sequences.
 
 package orchestrator

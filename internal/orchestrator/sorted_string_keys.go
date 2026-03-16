@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what sortedStringKeys returns sorted keys from a map[string]bool.
 
 package orchestrator

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=iteration
 //ff:what converts standalone function source to struct method with receiver, import fixes, and status replacement
 
 package gogin

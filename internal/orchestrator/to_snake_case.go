@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what toSnakeCase converts a PascalCase string to snake_case.
 
 package orchestrator

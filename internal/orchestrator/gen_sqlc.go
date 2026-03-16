@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=sequence
 //ff:what genSqlc runs sqlc code generation for DDL.
 
 package orchestrator

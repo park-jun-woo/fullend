@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=iteration
 //ff:what finds the 2xx success response code for an operationId in OpenAPI and returns Go http.Status constant
 
 package gogin

@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=selection
 //ff:what 더미 값을 JSON 리터럴로 포맷한다
 package hurl
 

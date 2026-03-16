@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=sequence
 //ff:what RunExec runs an external command with a timeout, skipping if tool not installed.
 
 package orchestrator

@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=selection
 //ff:what Returns sort order for CRUD methods (POST, GET, PUT, DELETE).
 package hurl
 

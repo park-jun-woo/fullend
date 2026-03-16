@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=parser
+//ff:func feature=gen-gogin type=parser control=iteration
 //ff:what reads models_gen.go and extracts interface method signatures
 
 package gogin

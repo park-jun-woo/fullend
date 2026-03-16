@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=selection
 //ff:what generates the struct field assignment for VerifyToken result
 
 package gogin

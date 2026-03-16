@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule
+//ff:func feature=orchestrator type=rule control=iteration
 //ff:what DDL NOT NULL 누락 컬럼 감지 — FK DEFAULT 0 센티널 레코드 검사 포함
 package orchestrator
 

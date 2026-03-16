@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=sequence
 //ff:what genAuthz generates OPA authorizer package from parsed Rego policies.
 
 package orchestrator

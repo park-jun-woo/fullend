@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util
+//ff:func feature=ssac-validate type=util control=sequence
 //ff:what 첫 글자를 소문자로 변환한다
 package validator
 

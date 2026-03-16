@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=sequence
 //ff:what 센티널 레코드(id=0) INSERT 존재 여부 확인
 package orchestrator
 

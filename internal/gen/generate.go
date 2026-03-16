@@ -1,4 +1,4 @@
-//ff:func feature=genapi type=command
+//ff:func feature=genapi type=command control=sequence
 //ff:what parsed SSOT에서 backend + frontend + hurl 전체 코드를 생성한다
 package gen
 

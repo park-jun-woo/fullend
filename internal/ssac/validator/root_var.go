@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util
+//ff:func feature=ssac-validate type=util control=sequence
 //ff:what "project.OwnerEmail" → "project" 루트 변수명을 추출한다
 package validator
 

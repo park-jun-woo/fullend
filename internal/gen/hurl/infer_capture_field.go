@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=iteration
 //ff:what 응답에서 캡처할 ID 필드를 추론한다
 package hurl
 

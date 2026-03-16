@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util
+//ff:func feature=ssac-validate type=util control=sequence
 //ff:what @call input value에서 Go 타입을 결정한다
 package validator
 
@@ -28,13 +28,7 @@ func resolveCallInputType(val string, resultModels map[string]string, st *Symbol
 	}
 	// request → DDL에서 역추적
 	if source == "request" {
-		snakeName := toSnakeCase(field)
-		for _, table := range st.DDLTables {
-			if goType, ok := table.Columns[snakeName]; ok {
-				return goType
-			}
-		}
-		return ""
+		return lookupAnyColumnType(st, toSnakeCase(field))
 	}
 	// 변수.Field → 해당 변수의 모델 테이블에서 Field 컬럼 타입
 	modelName, ok := resultModels[source]
@@ -43,20 +37,14 @@ func resolveCallInputType(val string, resultModels map[string]string, st *Symbol
 	}
 	tableName := inflection.Plural(toSnakeCase(modelName))
 	snakeName := toSnakeCase(field)
-	if table, ok := st.DDLTables[tableName]; ok {
-		if goType, ok := table.Columns[snakeName]; ok {
-			return goType
-		}
+	if goType := lookupColumnType(st, tableName, snakeName); goType != "" {
+		return goType
 	}
 	// ID 패턴 fallback
-	if strings.HasSuffix(field, "ID") {
-		refModel := field[:len(field)-2]
-		refTable := inflection.Plural(toSnakeCase(refModel))
-		if table, ok := st.DDLTables[refTable]; ok {
-			if goType, ok := table.Columns["id"]; ok {
-				return goType
-			}
-		}
+	if !strings.HasSuffix(field, "ID") {
+		return ""
 	}
-	return ""
+	refModel := field[:len(field)-2]
+	refTable := inflection.Plural(toSnakeCase(refModel))
+	return lookupColumnType(st, refTable, "id")
 }

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=iteration
 //ff:what creates internal/auth/issue_token.go with claims-based JWT issuing
 
 package gogin

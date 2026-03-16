@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule
+//ff:func feature=orchestrator type=rule control=iteration
 //ff:what Func 스펙 검증 — func spec 파일 수 + TODO 스텁 수 집계
 package orchestrator
 

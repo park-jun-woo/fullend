@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=sequence
 //ff:what findSSaCFile locates the SSaC source file for a service function.
 
 package orchestrator

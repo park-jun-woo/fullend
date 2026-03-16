@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what traceDDL finds DDL tables referenced by SSaC sequences.
 
 package orchestrator

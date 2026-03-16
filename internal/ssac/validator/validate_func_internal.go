@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=command
+//ff:func feature=ssac-validate type=command control=sequence
 //ff:what 개별 ServiceFunc의 내부 정합성을 검증하는 디스패처
 package validator
 

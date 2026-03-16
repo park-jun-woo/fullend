@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util
+//ff:func feature=ssac-validate type=util control=iteration dimension=2
 //ff:what snake_case 컬럼명이 존재하는 DDL 테이블을 찾는다
 package validator
 
@@ -17,7 +17,8 @@ func findColumnTable(snakeCol, model string, st *SymbolTable) (string, bool) {
 	if model != "" {
 		parts := strings.SplitN(model, ".", 2)
 		tableName := inflection.Plural(toSnakeCase(parts[0]))
-		if table, ok := st.DDLTables[tableName]; ok {
+		table, ok := st.DDLTables[tableName]
+		if ok {
 			if _, ok := table.Columns[snakeCol]; ok {
 				return tableName, true
 			}

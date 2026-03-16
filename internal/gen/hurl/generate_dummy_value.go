@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=selection
 //ff:what OpenAPI 스키마에서 더미 값을 생성한다
 package hurl
 

@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util
+//ff:func feature=symbol type=util control=selection
 //ff:what ast.Expr를 Go 타입 문자열로 변환한다
 package validator
 

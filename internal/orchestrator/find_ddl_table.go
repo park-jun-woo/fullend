@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what findDDLTable finds the DDL file and line number for a table name.
 
 package orchestrator

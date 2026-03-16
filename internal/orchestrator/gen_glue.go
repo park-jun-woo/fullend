@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=sequence
 //ff:what genGlue generates glue code (Server struct, main.go, frontend setup).
 
 package orchestrator

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=sequence
 //ff:what creates model/queryopts.go with parseQueryOpts, buildSelectQuery, buildCountQuery
 
 package gogin

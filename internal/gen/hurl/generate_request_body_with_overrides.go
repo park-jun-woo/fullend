@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator
+//ff:func feature=gen-hurl type=generator control=iteration
 //ff:what Builds a JSON body with role and email overrides, resolving FK fields to captured variables.
 package hurl
 

@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=iteration
 //ff:what Delete ordering — FK dependency-aware topological sort for DELETE steps.
 package hurl
 

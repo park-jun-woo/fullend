@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util
+//ff:func feature=gen-gogin type=util control=selection
 //ff:what converts a numeric HTTP status code string to Go net/http constant name
 
 package gogin

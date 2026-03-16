@@ -1,4 +1,4 @@
-//ff:func feature=genapi type=util
+//ff:func feature=genapi type=util control=sequence
 //ff:what 설정에 따라 백엔드 코드젠 구현체를 선택한다
 package gen
 

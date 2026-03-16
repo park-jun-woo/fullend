@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=sequence
 //ff:what DefaultProfile returns the default Go backend + React frontend profile.
 
 package orchestrator

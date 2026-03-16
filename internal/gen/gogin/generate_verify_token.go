@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=iteration
 //ff:what creates internal/auth/verify_token.go with JWT verification and claims extraction
 
 package gogin

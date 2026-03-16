@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=loader
+//ff:func feature=symbol type=loader control=iteration dimension=2
 //ff:what 서비스 파일의 import 경로에서 패키지 접두사 모델의 Go interface를 파싱한다
 package validator
 
@@ -33,9 +33,10 @@ func (st *SymbolTable) LoadPackageInterfaces(funcs []ssacparser.ServiceFunc, pro
 			// import 경로의 마지막 segment가 패키지명
 			segments := strings.Split(imp, "/")
 			pkgName := segments[len(segments)-1]
-			if pkgModels[pkgName] {
-				pkgPaths[pkgName] = imp
+			if !pkgModels[pkgName] {
+				continue
 			}
+			pkgPaths[pkgName] = imp
 		}
 	}
 

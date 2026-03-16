@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=iteration
 //ff:what genSTML generates frontend pages from STML specs.
 
 package orchestrator

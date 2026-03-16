@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule
+//ff:func feature=orchestrator type=rule control=sequence
 //ff:what SSaC 서비스 함수 검증 — 심볼 테이블 기반 시퀀스 유효성 검사
 package orchestrator
 

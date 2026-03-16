@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=iteration
 //ff:what DetectSSOTs scans root for known SSOT directories and returns what exists.
 
 package orchestrator

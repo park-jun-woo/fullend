@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule
+//ff:func feature=ssac-validate type=rule control=iteration dimension=1
 //ff:what result 변수명과 예약 소스 충돌 검증
 
 package validator

@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util
+//ff:func feature=symbol type=util control=sequence
 //ff:what 독립 FOREIGN KEY 절을 파싱한다
 package validator
 

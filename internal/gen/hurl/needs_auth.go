@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=sequence
 //ff:what 오퍼레이션이 인증을 필요로 하는지 확인한다
 package hurl
 

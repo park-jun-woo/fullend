@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=loader
+//ff:func feature=symbol type=loader control=iteration dimension=2
 //ff:what queries/*.sql에서 모델과 메서드를 추출한다
 package validator
 
@@ -41,32 +41,23 @@ func (st *SymbolTable) loadSqlcQueries(dir string) error {
 
 		for scanner.Scan() {
 			line := strings.TrimSpace(scanner.Text())
-			// -- name: FindByID :one  또는  -- name: CourseFindByID :one
-			if strings.HasPrefix(line, "-- name:") {
-				// 이전 메서드의 SQL 처리
-				if currentMethod != "" {
-					params := extractSqlcParams(currentSQL.String())
-					ms.Methods[currentMethod] = MethodInfo{
-						Cardinality: currentCardinality,
-						Params:      params,
-					}
-				}
-				// 새 메서드 시작
-				parts := strings.Fields(line)
-				if len(parts) >= 4 {
-					currentMethod = stripModelPrefix(parts[2], modelName)
-					currentCardinality = strings.TrimPrefix(parts[3], ":")
-				} else if len(parts) >= 3 {
-					currentMethod = stripModelPrefix(parts[2], modelName)
-					currentCardinality = ""
-				} else {
-					currentMethod = ""
-					currentCardinality = ""
-				}
-				currentSQL.Reset()
-			} else if currentMethod != "" {
+			// SQL 본문 행: -- name: 주석이 아닌 행은 현재 SQL에 누적
+			if !strings.HasPrefix(line, "-- name:") && currentMethod != "" {
 				currentSQL.WriteString(line + " ")
 			}
+			if !strings.HasPrefix(line, "-- name:") {
+				continue
+			}
+			// 이전 메서드의 SQL 처리
+			if currentMethod != "" {
+				ms.Methods[currentMethod] = MethodInfo{
+					Cardinality: currentCardinality,
+					Params:      extractSqlcParams(currentSQL.String()),
+				}
+			}
+			// 새 메서드 시작
+			currentMethod, currentCardinality = parseSqlcNameLine(line, modelName)
+			currentSQL.Reset()
 		}
 		// 마지막 메서드 처리
 		if currentMethod != "" {
@@ -83,4 +74,16 @@ func (st *SymbolTable) loadSqlcQueries(dir string) error {
 		}
 	}
 	return nil
+}
+
+// parseSqlcNameLine은 "-- name: FindByID :one" 형식의 줄에서 메서드명과 cardinality를 추출한다.
+func parseSqlcNameLine(line, modelName string) (method, cardinality string) {
+	parts := strings.Fields(line)
+	if len(parts) >= 4 {
+		return stripModelPrefix(parts[2], modelName), strings.TrimPrefix(parts[3], ":")
+	}
+	if len(parts) >= 3 {
+		return stripModelPrefix(parts[2], modelName), ""
+	}
+	return "", ""
 }

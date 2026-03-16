@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util
+//ff:func feature=gen-hurl type=util control=iteration
 //ff:what Path parameter handling — checks if all path parameters can be resolved from captured variables.
 package hurl
 

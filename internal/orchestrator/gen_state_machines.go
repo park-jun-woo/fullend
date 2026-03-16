@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=sequence
 //ff:what genStateMachines generates Go state machine code from Mermaid stateDiagram specs.
 
 package orchestrator

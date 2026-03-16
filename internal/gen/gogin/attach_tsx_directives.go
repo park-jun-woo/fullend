@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=iteration
 //ff:what scans pages/*.tsx files and injects // fullend:gen directive
 
 package gogin

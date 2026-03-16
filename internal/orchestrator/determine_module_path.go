@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=sequence
 //ff:what determineModulePath resolves the Go module path from config, go.mod, or directory name.
 
 package orchestrator

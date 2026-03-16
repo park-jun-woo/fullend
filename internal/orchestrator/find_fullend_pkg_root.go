@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what fullend pkg/ 디렉토리 탐색 — CWD에서 상위로 go.mod 검색
 package orchestrator
 

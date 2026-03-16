@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util
+//ff:func feature=orchestrator type=util control=iteration
 //ff:what detectDBEngine inspects DDL files to determine the database engine.
 
 package orchestrator

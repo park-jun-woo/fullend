@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=sequence
 //ff:what creates service/auth.go with CurrentUser type and extraction stub
 
 package gogin

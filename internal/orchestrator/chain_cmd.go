@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command
+//ff:func feature=orchestrator type=command control=iteration
 //ff:what Chain traces all SSOT nodes connected to the given operationId.
 
 package orchestrator

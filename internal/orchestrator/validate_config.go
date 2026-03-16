@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule
+//ff:func feature=orchestrator type=rule control=sequence
 //ff:what fullend.yaml 설정 검증 — 프로젝트 메타데이터 + 백엔드/프론트엔드 구성 확인
 package orchestrator
 
