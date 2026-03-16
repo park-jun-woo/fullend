@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=func-check
 //ff:what 단일 @call 시퀀스의 spec 조회 및 검증
 package crosscheck
 

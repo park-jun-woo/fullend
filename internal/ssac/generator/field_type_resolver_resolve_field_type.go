@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=type-resolve
 //ff:what dotted target의 필드 타입을 DDL/func 출처별로 조회하여 반환
 package generator
 

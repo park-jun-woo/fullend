@@ -1,4 +1,4 @@
-//ff:type feature=ssac-gen type=generator
+//ff:type feature=ssac-gen type=generator topic=output
 //ff:what 특정 언어의 코드 생성기가 구현해야 하는 인터페이스
 package generator
 

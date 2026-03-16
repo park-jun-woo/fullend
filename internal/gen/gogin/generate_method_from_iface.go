@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=selection
+//ff:func feature=gen-gogin type=generator control=selection topic=interface-derive
 //ff:what writes a single method implementation based on the interface signature
 
 package gogin

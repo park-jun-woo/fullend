@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=2
+//ff:func feature=ssac-validate type=rule control=iteration dimension=2 topic=type-resolve
 //ff:what @call inputs 필드 타입과 func Request struct 필드 타입 비교
 
 package validator

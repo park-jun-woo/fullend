@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=sequence
+//ff:func feature=ssac-validate type=util control=sequence topic=type-resolve
 //ff:what put/delete 모델의 mutation 여부를 기록한다
 package validator
 

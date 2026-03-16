@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=query-opts
 //ff:what QueryOpts의 Pagination 설정 코드를 버퍼에 출력
 package generator
 

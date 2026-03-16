@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=ssac-openapi
 //ff:what @call 시퀀스의 func spec에서 응답 필드 해석
 package crosscheck
 

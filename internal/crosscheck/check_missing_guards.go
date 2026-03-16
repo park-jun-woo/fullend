@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=states
 //ff:what 상태 전이가 있지만 @state 시퀀스가 없는 함수 경고
 package crosscheck
 

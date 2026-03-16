@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=scenario-check
 //ff:what OpenAPI 경로를 정규화된 세그먼트로 변환
 package crosscheck
 

@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=sensitive
 //ff:what DDL 컬럼 이름이 민감 패턴에 매치되지만 @sensitive 없는 경우 경고
 package crosscheck
 

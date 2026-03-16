@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=ssac-openapi
 //ff:what 단일 SSaC 함수의 ErrStatus 코드가 OpenAPI에 정의되어 있는지 검증
 package crosscheck
 

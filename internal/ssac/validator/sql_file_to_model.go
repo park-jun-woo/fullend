@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=sequence
+//ff:func feature=symbol type=util control=sequence topic=sqlc
 //ff:what SQL 파일명을 모델명으로 변환한다 (reservations.sql → Reservation)
 package validator
 

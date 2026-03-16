@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=config-check
 //ff:what fullend.yaml 미들웨어와 OpenAPI securitySchemes 일치 여부 검증
 package crosscheck
 

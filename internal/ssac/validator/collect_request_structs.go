@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=loader control=iteration dimension=4
+//ff:func feature=symbol type=loader control=iteration dimension=4 topic=go-interface
 //ff:what Go 파일에서 *Request struct를 수집하여 필드 맵을 반환한다
 package validator
 

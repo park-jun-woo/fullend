@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=selection
+//ff:func feature=ssac-gen type=generator control=selection topic=args-inputs
 //ff:what inputs 값에 예약 소스 변환(query, request 등)을 적용
 package generator
 

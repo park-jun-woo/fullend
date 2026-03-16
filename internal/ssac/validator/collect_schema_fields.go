@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=iteration dimension=2
+//ff:func feature=symbol type=util control=iteration dimension=2 topic=openapi
 //ff:what 인라인 properties와 $ref 모두에서 필드를 수집한다
 package validator
 

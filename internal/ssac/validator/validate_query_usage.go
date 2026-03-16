@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=2
+//ff:func feature=ssac-validate type=rule control=iteration dimension=2 topic=query-opts
 //ff:what SSaC query 사용과 OpenAPI x-extensions 교차 검증
 
 package validator

@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=ddl-coverage
 //ff:what SSaC @model/@result에서 참조하는 DDL 테이블 이름을 수집
 package crosscheck
 

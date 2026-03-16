@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=openapi-ddl
 //ff:what operationId에서 CRUD 접두사(List/Get/Create/Update/Delete) 제거
 package crosscheck
 

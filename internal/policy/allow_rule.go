@@ -1,4 +1,4 @@
-//ff:type feature=policy type=model
+//ff:type feature=policy type=model topic=policy-check
 //ff:what allow 규칙에서 추출한 액션-리소스 쌍 구조체
 package policy
 

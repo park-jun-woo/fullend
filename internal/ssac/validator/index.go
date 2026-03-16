@@ -1,4 +1,4 @@
-//ff:type feature=symbol type=model
+//ff:type feature=symbol type=model topic=ddl
 //ff:what 테이블 인덱스
 package validator
 

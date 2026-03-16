@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=func-check
 //ff:what @call Input 키 이름과 타입이 Request 필드와 일치하는지 검증
 package crosscheck
 

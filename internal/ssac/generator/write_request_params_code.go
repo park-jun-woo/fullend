@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=request-params
 //ff:what 요청 파라미터 추출 코드를 버퍼에 출력
 package generator
 

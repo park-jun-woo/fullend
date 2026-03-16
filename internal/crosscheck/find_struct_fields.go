@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=func-check
 //ff:what struct 목록에서 이름에 맞는 struct의 필드 이름을 추출
 package crosscheck
 

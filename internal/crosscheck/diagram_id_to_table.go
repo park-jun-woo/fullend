@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=states
 //ff:what 다이어그램 ID를 DDL 테이블명으로 변환
 package crosscheck
 

@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=iteration dimension=1
+//ff:func feature=symbol type=util control=iteration dimension=1 topic=ddl
 //ff:what 컬럼 정의에서 인라인 REFERENCES를 파싱한다
 package validator
 

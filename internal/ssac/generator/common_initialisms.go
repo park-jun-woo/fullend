@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=string-convert
 //ff:what Go 컨벤션 공통 이니셜리즘 맵 정의
 package generator
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=type-resolve
 //ff:what Go 타입별 제로값 비교 연산자를 반환
 package generator
 

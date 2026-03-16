@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=type-resolve
 //ff:what Arg에서 DDL 테이블을 참조하여 Go 파라미터 타입을 추론
 package generator
 

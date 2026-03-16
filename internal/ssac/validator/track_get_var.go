@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=sequence
+//ff:func feature=ssac-validate type=util control=sequence topic=type-resolve
 //ff:what @get 결과 변수와 모델명을 추적한다
 package validator
 

@@ -1,4 +1,4 @@
-//ff:type feature=crosscheck type=model
+//ff:type feature=crosscheck type=model topic=ddl-coverage
 //ff:what DDL @archived 태그 정보를 담는 구조체
 package crosscheck
 

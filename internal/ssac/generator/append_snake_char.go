@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=string-convert
 //ff:what 대문자면 언더스코어+소문자로, 아니면 그대로 바이트 슬라이스에 추가
 package generator
 

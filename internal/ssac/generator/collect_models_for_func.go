@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=model-collect
 //ff:what 단일 ServiceFunc에서 사용하는 모델명을 도메인 맵에 추가
 package generator
 

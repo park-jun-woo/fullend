@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=string-convert
 //ff:what dotted 변수명에서 루트 변수를 추출 (예: "a.b" -> "a")
 package generator
 

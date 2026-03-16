@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=1
+//ff:func feature=gen-gogin type=util control=iteration dimension=1 topic=query-opts
 //ff:what reports whether the method has a QueryOpts parameter
 
 package gogin

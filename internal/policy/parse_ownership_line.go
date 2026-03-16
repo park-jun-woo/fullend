@@ -1,4 +1,4 @@
-//ff:func feature=policy type=parser control=sequence
+//ff:func feature=policy type=parser control=sequence topic=policy-check
 //ff:what 한 줄에서 @ownership 어노테이션을 파싱하여 OwnershipMapping을 반환한다
 package policy
 

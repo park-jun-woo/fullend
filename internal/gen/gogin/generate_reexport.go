@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=sequence
+//ff:func feature=gen-gogin type=generator control=sequence topic=interface-derive
 //ff:what creates internal/auth/reexport.go that re-exports pkg/auth utilities
 
 package gogin

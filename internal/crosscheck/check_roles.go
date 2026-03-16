@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=config-check
 //ff:what OPA Rego input.role 값이 fullend.yaml auth.roles와 일치하는지 검증
 package crosscheck
 

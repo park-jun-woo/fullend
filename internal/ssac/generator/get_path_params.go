@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=path-params
 //ff:what 심볼 테이블에서 함수명에 해당하는 경로 파라미터를 조회
 package generator
 

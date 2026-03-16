@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=template-data
 //ff:what @call 시퀀스의 패키지명, 함수명, 에러 상태를 templateData에 설정
 package generator
 

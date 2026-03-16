@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=model-collect
 //ff:what 도메인별 모델 맵의 키를 정렬하여 슬라이스로 변환
 package generator
 

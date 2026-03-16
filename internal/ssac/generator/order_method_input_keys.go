@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=args-inputs
 //ff:what 메서드 파라미터 순서에 따라 입력 키를 정렬
 package generator
 

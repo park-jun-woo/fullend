@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=openapi-ddl
 //ff:what 지정 컬럼을 포함하는 첫 번째 테이블명 반환
 package crosscheck
 

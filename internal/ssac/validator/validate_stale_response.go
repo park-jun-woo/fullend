@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=1
+//ff:func feature=ssac-validate type=rule control=iteration dimension=1 topic=response
 //ff:what put/delete 이후 갱신 없이 response에서 사용되는 변수 경고
 
 package validator

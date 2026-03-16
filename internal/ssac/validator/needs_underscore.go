@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=sequence
+//ff:func feature=ssac-validate type=util control=sequence topic=string-convert
 //ff:what snake_case 변환 시 언더스코어 삽입 여부를 판단한다
 package validator
 

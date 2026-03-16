@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=output
 //ff:what 큐 구독 핸들러 함수를 생성
 package generator
 

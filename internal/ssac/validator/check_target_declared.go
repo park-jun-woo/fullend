@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=sequence
+//ff:func feature=ssac-validate type=util control=sequence topic=type-resolve
 //ff:what target 변수의 선언 여부를 검사한다
 package validator
 

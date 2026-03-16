@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=string-convert
 //ff:what 문자열의 선행 대문자 연속 개수를 반환
 package generator
 

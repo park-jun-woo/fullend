@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=policy-check
 //ff:what @ownership 어노테이션의 테이블·컬럼이 DDL에 존재하는지 검증
 package crosscheck
 

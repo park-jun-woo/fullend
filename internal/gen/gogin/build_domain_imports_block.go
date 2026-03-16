@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=1
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1 topic=output
 //ff:what 도메인 import 코드 블록을 생성한다
 
 package gogin

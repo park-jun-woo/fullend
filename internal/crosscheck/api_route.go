@@ -1,4 +1,4 @@
-//ff:type feature=crosscheck type=util
+//ff:type feature=crosscheck type=util topic=scenario-check
 //ff:what OpenAPI 경로 정규화 라우트 타입 정의
 package crosscheck
 

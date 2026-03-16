@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=sequence
+//ff:func feature=symbol type=util control=sequence topic=ddl
 //ff:what 컬럼 라인의 인라인 제약(PK, UNIQUE, FK)을 DDLTable에 반영한다
 package validator
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=2
+//ff:func feature=ssac-validate type=rule control=iteration dimension=2 topic=subscribe
 //ff:what subscribe 함수의 파라미터·타입·시퀀스 제약 조건을 검증한다
 package validator
 

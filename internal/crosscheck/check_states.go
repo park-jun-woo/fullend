@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=states
 //ff:what 상태 다이어그램을 SSaC, DDL, OpenAPI와 교차 검증
 package crosscheck
 

@@ -1,4 +1,4 @@
-//ff:type feature=symbol type=model
+//ff:type feature=symbol type=model topic=go-interface
 //ff:what 모델의 메서드 목록 + HasMethod
 package validator
 

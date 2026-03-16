@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=response
 //ff:what 응답 필드를 templateData에 설정
 package generator
 

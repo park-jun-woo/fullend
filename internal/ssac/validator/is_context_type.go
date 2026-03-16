@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=sequence
+//ff:func feature=symbol type=util control=sequence topic=go-interface
 //ff:what ast.Expr이 context.Context 타입인지 확인한다
 package validator
 

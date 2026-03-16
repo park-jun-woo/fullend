@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=func-check
 //ff:what 단일 SSaC 서비스 함수의 @call 시퀀스 검증
 package crosscheck
 

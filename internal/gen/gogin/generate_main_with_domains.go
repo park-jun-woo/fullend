@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=sequence
+//ff:func feature=gen-gogin type=generator control=sequence topic=output
 //ff:what domain 모드 cmd/main.go를 생성한다
 
 package gogin

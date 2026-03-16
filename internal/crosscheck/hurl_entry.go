@@ -1,4 +1,4 @@
-//ff:type feature=crosscheck type=util
+//ff:type feature=crosscheck type=util topic=scenario-check
 //ff:what Hurl 요청/응답 쌍 타입 정의
 package crosscheck
 

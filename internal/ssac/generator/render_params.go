@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=interface-derive
 //ff:what 파생 파라미터 배열을 Go 메서드 시그니처 문자열로 변환
 package generator
 

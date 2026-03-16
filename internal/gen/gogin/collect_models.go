@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=2
+//ff:func feature=gen-gogin type=util control=iteration dimension=2 topic=model-collect
 //ff:what extracts unique model names from service functions
 
 package gogin

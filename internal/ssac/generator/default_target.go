@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=output
 //ff:what Go Target 기본 인스턴스를 반환
 package generator
 

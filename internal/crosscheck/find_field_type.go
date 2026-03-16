@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=func-check
 //ff:what 필드 목록에서 이름으로 타입 조회
 package crosscheck
 

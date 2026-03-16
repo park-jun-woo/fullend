@@ -1,4 +1,4 @@
-//ff:func feature=ssac-parse type=parser control=sequence
+//ff:func feature=ssac-parse type=parser control=sequence topic=states
 //ff:what @state 상태 전이 시퀀스 파싱
 package parser
 

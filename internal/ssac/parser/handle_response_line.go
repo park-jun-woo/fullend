@@ -1,4 +1,4 @@
-//ff:func feature=ssac-parse type=parser control=sequence
+//ff:func feature=ssac-parse type=parser control=sequence topic=response
 //ff:what @response 블록 내부 줄을 처리하여 블록 종료 여부 반환
 package parser
 

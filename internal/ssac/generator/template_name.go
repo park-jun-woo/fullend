@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=http-handler
 //ff:what HTTP 함수 내 시퀀스의 템플릿 이름을 반환
 package generator
 

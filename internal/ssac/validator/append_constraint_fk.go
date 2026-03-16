@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=sequence
+//ff:func feature=symbol type=util control=sequence topic=ddl
 //ff:what CONSTRAINT FK 라인을 파싱하여 DDLTable에 추가한다
 package validator
 

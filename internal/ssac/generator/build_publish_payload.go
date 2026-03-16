@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=publish
 //ff:what publish의 Inputs를 map[string]any 리터럴 필드로 변환
 package generator
 

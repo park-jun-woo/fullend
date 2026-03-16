@@ -1,4 +1,4 @@
-//ff:func feature=statemachine type=parser control=sequence
+//ff:func feature=statemachine type=parser control=sequence topic=states
 //ff:what Mermaid stateDiagram 마크다운 파일 하나를 파싱한다
 package statemachine
 

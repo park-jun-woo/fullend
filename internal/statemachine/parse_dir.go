@@ -1,4 +1,4 @@
-//ff:func feature=statemachine type=parser control=iteration dimension=1
+//ff:func feature=statemachine type=parser control=iteration dimension=1 topic=states
 //ff:what 디렉토리 내 모든 .md 파일을 파싱하여 StateDiagram 슬라이스를 반환한다
 package statemachine
 

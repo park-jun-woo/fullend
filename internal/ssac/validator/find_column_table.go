@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=iteration dimension=2
+//ff:func feature=ssac-validate type=util control=iteration dimension=2 topic=type-resolve
 //ff:what snake_case 컬럼명이 존재하는 DDL 테이블을 찾는다
 package validator
 

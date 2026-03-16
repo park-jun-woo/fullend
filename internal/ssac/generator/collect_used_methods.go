@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=model-collect
 //ff:what 특정 모델에서 사용된 메서드명을 중복 없이 수집
 package generator
 

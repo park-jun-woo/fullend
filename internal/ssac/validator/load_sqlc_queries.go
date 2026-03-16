@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=loader control=iteration dimension=2
+//ff:func feature=symbol type=loader control=iteration dimension=2 topic=sqlc
 //ff:what queries/*.sql에서 모델과 메서드를 추출한다
 package validator
 

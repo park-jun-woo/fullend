@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=func-check
 //ff:what fullend/project func spec을 key 맵으로 변환
 package crosscheck
 

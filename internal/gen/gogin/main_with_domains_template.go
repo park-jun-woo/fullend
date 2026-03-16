@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=sequence
+//ff:func feature=gen-gogin type=generator control=sequence topic=output
 //ff:what domain 모드 main.go 생성 템플릿 문자열을 반환한다
 
 package gogin

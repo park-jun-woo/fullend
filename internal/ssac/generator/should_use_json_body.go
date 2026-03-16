@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=request-params
 //ff:what POST/PUT 또는 2+ 파라미터일 때 JSON body 사용 여부를 판단
 package generator
 

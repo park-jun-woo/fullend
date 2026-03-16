@@ -1,4 +1,4 @@
-//ff:type feature=ssac-gen type=model
+//ff:type feature=ssac-gen type=model topic=template-data
 //ff:what 템플릿 실행에 필요한 시퀀스별 데이터 구조체
 package generator
 

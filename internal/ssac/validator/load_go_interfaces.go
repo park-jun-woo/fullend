@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=loader control=iteration dimension=3
+//ff:func feature=symbol type=loader control=iteration dimension=3 topic=go-interface
 //ff:what model/*.go에서 interface(component)와 func을 추출한다
 package validator
 

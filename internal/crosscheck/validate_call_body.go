@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=func-check
 //ff:what @call func의 본체 구현 여부 검증
 package crosscheck
 

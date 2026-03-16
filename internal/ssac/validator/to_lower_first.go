@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=sequence
+//ff:func feature=ssac-validate type=util control=sequence topic=string-convert
 //ff:what 첫 글자를 소문자로 변환한다
 package validator
 

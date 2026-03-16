@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=iteration dimension=1
+//ff:func feature=symbol type=util control=iteration dimension=1 topic=go-interface
 //ff:what FuncDecl의 Doc에서 @error 어노테이션의 HTTP 상태 코드를 추출한다
 package validator
 

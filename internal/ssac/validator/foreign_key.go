@@ -1,4 +1,4 @@
-//ff:type feature=symbol type=model
+//ff:type feature=symbol type=model topic=ddl
 //ff:what 외래 키 관계
 package validator
 

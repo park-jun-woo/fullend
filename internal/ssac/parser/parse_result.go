@@ -1,4 +1,4 @@
-//ff:func feature=ssac-parse type=parser control=sequence
+//ff:func feature=ssac-parse type=parser control=sequence topic=response
 //ff:what "Type var" 또는 "[]Type var" 결과 바인딩 파싱
 package parser
 

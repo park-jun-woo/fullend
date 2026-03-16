@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=publish
 //ff:what publish 옵션 키를 Go 코드로 변환 (delay, priority)
 package generator
 

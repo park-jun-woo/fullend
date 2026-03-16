@@ -1,4 +1,4 @@
-//ff:func feature=statemachine type=parser control=iteration dimension=1
+//ff:func feature=statemachine type=parser control=iteration dimension=1 topic=states
 //ff:what Mermaid stateDiagram 텍스트를 파싱하여 StateDiagram 구조체를 반환한다
 package statemachine
 

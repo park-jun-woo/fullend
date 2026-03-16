@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=authz-check
 //ff:what 단일 SSaC 함수의 @auth 시퀀스 입력 필드를 검증
 package crosscheck
 

@@ -1,4 +1,4 @@
-//ff:type feature=symbol type=model
+//ff:type feature=symbol type=model topic=openapi
 //ff:what x-include 확장
 package validator
 

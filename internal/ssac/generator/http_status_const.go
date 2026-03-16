@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=http-handler
 //ff:what HTTP 상태 코드 정수를 Go net/http 상수 문자열로 변환
 package generator
 

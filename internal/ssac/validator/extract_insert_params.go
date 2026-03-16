@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=iteration dimension=1
+//ff:func feature=symbol type=util control=iteration dimension=1 topic=sqlc
 //ff:what INSERT INTO table (col1, col2) VALUES ($1, $2) 패턴에서 컬럼 순서를 추출한다
 package validator
 

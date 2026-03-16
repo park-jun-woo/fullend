@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=sensitive
 //ff:what SQL 텍스트에서 @sensitive/@nosensitive 컬럼 태그를 추출
 package crosscheck
 

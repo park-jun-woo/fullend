@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=openapi-ddl
 //ff:what 단일 x-include 스펙 항목의 포맷과 DDL 참조 유효성 검증
 package crosscheck
 

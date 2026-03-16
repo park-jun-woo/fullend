@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=openapi-ddl
 //ff:what operationId에서 주 테이블명 추론
 package crosscheck
 

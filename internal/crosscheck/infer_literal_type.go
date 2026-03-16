@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=selection
+//ff:func feature=crosscheck type=util control=selection topic=func-check
 //ff:what 리터럴 값의 Go 타입 추론
 package crosscheck
 

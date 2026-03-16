@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=query-opts
 //ff:what 심볼 테이블의 OpenAPI 확장에서 QueryOpts 설정 코드를 생성
 package generator
 

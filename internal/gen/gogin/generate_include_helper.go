@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=sequence
+//ff:func feature=gen-gogin type=generator control=sequence topic=interface-derive
 //ff:what generates a forward FK include helper method for a model
 
 package gogin

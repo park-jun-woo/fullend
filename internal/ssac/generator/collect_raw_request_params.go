@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=request-params
 //ff:what 시퀀스에서 request 소스의 필드명과 DDL 타입을 수집
 package generator
 

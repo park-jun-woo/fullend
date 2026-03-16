@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=config-check
 //ff:what JWT 빌트인 함수 목록 정의
 package crosscheck
 

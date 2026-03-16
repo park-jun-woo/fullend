@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=openapi-ddl
 //ff:what 컬럼이 PRIMARY KEY 또는 UNIQUE 제약인지 확인
 package crosscheck
 

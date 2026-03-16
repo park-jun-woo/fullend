@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=type-resolve
 //ff:what FuncSpec에서 함수명+필드명으로 응답 필드 타입을 조회
 package generator
 

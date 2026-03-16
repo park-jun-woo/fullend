@@ -1,4 +1,4 @@
-//ff:func feature=stml-gen type=util control=iteration dimension=1
+//ff:func feature=stml-gen type=util control=iteration dimension=1 topic=string-convert
 //ff:what 케밥케이스 이름을 PascalCase 컴포넌트 이름으로 변환한다
 package generator
 

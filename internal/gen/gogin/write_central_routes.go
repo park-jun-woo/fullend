@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=2
+//ff:func feature=gen-gogin type=generator control=iteration dimension=2 topic=http-handler
 //ff:what writes route registrations from OpenAPI paths for central server
 
 package gogin

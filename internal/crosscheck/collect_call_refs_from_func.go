@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=func-check
 //ff:what 단일 SSaC 함수에서 @call 모델 참조를 수집
 package crosscheck
 

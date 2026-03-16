@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=iteration dimension=1
+//ff:func feature=symbol type=util control=iteration dimension=1 topic=ddl
 //ff:what 모든 DDL 테이블에서 해당 컬럼명의 Go 타입을 찾는다
 package validator
 

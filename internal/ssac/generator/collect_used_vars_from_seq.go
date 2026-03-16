@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=http-handler
 //ff:what 단일 시퀀스에서 참조되는 변수명을 수집
 package generator
 

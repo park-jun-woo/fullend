@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=config-check
 //ff:what SSaC 시퀀스에서 currentUser.X 참조 필드를 수집
 package crosscheck
 

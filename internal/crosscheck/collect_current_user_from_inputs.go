@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=config-check
 //ff:what 단일 시퀀스의 입력에서 currentUser 필드 참조를 수집
 package crosscheck
 

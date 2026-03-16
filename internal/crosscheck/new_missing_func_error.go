@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=func-check
 //ff:what 미구현 func에 대한 CrossError 생성
 package crosscheck
 

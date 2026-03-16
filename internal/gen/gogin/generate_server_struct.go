@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=2
+//ff:func feature=gen-gogin type=generator control=iteration dimension=2 topic=http-handler
 //ff:what creates service/server.go with Server struct definition and Handler function
 
 package gogin

@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=openapi-ddl
 //ff:what x-filter 컬럼이 DDL 테이블에 존재하는지 검증
 package crosscheck
 

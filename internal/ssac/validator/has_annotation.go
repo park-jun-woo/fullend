@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=iteration dimension=1
+//ff:func feature=symbol type=util control=iteration dimension=1 topic=go-interface
 //ff:what CommentGroup에서 지정한 annotation 문자열이 포함되어 있는지 검사한다
 package validator
 

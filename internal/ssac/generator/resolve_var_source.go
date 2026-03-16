@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=type-resolve
 //ff:what 시퀀스 타입에 따라 변수 출처(DDL/func)를 결정
 package generator
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=http-handler
 //ff:what 트랜잭션 시작 코드를 버퍼에 출력
 package generator
 

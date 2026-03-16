@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=selection
+//ff:func feature=ssac-gen type=generator control=selection topic=template-data
 //ff:what 시퀀스 타입별 가드 에러 상태 코드를 templateData에 설정
 package generator
 

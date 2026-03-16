@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=args-inputs
 //ff:what paramOrder 유무에 따라 입력 키 정렬 전략을 선택
 package generator
 

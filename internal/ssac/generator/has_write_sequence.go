@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=http-handler
 //ff:what 시퀀스에 쓰기 작업(POST/PUT/DELETE)이 있는지 확인
 package generator
 

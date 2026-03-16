@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=output
 //ff:what 패키지, import, 본문을 조립하여 gofmt 적용한 Go 소스를 반환
 package generator
 

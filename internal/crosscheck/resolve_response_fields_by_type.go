@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=selection
+//ff:func feature=crosscheck type=util control=selection topic=ssac-openapi
 //ff:what 시퀀스 타입에 따라 응답 필드 해석 (call vs model)
 package crosscheck
 

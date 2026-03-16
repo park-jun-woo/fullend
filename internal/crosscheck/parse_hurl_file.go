@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=scenario-check
 //ff:what .hurl 파일에서 요청/응답 쌍 추출
 package crosscheck
 

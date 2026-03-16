@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=2
+//ff:func feature=ssac-validate type=rule control=iteration dimension=2 topic=subscribe
 //ff:what subscribe 함수의 message.Field 참조가 struct 필드에 존재하는지 검증한다
 package validator
 

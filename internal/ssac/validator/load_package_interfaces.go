@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=loader control=iteration dimension=2
+//ff:func feature=symbol type=loader control=iteration dimension=2 topic=go-interface
 //ff:what 서비스 파일의 import 경로에서 패키지 접두사 모델의 Go interface를 파싱한다
 package validator
 

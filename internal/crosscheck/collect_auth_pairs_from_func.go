@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=policy-check
 //ff:what 단일 SSaC 함수에서 @auth (action, resource) 쌍을 수집
 package crosscheck
 

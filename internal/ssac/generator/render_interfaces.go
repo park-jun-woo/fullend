@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=interface-derive
 //ff:what 파생 인터페이스 배열을 Go 소스 코드(package model)로 렌더링
 package generator
 

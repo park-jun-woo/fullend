@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=interface-derive
 //ff:what 메서드의 파라미터를 시그니처 문자열로 결합 (QueryOpts 포함)
 package generator
 

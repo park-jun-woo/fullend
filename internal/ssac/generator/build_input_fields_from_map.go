@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=args-inputs
 //ff:what map[string]string을 Go struct 리터럴 필드 문자열로 변환
 package generator
 

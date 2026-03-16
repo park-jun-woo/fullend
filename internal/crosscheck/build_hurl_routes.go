@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=scenario-check
 //ff:what OpenAPI에서 Hurl 검증용 정규화 라우트 목록 생성
 package crosscheck
 

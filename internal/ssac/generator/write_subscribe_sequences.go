@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=subscribe
 //ff:what subscribe 시퀀스를 순회하며 각 시퀀스의 코드를 버퍼에 출력
 package generator
 

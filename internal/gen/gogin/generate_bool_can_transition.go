@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=sequence
+//ff:func feature=gen-gogin type=generator control=sequence topic=states
 //ff:what generates CanTransition for boolean status fields
 
 package gogin

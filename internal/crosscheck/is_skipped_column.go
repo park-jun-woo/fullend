@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=openapi-ddl
 //ff:what 컬럼이 민감 정보 또는 x-include로 스킵 대상인지 확인
 package crosscheck
 

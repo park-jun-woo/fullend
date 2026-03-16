@@ -1,4 +1,4 @@
-//ff:type feature=statemachine type=model
+//ff:type feature=statemachine type=model topic=states
 //ff:what 상태 전이를 나타내는 구조체
 package statemachine
 

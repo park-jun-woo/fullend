@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=import-collect
 //ff:what 시퀀스에서 필요한 패키지 import을 수집
 package generator
 

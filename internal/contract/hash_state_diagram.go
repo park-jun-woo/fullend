@@ -1,4 +1,4 @@
-//ff:func feature=contract type=util control=iteration dimension=1
+//ff:func feature=contract type=util control=iteration dimension=1 topic=states
 //ff:what 상태 다이어그램의 계약 해시를 계산한다
 package contract
 

@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=iteration dimension=1
+//ff:func feature=symbol type=util control=iteration dimension=1 topic=ddl
 //ff:what CREATE TABLE 문에서 테이블명을 추출하고 tables에 등록한다
 package validator
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=selection
+//ff:func feature=ssac-gen type=generator control=selection topic=args-inputs
 //ff:what 시퀀스 타입에 따라 Args 또는 Inputs를 코드로 변환
 package generator
 

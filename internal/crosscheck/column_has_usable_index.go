@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=openapi-ddl
 //ff:what 컬럼에 사용 가능한 인덱스(선행 컬럼 또는 단일 컬럼)가 있는지 확인
 package crosscheck
 

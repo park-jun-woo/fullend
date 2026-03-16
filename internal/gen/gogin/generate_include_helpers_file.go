@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=sequence
+//ff:func feature=gen-gogin type=generator control=sequence topic=interface-derive
 //ff:what creates model/include_helpers.go with shared utility functions
 
 package gogin

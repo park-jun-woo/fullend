@@ -1,4 +1,4 @@
-//ff:type feature=policy type=model
+//ff:type feature=policy type=model topic=policy-check
 //ff:what @ownership 어노테이션에서 추출한 소유권 매핑 구조체
 package policy
 

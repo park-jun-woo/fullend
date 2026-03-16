@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=sensitive
 //ff:what 컬럼명이 민감 정보 패턴과 일치하는지 확인
 package crosscheck
 

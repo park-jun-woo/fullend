@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=scenario-check
 //ff:what 단일 Hurl 파일 라인을 파싱하여 요청/응답 상태 갱신
 package crosscheck
 

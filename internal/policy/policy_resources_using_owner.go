@@ -1,4 +1,4 @@
-//ff:func feature=policy type=util control=iteration dimension=1
+//ff:func feature=policy type=util control=iteration dimension=1 topic=policy-check
 //ff:what input.resource_owner를 참조하는 리소스 목록을 반환한다
 package policy
 

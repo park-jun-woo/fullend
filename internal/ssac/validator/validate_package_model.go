@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=1
+//ff:func feature=ssac-validate type=rule control=iteration dimension=1 topic=type-resolve
 //ff:what 패키지 접두사 모델의 존재 및 파라미터 매칭을 검증한다
 package validator
 

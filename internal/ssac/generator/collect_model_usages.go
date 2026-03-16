@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=model-collect
 //ff:what ServiceFunc 배열에서 모델 사용 정보를 수집
 package generator
 

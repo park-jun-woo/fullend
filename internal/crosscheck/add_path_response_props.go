@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=ssac-openapi
 //ff:what 단일 PathItem의 모든 Operation 응답 속성을 결과 맵에 추가
 package crosscheck
 

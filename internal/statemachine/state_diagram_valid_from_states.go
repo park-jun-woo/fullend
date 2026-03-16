@@ -1,4 +1,4 @@
-//ff:func feature=statemachine type=util control=iteration dimension=1
+//ff:func feature=statemachine type=util control=iteration dimension=1 topic=states
 //ff:what 특정 이벤트가 유효한 출발 상태 목록을 반환한다
 package statemachine
 

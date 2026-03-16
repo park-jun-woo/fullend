@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=queue-check
 //ff:what publish ↔ subscribe 토픽 교차 참조와 설정 유무를 검증
 package crosscheck
 

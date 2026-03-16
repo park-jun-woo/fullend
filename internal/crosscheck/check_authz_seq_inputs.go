@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=authz-check
 //ff:what @auth 시퀀스의 각 입력 키가 CheckRequest 필드에 있는지 검증
 package crosscheck
 

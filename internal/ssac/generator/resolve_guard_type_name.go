@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=type-resolve
 //ff:what 가드 대상의 타입명을 resolver와 resultTypes에서 순차 조회
 package generator
 

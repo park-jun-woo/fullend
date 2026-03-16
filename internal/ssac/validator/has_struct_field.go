@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=iteration dimension=2
+//ff:func feature=ssac-validate type=util control=iteration dimension=2 topic=type-resolve
 //ff:what struct에 지정된 필드가 존재하는지 확인한다
 package validator
 

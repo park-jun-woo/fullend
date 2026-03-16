@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=func-check
 //ff:what @call 결과와 Response 필드 매칭 검증
 package crosscheck
 

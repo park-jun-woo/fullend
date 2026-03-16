@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=selection
+//ff:func feature=crosscheck type=util control=selection topic=ssac-openapi
 //ff:what OpenAPI 스키마 타입을 Go 타입으로 변환
 package crosscheck
 

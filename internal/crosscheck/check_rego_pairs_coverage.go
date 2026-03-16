@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=policy-check
 //ff:what Rego allow 규칙이 SSaC authorize 시퀀스에 매칭되는지 검증
 package crosscheck
 

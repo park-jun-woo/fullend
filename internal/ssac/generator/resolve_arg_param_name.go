@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=args-inputs
 //ff:what Arg에서 Go 파라미터 이름을 추론
 package generator
 

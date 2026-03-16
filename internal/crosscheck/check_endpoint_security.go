@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=config-check
 //ff:what OpenAPI 엔드포인트의 보안 참조가 미들웨어에 존재하는지 검증
 package crosscheck
 

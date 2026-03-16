@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=ddl-coverage
 //ff:what 단일 SSaC 시퀀스에서 참조되는 DDL 테이블을 수집
 package crosscheck
 

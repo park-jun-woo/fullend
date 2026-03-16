@@ -1,4 +1,4 @@
-//ff:func feature=stml-gen type=util control=iteration dimension=1
+//ff:func feature=stml-gen type=util control=iteration dimension=1 topic=import-collect
 //ff:what PageSpec을 분석하여 필요한 임포트 목록을 결정한다
 package generator
 

@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=openapi-ddl
 //ff:what 단일 스키마의 속성이 DDL 컬럼에 존재하는지 검증
 package crosscheck
 

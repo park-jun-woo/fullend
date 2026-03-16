@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=ddl-coverage
 //ff:what DDL 테이블이 SSaC에서 참조되는지 검증
 package crosscheck
 

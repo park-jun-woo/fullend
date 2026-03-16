@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=ssac-openapi
 //ff:what PathItem에서 operationId로 필드 타입 조회
 package crosscheck
 

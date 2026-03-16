@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=1
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1 topic=http-handler
 //ff:what writes inline handler with path param extraction for a single route
 
 package gogin

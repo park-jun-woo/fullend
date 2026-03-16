@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=iteration dimension=1
+//ff:func feature=symbol type=util control=iteration dimension=1 topic=go-interface
 //ff:what InterfaceType에서 메서드 목록을 추출하여 ModelSymbol을 생성한다
 package validator
 

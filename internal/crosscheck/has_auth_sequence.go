@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=config-check
 //ff:what SSaC 함수 목록에서 @auth 시퀀스 존재 여부를 확인
 package crosscheck
 

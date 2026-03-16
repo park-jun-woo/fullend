@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=args-inputs
 //ff:what paramOrder 순서대로 입력 키를 배치하고 나머지를 알파벳순 추가
 package generator
 

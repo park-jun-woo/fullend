@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=policy-check
 //ff:what 정책과 SSaC/DDL/States 간 교차 검증 실행
 package crosscheck
 

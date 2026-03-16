@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=1
+//ff:func feature=gen-gogin type=util control=iteration dimension=1 topic=output
 //ff:what builds a contract directive for a model method from DDL table info
 
 package gogin

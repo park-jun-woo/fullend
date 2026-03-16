@@ -1,4 +1,4 @@
-//ff:func feature=stml-gen type=generator control=iteration dimension=1
+//ff:func feature=stml-gen type=generator control=iteration dimension=1 topic=output
 //ff:what PageSpec에서 React TSX 컴포넌트 전체 소스 코드를 생성한다
 package generator
 

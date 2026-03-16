@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=template-data
 //ff:what 사용되지 않는 result 변수에 Unused/ReAssign 플래그를 설정
 package generator
 

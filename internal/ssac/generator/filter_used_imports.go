@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=import-collect
 //ff:what 생성된 코드 본문에서 실제 참조되는 패키지만 필터링
 package generator
 

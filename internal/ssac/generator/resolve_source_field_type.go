@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=type-resolve
 //ff:what source.field 참조에서 DDL 테이블의 컬럼 타입을 조회
 package generator
 

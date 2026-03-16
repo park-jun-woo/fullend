@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=queue-check
 //ff:what subscribe 메시지 필드가 publish payload에 존재하는지 검증
 package crosscheck
 

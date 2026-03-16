@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=config-check
 //ff:what OpenAPI securitySchemes 이름을 수집
 package crosscheck
 

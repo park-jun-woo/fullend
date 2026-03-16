@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=states
 //ff:what 단일 다이어그램에서 @state가 없는 전이 이벤트 경고
 package crosscheck
 

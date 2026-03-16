@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=states
 //ff:what @state Inputs 필드가 DDL 컬럼에 존재하는지 검증
 package crosscheck
 

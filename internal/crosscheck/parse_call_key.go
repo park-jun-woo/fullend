@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=func-check
 //ff:what SSaC @call model 문자열에서 패키지, camelCase 함수명, 키 추출
 package crosscheck
 

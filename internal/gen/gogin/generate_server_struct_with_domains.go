@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=1
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1 topic=http-handler
 //ff:what creates per-domain handler.go files and central server.go
 
 package gogin

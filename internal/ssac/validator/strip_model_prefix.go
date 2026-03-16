@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=sequence
+//ff:func feature=symbol type=util control=sequence topic=sqlc
 //ff:what 쿼리 이름에서 모델명 접두사를 제거한다
 package validator
 

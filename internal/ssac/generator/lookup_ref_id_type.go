@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=type-resolve
 //ff:what {Model}ID 패턴의 필드에서 참조 테이블의 id 컬럼 타입을 조회
 package generator
 

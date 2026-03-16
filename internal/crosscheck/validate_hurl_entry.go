@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=scenario-check
 //ff:what 단일 Hurl 항목을 OpenAPI 라우트와 대조 검증
 package crosscheck
 

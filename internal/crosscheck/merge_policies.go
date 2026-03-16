@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=policy-check
 //ff:what 모든 정책의 action-resource 쌍과 ownership 정보를 병합
 package crosscheck
 

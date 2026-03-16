@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=selection
+//ff:func feature=ssac-gen type=generator control=selection topic=args-inputs
 //ff:what 단일 Arg를 Go 코드 표현으로 변환
 package generator
 

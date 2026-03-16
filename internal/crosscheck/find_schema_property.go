@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=openapi-ddl
 //ff:what 스키마에서 속성명 또는 camelCase 대체 조회
 package crosscheck
 

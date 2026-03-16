@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=type-resolve
 //ff:what SSaC input KEY 이름에서 DDL 테이블을 참조하여 Go 타입을 추론 (VALUE 기반 실패 시 fallback)
 package generator
 

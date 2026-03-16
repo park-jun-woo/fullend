@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=response
 //ff:what 시퀀스에 직접 응답(@response varName) 패턴이 있는지 확인
 package generator
 

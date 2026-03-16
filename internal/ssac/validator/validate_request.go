@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=1
+//ff:func feature=ssac-validate type=rule control=iteration dimension=1 topic=args-inputs
 //ff:what request 필드 OpenAPI 일치 검증
 
 package validator

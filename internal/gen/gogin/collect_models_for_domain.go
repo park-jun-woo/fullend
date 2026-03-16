@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=2
+//ff:func feature=gen-gogin type=util control=iteration dimension=2 topic=model-collect
 //ff:what extracts model names used by funcs in a specific domain
 
 package gogin

@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=config-check
 //ff:what fullend.yaml claims에서 claim key 집합을 생성
 package crosscheck
 

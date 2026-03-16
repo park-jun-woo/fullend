@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=output
 //ff:what Go 파일 확장자 ".go"를 반환
 package generator
 

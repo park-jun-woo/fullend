@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=states
 //ff:what 단일 다이어그램의 이벤트가 SSaC 함수에 존재하는지 검증
 package crosscheck
 

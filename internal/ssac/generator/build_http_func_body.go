@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=http-handler
 //ff:what HTTP 핸들러 함수의 본문을 생성
 package generator
 

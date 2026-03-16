@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=output
 //ff:what 단일 ServiceFunc의 코드를 생성하고 파일로 출력
 package generator
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=args-inputs
 //ff:what 입력 키를 알파벳순으로 정렬하되 query를 마지막에 배치
 package generator
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=2
+//ff:func feature=ssac-validate type=rule control=iteration dimension=2 topic=subscribe
 //ff:what HTTP 함수에서 message 사용을 검증한다
 package validator
 

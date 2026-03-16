@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=states
 //ff:what 상태 필드 PascalCase를 snake_case로 변환
 package crosscheck
 

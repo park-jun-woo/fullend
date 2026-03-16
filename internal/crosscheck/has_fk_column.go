@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=openapi-ddl
 //ff:what 소스 테이블에 특정 FK 컬럼이 대상 테이블을 참조하는지 확인
 package crosscheck
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=selection
+//ff:func feature=ssac-gen type=generator control=selection topic=template-data
 //ff:what 시퀀스의 모델 참조를 분석하여 templateData의 ModelCall/PkgName 설정
 package generator
 

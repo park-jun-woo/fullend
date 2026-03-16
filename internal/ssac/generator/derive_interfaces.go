@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=interface-derive
 //ff:what 모델 사용 정보와 심볼 테이블에서 인터페이스를 파생
 package generator
 

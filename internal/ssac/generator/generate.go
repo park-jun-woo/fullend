@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=output
 //ff:what ServiceFunc 배열을 받아 outDir에 Go 파일을 생성하는 진입점
 package generator
 

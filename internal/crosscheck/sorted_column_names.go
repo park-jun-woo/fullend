@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=openapi-ddl
 //ff:what DDL 컬럼 맵에서 정렬된 컬럼명 목록 반환
 package crosscheck
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=string-convert
 //ff:what 문자열의 첫 글자를 대문자로 변환하는 경량 래퍼
 package generator
 

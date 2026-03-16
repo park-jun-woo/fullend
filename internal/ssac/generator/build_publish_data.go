@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=publish
 //ff:what publish 시퀀스의 토픽, 페이로드, 옵션을 templateData에 설정
 package generator
 

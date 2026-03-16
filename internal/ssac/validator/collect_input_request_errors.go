@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=iteration dimension=1
+//ff:func feature=ssac-validate type=util control=iteration dimension=1 topic=args-inputs
 //ff:what Inputs에서 request 접두사 필드의 OpenAPI 일치를 검사한다
 package validator
 

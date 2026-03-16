@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=config-check
 //ff:what SSaC currentUser 필드 참조가 fullend.yaml claims에 정의되어 있는지 검증
 package crosscheck
 

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=1
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1 topic=interface-derive
 //ff:what @func 호출 결과 변수에 string 타입 단언을 추가한다
 
 package gogin

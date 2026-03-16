@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=subscribe
 //ff:what subscribe 함수의 트랜잭션 시작 코드를 출력
 package generator
 

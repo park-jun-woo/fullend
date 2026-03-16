@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=publish
 //ff:what publish의 Options를 Go 코드(WithDelay, WithPriority)로 변환
 package generator
 

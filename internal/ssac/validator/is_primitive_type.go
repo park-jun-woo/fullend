@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=sequence
+//ff:func feature=ssac-validate type=util control=sequence topic=type-resolve
 //ff:what Go 기본 타입 여부를 반환한다
 package validator
 

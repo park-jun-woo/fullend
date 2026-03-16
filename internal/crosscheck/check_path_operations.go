@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=openapi-ddl
 //ff:what 단일 경로의 Operation별 x-sort/x-filter/x-include/cursor 검증
 package crosscheck
 

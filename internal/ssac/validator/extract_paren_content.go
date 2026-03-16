@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=sequence
+//ff:func feature=symbol type=util control=sequence topic=ddl
 //ff:what "(content)" 에서 content를 추출한다
 package validator
 

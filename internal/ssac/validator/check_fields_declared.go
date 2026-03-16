@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=iteration dimension=1
+//ff:func feature=ssac-validate type=util control=iteration dimension=1 topic=args-inputs
 //ff:what Fields 참조 변수의 선언 여부를 검사한다
 package validator
 

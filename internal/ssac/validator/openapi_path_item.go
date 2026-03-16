@@ -1,4 +1,4 @@
-//ff:type feature=symbol type=model
+//ff:type feature=symbol type=model topic=openapi
 //ff:what openAPIPathItem 타입 정의
 package validator
 

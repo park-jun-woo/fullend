@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=1
+//ff:func feature=gen-gogin type=util control=iteration dimension=1 topic=output
 //ff:what builds a map from generated .go filename to operationID
 
 package gogin

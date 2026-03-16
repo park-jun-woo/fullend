@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=2
+//ff:func feature=gen-gogin type=util control=iteration dimension=2 topic=model-collect
 //ff:what resolves x-include specs against DDL FK relationships
 
 package gogin

@@ -1,4 +1,4 @@
-//ff:func feature=policy type=util control=iteration dimension=1
+//ff:func feature=policy type=util control=iteration dimension=1 topic=policy-check
 //ff:what 특정 리소스의 소유권 매핑을 찾아 반환한다
 package policy
 

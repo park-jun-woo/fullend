@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=2
+//ff:func feature=ssac-validate type=rule control=iteration dimension=2 topic=type-resolve
 //ff:what Model 심볼 테이블 존재 검증
 
 package validator

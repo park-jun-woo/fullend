@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=ssac-openapi
 //ff:what shorthand @response 변수명에서 JSON 필드명 해석
 package crosscheck
 

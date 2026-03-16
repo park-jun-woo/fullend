@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=type-resolve
 //ff:what SymbolTable에서 @call 대상 함수의 @error 어노테이션 값을 조회
 package generator
 

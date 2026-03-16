@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=ssac-openapi
 //ff:what Operation에서 응답 코드 수집
 package crosscheck
 

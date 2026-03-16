@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=sensitive
 //ff:what SQL 한 줄에서 @sensitive/@nosensitive 태그를 감지하고 테이블·컬럼 정보를 갱신
 package crosscheck
 

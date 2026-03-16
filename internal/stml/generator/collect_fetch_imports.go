@@ -1,4 +1,4 @@
-//ff:func feature=stml-gen type=util control=iteration dimension=1
+//ff:func feature=stml-gen type=util control=iteration dimension=1 topic=import-collect
 //ff:what FetchBlock에서 필요한 임포트(useParams, useState, 컴포넌트)를 수집한다
 package generator
 

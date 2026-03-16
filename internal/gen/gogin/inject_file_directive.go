@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=1
+//ff:func feature=gen-gogin type=util control=iteration dimension=1 topic=output
 //ff:what inserts a file-level directive before the package declaration
 
 package gogin

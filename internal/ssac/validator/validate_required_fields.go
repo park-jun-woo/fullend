@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=1
+//ff:func feature=ssac-validate type=rule control=iteration dimension=1 topic=args-inputs
 //ff:what 타입별 필수 필드 누락 검증
 package validator
 

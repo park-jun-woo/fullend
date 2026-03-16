@@ -1,4 +1,4 @@
-//ff:func feature=contract type=util control=iteration dimension=1
+//ff:func feature=contract type=util control=iteration dimension=1 topic=config-check
 //ff:what 미들웨어 클레임의 계약 해시를 계산한다
 package contract
 

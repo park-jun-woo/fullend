@@ -1,4 +1,4 @@
-//ff:func feature=stml-gen type=generator control=sequence
+//ff:func feature=stml-gen type=generator control=sequence topic=output
 //ff:what 기본 Target으로 페이지 목록의 프레임워크별 파일을 생성한다
 package generator
 

@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=ssac-ddl
 //ff:what SymbolTable에서 DDL 컬럼의 Go 타입 조회
 package crosscheck
 

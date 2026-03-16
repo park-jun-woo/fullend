@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=1
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1 topic=interface-derive
 //ff:what writes method implementations and include helpers for a model file
 
 package gogin

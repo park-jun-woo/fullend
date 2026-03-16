@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=sequence
+//ff:func feature=symbol type=util control=sequence topic=sqlc
 //ff:what SQL 본문에서 $N ↔ 컬럼명 매핑을 추출하여 파라미터명을 반환한다
 package validator
 

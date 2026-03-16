@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=ssac-openapi
 //ff:what shorthand @response 변수를 OpenAPI 속성과 대조 검증
 package crosscheck
 

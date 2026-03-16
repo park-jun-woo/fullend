@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=scenario-check
 //ff:what 단일 OpenAPI 경로의 메서드별 정규화 라우트 생성
 package crosscheck
 

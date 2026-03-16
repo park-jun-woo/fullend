@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=policy-check
 //ff:what 리소스명에서 DDL 테이블명 해석
 package crosscheck
 

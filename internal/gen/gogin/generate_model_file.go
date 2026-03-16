@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=2
+//ff:func feature=gen-gogin type=generator control=iteration dimension=2 topic=interface-derive
 //ff:what creates model/{model}.go with the implementation struct using *sql.DB
 
 package gogin

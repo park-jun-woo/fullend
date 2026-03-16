@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=openapi-ddl
 //ff:what snake_case 컬럼이 DDL 테이블 중 하나에 존재하는지 확인
 package crosscheck
 

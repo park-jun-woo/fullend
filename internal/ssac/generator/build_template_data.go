@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=template-data
 //ff:what 시퀀스를 분석하여 templateData를 구성 (모델 호출, 가드, 상태, 인증, 응답 등)
 package generator
 

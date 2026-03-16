@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=interface-derive
 //ff:what 단일 메서드의 파라미터와 반환 타입을 파생
 package generator
 

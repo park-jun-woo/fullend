@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=sequence
+//ff:func feature=symbol type=util control=sequence topic=ddl
 //ff:what UNIQUE 제약 라인에서 unique index를 추가한다
 package validator
 

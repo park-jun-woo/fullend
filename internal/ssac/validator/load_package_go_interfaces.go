@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=loader control=sequence
+//ff:func feature=symbol type=loader control=sequence topic=go-interface
 //ff:what 디렉토리에서 Go interface를 파싱하여 "pkg.Model" 키로 등록한다
 package validator
 

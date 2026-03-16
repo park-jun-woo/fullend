@@ -1,4 +1,4 @@
-//ff:type feature=statemachine type=model
+//ff:type feature=statemachine type=model topic=states
 //ff:what Mermaid stateDiagram 파싱 결과를 담는 구조체
 package statemachine
 

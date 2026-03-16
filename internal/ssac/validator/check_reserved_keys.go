@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=iteration dimension=1
+//ff:func feature=ssac-validate type=util control=iteration dimension=1 topic=string-convert
 //ff:what 단일 시퀀스의 Inputs 키에서 Go 예약어 충돌을 검사한다
 package validator
 

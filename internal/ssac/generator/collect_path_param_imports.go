@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=path-params
 //ff:what 경로 파라미터에 비문자열 타입이 있으면 strconv import 추가
 package generator
 

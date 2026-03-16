@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=output
 //ff:what 지정된 Target으로 ServiceFunc 배열을 순회하며 코드를 생성
 package generator
 

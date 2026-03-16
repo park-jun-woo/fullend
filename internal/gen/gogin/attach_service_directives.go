@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=1
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1 topic=output
 //ff:what scans service .go files and injects //fullend:gen directives
 
 package gogin

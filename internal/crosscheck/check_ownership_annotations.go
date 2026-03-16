@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=policy-check
 //ff:what Rego resource_owner 참조에 대한 @ownership 어노테이션 존재 여부 검증
 package crosscheck
 

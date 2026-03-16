@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=ssac-openapi
 //ff:what OpenAPI 요청 스키마에서 필드의 Go 타입 조회
 package crosscheck
 

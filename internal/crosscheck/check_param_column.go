@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=ssac-ddl
 //ff:what SSaC 입력 파라미터가 DDL 테이블 컬럼에 존재하는지 검증
 package crosscheck
 

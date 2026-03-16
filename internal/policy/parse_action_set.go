@@ -1,4 +1,4 @@
-//ff:func feature=policy type=util control=iteration dimension=1
+//ff:func feature=policy type=util control=iteration dimension=1 topic=policy-check
 //ff:what 쉼표로 구분된 액션 문자열을 파싱하여 슬라이스로 반환한다
 package policy
 

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=1
+//ff:func feature=gen-gogin type=util control=iteration dimension=1 topic=query-opts
 //ff:what finds cursor field name by matching method name to cursor specs
 
 package gogin

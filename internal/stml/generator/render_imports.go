@@ -1,4 +1,4 @@
-//ff:func feature=stml-gen type=generator control=iteration dimension=1
+//ff:func feature=stml-gen type=generator control=iteration dimension=1 topic=import-collect
 //ff:what importSet을 기반으로 React 임포트 블록 문자열을 생성한다
 package generator
 

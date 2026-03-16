@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=scenario-check
 //ff:what Hurl 시나리오 파일이 유효한 OpenAPI 경로를 참조하는지 검증
 package crosscheck
 

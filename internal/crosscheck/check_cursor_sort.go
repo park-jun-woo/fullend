@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=openapi-ddl
 //ff:what cursor 페이지네이션과 x-sort 제약 조건 검증
 package crosscheck
 

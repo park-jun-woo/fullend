@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=states
 //ff:what @state Inputs에서 상태 필드명 추출
 package crosscheck
 

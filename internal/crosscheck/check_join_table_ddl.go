@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=policy-check
 //ff:what @ownership 조인 테이블·컬럼이 DDL에 존재하는지 검증
 package crosscheck
 

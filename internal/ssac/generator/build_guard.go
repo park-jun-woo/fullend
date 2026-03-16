@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=template-data
 //ff:what empty/exists 가드의 제로값 비교 코드를 templateData에 설정
 package generator
 

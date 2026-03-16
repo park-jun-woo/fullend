@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=response
 //ff:what 응답 필드 배열에서 이름으로 타입을 검색
 package generator
 

@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=iteration dimension=1
+//ff:func feature=symbol type=util control=iteration dimension=1 topic=ddl
 //ff:what 괄호 안 컬럼을 추출한다
 package validator
 

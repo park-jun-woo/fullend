@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=selection
+//ff:func feature=ssac-validate type=rule control=selection topic=args-inputs
 //ff:what 시퀀스 타입별 필수 필드 누락을 검증한다
 package validator
 

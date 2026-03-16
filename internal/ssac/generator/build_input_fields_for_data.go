@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=args-inputs
 //ff:what state/auth/call 시퀀스의 Inputs를 Go struct 필드로 변환
 package generator
 

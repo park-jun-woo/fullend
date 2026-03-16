@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=args-inputs
 //ff:what Inputs map의 value를 paramOrder 또는 알파벳순으로 positional 함수 인자로 변환
 package generator
 

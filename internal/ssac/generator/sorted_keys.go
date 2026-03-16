@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=string-convert
 //ff:what map[string]bool의 키를 정렬하여 반환
 package generator
 

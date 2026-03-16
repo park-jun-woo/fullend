@@ -1,4 +1,4 @@
-//ff:type feature=symbol type=model
+//ff:type feature=symbol type=model topic=openapi
 //ff:what API 엔드포인트의 request/response 필드 목록 + HasQueryOpts
 package validator
 

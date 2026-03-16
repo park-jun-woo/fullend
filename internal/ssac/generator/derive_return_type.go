@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=interface-derive
 //ff:what 메서드 정보와 사용 정보에서 Go 반환 타입을 파생
 package generator
 

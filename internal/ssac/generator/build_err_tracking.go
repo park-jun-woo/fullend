@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=selection
+//ff:func feature=ssac-gen type=generator control=selection topic=template-data
 //ff:what 시퀀스 타입별 err 변수 선언 추적 및 FirstErr 플래그 설정
 package generator
 

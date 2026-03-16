@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=iteration dimension=1
+//ff:func feature=ssac-validate type=util control=iteration dimension=1 topic=string-convert
 //ff:what PascalCase/camelCase를 snake_case로 변환한다
 package validator
 

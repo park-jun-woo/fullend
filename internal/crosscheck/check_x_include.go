@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=openapi-ddl
 //ff:what x-include FK 조인 필드가 DDL 테이블과 일치하는지 검증
 package crosscheck
 

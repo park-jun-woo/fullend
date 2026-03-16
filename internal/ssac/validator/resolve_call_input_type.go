@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=sequence
+//ff:func feature=ssac-validate type=util control=sequence topic=type-resolve
 //ff:what @call input value에서 Go 타입을 결정한다
 package validator
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=output
 //ff:what 심볼 테이블과 SSaC spec을 교차하여 models_gen.go를 생성
 package generator
 

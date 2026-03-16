@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=string-convert
 //ff:what Go 컨벤션에 맞게 첫 글자를 대문자로 변환 (이니셜리즘 포함)
 package generator
 

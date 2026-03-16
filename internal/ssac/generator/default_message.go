@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=selection
+//ff:func feature=ssac-gen type=util control=selection topic=template-data
 //ff:what 시퀀스 타입별 기본 에러 메시지를 반환
 package generator
 

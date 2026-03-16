@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=args-inputs
 //ff:what sqlc/interface 파라미터 순서대로 입력 키를 배치
 package generator
 

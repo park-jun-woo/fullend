@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=selection
+//ff:func feature=gen-gogin type=generator control=selection topic=states
 //ff:what writes the CanTransition function based on field type
 
 package gogin

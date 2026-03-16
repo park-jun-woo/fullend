@@ -1,4 +1,4 @@
-//ff:type feature=ssac-gen type=generator
+//ff:type feature=ssac-gen type=generator topic=output
 //ff:what Go 언어용 코드 생성기 구조체
 package generator
 

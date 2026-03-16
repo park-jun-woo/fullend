@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=selection
+//ff:func feature=ssac-gen type=generator control=selection topic=path-params
 //ff:what 경로 파라미터의 Go 추출 코드를 생성
 package generator
 

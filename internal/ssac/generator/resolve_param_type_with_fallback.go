@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=type-resolve
 //ff:what value 기반 타입 추론 후 string이면 key 기반으로 fallback
 package generator
 

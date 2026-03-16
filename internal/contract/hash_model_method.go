@@ -1,4 +1,4 @@
-//ff:func feature=contract type=util control=sequence
+//ff:func feature=contract type=util control=sequence topic=go-interface
 //ff:what 모델 구현 메서드의 계약 해시를 계산한다
 package contract
 

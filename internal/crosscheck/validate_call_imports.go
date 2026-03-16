@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=func-check
 //ff:what @call func에서 I/O 패키지 import 금지 검증
 package crosscheck
 

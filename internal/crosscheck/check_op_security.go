@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=config-check
 //ff:what 단일 OpenAPI 오퍼레이션의 보안 요구사항이 미들웨어에 존재하는지 검증
 package crosscheck
 

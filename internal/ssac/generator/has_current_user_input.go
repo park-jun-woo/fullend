@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=currentuser
 //ff:what 시퀀스의 Inputs에 currentUser. 접두사가 있는지 확인
 package generator
 

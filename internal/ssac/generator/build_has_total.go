@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=sequence
+//ff:func feature=ssac-gen type=generator control=sequence topic=template-data
 //ff:what query + 리스트 반환 시 HasTotal 플래그를 설정
 package generator
 

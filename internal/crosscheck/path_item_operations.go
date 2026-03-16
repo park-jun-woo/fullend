@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=ssac-openapi
 //ff:what PathItem에서 모든 Operation 목록 반환
 package crosscheck
 

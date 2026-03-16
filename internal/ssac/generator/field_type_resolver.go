@@ -1,4 +1,4 @@
-//ff:type feature=ssac-gen type=util
+//ff:type feature=ssac-gen type=util topic=type-resolve
 //ff:what 변수.필드의 Go 타입을 조회하는 리졸버 구조체
 package generator
 

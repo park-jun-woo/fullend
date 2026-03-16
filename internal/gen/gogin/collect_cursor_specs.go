@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration dimension=2
+//ff:func feature=gen-gogin type=util control=iteration dimension=2 topic=query-opts
 //ff:what extracts cursor column Go field name per operationId from OpenAPI x-pagination
 
 package gogin

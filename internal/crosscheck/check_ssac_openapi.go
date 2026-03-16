@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=ssac-openapi
 //ff:what SSaC 함수명과 OpenAPI operationId 교차 검증 및 @response 필드 매칭
 package crosscheck
 

@@ -1,4 +1,4 @@
-//ff:type feature=policy type=model
+//ff:type feature=policy type=model topic=policy-check
 //ff:what OPA Rego 정책 파싱 결과를 담는 구조체
 package policy
 

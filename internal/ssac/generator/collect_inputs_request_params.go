@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=request-params
 //ff:what 시퀀스의 Inputs에서 request. 접두사 파라미터를 수집
 package generator
 

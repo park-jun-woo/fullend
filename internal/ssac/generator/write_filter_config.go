@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=query-opts
 //ff:what QueryOpts의 Filter 설정 코드를 버퍼에 출력
 package generator
 

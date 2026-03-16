@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=output
 //ff:what 도메인별 Handler struct를 생성하여 파일로 출력
 package generator
 

@@ -1,4 +1,4 @@
-//ff:type feature=ssac-gen type=model
+//ff:type feature=ssac-gen type=model topic=type-resolve
 //ff:what 변수의 출처 정보(DDL/func)를 나타내는 구조체
 package generator
 

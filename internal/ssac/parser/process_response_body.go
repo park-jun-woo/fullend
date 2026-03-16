@@ -1,4 +1,4 @@
-//ff:func feature=ssac-parse type=parser control=sequence
+//ff:func feature=ssac-parse type=parser control=sequence topic=response
 //ff:what @response 블록 본문 줄을 처리
 package parser
 

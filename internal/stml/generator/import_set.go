@@ -1,4 +1,4 @@
-//ff:type feature=stml-gen type=model
+//ff:type feature=stml-gen type=model topic=import-collect
 //ff:what 페이지에 필요한 고유 임포트를 수집하는 구조체
 package generator
 

@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=openapi-ddl
 //ff:what OpenAPI x-sort, x-filter, x-include를 DDL 테이블과 검증하고 유령 property 검사
 package crosscheck
 

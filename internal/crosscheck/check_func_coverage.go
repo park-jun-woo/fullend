@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=func-coverage
 //ff:what 프로젝트 func spec이 SSaC @call에서 참조되는지 검증
 package crosscheck
 

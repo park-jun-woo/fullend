@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=2
+//ff:func feature=ssac-validate type=rule control=iteration dimension=2 topic=type-resolve
 //ff:what FK 참조 @get 후 @empty 가드 누락 검증
 
 package validator

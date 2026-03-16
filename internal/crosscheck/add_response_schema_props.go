@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=ssac-openapi
 //ff:what 응답 참조에서 JSON 스키마 속성명을 맵에 추가
 package crosscheck
 

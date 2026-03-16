@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=authz-check
 //ff:what map의 키를 bool set으로 변환
 package crosscheck
 

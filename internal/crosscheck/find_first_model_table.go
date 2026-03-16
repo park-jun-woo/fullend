@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=func-check
 //ff:what SSaC 함수의 첫 번째 @model에서 테이블명 추출
 package crosscheck
 

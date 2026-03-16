@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=selection
+//ff:func feature=crosscheck type=util control=selection topic=openapi-ddl
 //ff:what kin-openapi 확장 값을 JSON 언마샬
 package crosscheck
 

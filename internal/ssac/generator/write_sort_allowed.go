@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=query-opts
 //ff:what Sort 허용 컬럼 목록을 Go 코드로 버퍼에 출력
 package generator
 

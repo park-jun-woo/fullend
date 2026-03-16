@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=openapi-ddl
 //ff:what DDL 테이블명과 타입명의 대응 여부 확인
 package crosscheck
 

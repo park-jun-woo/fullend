@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=sequence
+//ff:func feature=ssac-gen type=util control=sequence topic=type-resolve
 //ff:what 심볼 테이블에서 모델 메서드의 파라미터 순서를 조회
 package generator
 

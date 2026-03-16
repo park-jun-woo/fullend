@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=selection
+//ff:func feature=symbol type=util control=selection topic=openapi
 //ff:what OpenAPI type+format을 Go 타입으로 변환한다
 package validator
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=iteration dimension=1
+//ff:func feature=ssac-validate type=rule control=iteration dimension=1 topic=query-opts
 //ff:what x-pagination style과 Result.Wrapper 타입 일치 검증
 package validator
 

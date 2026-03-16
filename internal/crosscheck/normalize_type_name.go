@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=func-check
 //ff:what 타입 이름에서 슬라이스·포인터 접두사를 제거
 package crosscheck
 

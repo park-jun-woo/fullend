@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=ddl-coverage
 //ff:what @archived 인라인 태그가 있는 컬럼을 ArchivedInfo에 기록
 package crosscheck
 

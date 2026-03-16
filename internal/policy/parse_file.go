@@ -1,4 +1,4 @@
-//ff:func feature=policy type=parser control=iteration dimension=1
+//ff:func feature=policy type=parser control=iteration dimension=1 topic=policy-check
 //ff:what .rego 파일 하나를 파싱하여 Policy 구조체를 반환한다
 package policy
 

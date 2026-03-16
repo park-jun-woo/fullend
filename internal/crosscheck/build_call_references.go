@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=func-check
 //ff:what SSaC @call 시퀀스에서 참조된 func 이름을 수집
 package crosscheck
 

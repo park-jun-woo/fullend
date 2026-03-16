@@ -1,4 +1,4 @@
-//ff:func feature=statemachine type=util control=sequence
+//ff:func feature=statemachine type=util control=sequence topic=states
 //ff:what 마크다운에서 mermaid 코드 블록의 내용을 추출한다
 package statemachine
 

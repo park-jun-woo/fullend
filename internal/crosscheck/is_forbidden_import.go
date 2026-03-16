@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=func-check
 //ff:what import가 금지된 I/O 패키지 접두사와 일치하는지 확인
 package crosscheck
 

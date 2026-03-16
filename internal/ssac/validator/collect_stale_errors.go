@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=util control=iteration dimension=1
+//ff:func feature=ssac-validate type=util control=iteration dimension=1 topic=response
 //ff:what response 필드에서 stale 변수 참조를 검출한다
 package validator
 

@@ -1,4 +1,4 @@
-//ff:func feature=policy type=parser control=sequence
+//ff:func feature=policy type=parser control=sequence topic=policy-check
 //ff:what allow 블록 하나에서 AllowRule을 추출한다
 package policy
 

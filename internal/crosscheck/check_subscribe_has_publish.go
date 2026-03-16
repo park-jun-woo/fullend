@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=queue-check
 //ff:what subscribe 토픽에 대한 publish 존재 여부 검증
 package crosscheck
 

@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:func feature=crosscheck type=rule control=iteration dimension=1 topic=sensitive
 //ff:what 단일 테이블의 컬럼이 민감 패턴에 매치되지만 @sensitive 없는 경우 검증
 package crosscheck
 

@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=subscribe
 //ff:what subscribe 함수에 필요한 import 경로를 수집
 package generator
 

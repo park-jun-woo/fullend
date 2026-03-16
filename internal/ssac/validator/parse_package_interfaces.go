@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=loader control=iteration dimension=5
+//ff:func feature=symbol type=loader control=iteration dimension=5 topic=go-interface
 //ff:what Go 파일에서 interface를 파싱하여 SymbolTable.Models에 등록한다
 package validator
 

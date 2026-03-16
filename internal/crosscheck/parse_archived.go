@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=ddl-coverage
 //ff:what DDL 디렉토리에서 @archived 태그를 파싱
 package crosscheck
 

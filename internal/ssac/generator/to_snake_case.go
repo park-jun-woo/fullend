@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=string-convert
 //ff:what PascalCase/camelCase를 snake_case로 변환
 package generator
 

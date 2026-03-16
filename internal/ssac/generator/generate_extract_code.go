@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=selection
+//ff:func feature=ssac-gen type=generator control=selection topic=request-params
 //ff:what Go 타입별 요청 파라미터 추출 코드를 생성
 package generator
 

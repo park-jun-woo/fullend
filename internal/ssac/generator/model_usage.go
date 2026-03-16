@@ -1,4 +1,4 @@
-//ff:type feature=ssac-gen type=model
+//ff:type feature=ssac-gen type=model topic=model-collect
 //ff:what 모델 사용 정보를 담는 구조체
 package generator
 

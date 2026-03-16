@@ -1,4 +1,4 @@
-//ff:func feature=policy type=util control=iteration dimension=1
+//ff:func feature=policy type=util control=iteration dimension=1 topic=policy-check
 //ff:what 중괄호 깊이를 추적하여 allow 블록의 닫는 중괄호 인덱스를 찾는다
 package policy
 

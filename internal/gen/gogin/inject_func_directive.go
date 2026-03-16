@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=sequence
+//ff:func feature=gen-gogin type=util control=sequence topic=output
 //ff:what inserts a directive before the first func declaration
 
 package gogin

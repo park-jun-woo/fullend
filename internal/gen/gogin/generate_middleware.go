@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=1
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1 topic=config-check
 //ff:what creates internal/middleware/bearerauth.go with claims-based CurrentUser mapping
 
 package gogin

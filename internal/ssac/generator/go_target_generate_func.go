@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=selection
+//ff:func feature=ssac-gen type=generator control=selection topic=output
 //ff:what ServiceFunc의 subscribe 여부에 따라 HTTP/Subscribe 코드 생성을 분기
 package generator
 

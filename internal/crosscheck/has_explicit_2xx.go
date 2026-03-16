@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=iteration dimension=1
+//ff:func feature=crosscheck type=util control=iteration dimension=1 topic=ssac-openapi
 //ff:what OpenAPI Operation에 명시적 2xx 응답 코드가 있는지 확인
 package crosscheck
 

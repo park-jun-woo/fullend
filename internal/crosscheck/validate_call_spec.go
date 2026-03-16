@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=rule control=sequence
+//ff:func feature=crosscheck type=rule control=sequence topic=func-check
 //ff:what @call 시퀀스의 spec 매칭 (HasBody, 금지 import, 파라미터, 결과, 소스 변수) 검증
 package crosscheck
 

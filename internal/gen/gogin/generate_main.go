@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=2
+//ff:func feature=gen-gogin type=generator control=iteration dimension=2 topic=output
 //ff:what creates backend/go.mod and backend/cmd/main.go for flat mode
 
 package gogin

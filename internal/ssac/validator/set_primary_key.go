@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=sequence
+//ff:func feature=symbol type=util control=sequence topic=ddl
 //ff:what PRIMARY KEY 라인에서 PK 컬럼을 추출하여 설정한다
 package validator
 

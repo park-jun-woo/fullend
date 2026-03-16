@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=import-collect
 //ff:what 표준 라이브러리 우선 순서로 import 슬라이스를 생성
 package generator
 

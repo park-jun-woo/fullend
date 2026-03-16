@@ -1,4 +1,4 @@
-//ff:func feature=ssac-gen type=generator control=iteration dimension=1
+//ff:func feature=ssac-gen type=generator control=iteration dimension=1 topic=interface-derive
 //ff:what 단일 인터페이스 정의를 버퍼에 출력
 package generator
 
