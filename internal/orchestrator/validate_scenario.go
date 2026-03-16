@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule control=sequence
+//ff:func feature=orchestrator type=rule control=iteration dimension=1
 //ff:what Hurl 시나리오 검증 — .feature 파일 차단 + scenario/invariant .hurl 파일 수집
 package orchestrator
 
