@@ -1,0 +1,12 @@
+//ff:func feature=ssac-gen type=util control=iteration dimension=1
+//ff:what 문자열 슬라이스에 대상 문자열이 포함되어 있는지 확인
+package generator
+
+func containsString(ss []string, target string) bool {
+	for _, s := range ss {
+		if s == target {
+			return true
+		}
+	}
+	return false
+}
