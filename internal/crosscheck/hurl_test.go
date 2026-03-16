@@ -3,6 +3,7 @@ package crosscheck
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 )
 
@@ -20,14 +21,8 @@ func TestNormalizeHurlPath(t *testing.T) {
 
 	for _, tt := range tests {
 		got := normalizeHurlPath(tt.input)
-		if len(got) != len(tt.want) {
+		if !slices.Equal(got, tt.want) {
 			t.Errorf("normalizeHurlPath(%q) = %v, want %v", tt.input, got, tt.want)
-			continue
-		}
-		for i := range got {
-			if got[i] != tt.want[i] {
-				t.Errorf("normalizeHurlPath(%q)[%d] = %q, want %q", tt.input, i, got[i], tt.want[i])
-			}
 		}
 	}
 }
@@ -44,14 +39,8 @@ func TestNormalizeOpenAPIPath(t *testing.T) {
 
 	for _, tt := range tests {
 		got := normalizeOpenAPIPath(tt.input)
-		if len(got) != len(tt.want) {
+		if !slices.Equal(got, tt.want) {
 			t.Errorf("normalizeOpenAPIPath(%q) = %v, want %v", tt.input, got, tt.want)
-			continue
-		}
-		for i := range got {
-			if got[i] != tt.want[i] {
-				t.Errorf("normalizeOpenAPIPath(%q)[%d] = %q, want %q", tt.input, i, got[i], tt.want[i])
-			}
 		}
 	}
 }
