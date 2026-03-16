@@ -22,16 +22,17 @@ internal 소형 10개 패키지 filefunc 준수 + gen/gogin Q3 WARNING 4건 해�
 
 합계: 14파일 (2,529 LOC) → ~106파일
 
-## gen/gogin Q3 WARNING (추가)
+## Q3 WARNING (추가)
 
-이미 filefunc 1-func/file 준수 상태. 100줄 초과 함수 4건 분해만 필요.
+이미 filefunc 1-func/file 준수 상태. 100줄 초과 함수 분해만 필요.
 
-| 파일 | 함수 | LOC |
-|---|---|---|
-| generate_main.go | generateMain | 124 |
-| generate_main_with_domains.go | generateMainWithDomains | 190 |
-| generate_query_opts.go | generateQueryOpts | 216 |
-| transform_source.go | transformSource | 105 |
+| 패키지 | 파일 | 함수 | LOC |
+|---|---|---|---|
+| gen/gogin | generate_main.go | generateMain | 124 |
+| gen/gogin | generate_main_with_domains.go | generateMainWithDomains | 190 |
+| gen/gogin | generate_query_opts.go | generateQueryOpts | 216 |
+| gen/gogin | transform_source.go | transformSource | 105 |
+| gen/react | react.go | writeAPIClient | 120 |
 
 hint: backtick string detected — 템플릿 문자열 별도 파일 추출 검토.
 
@@ -40,7 +41,7 @@ hint: backtick string detected — 템플릿 문자열 별도 파일 추출 검�
 1. 파일 분해 — F1/F2/F3 해소
 2. `//ff:func`/`//ff:type`/`//ff:what` 부착 — A1/A3 해소
 3. Q1 해소 (main.go, genmodel, gen/react 등 nesting depth)
-4. Q3 해소 (cmd/fullend runHistory 133줄, gen/gogin 4건)
+4. Q3 해소 (cmd/fullend runHistory 133줄, gen/react writeAPIClient 120줄, gen/gogin 4건)
 5. `go build ./...` + `go test ./...`
 6. `filefunc validate` 패키지 단위 확인
 

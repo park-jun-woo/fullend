@@ -164,42 +164,7 @@ func generateMainWithDomains(artifactsDir string, serviceFuncs []ssacparser.Serv
 		osImport = "\n\t\"os\""
 	}
 
-	src := fmt.Sprintf(`package main
-
-import (
-	"database/sql"
-	"flag"
-	"log"%s
-
-	_ "github.com/lib/pq"
-%s%s
-)
-
-func main() {
-	addr := flag.String("addr", ":8080", "listen address")
-	dsn := flag.String("dsn", "postgres://localhost:5432/app?sslmode=disable", "database connection string")
-	dbDriver := flag.String("db", "postgres", "database driver (postgres, mysql)")%s
-	flag.Parse()
-
-	conn, err := sql.Open(*dbDriver, *dsn)
-	if err != nil {
-		log.Fatalf("database connection failed: %%v", err)
-	}
-	defer conn.Close()
-
-	if err := conn.Ping(); err != nil {
-		log.Fatalf("database ping failed: %%v", err)
-	}
-%s%s
-	server := &service.Server{
-%s
-	}
-%s
-	r := service.SetupRouter(server)
-	log.Printf("server listening on %%s", *addr)
-	log.Fatal(r.Run(*addr))
-}
-`, osImport, importBlock, queueImport, jwtFlagLine, authzBlock, queueInitBlock, initBlock, queueSubscribeBlock)
+	src := mainWithDomainsTemplate(osImport, importBlock, queueImport, jwtFlagLine, authzBlock, queueInitBlock, initBlock, queueSubscribeBlock)
 
 	path := filepath.Join(artifactsDir, "backend", "cmd", "main.go")
 	return os.WriteFile(path, []byte(src), 0644)
