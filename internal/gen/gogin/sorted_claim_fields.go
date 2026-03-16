@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=1
 //ff:what returns claim field names in sorted order
 
 package gogin

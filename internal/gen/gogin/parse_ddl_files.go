@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=parser control=iteration
+//ff:func feature=gen-gogin type=parser control=iteration dimension=2
 //ff:what parses CREATE TABLE statements from DDL files
 
 package gogin

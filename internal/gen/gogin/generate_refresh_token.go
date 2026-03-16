@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1
 //ff:what creates internal/auth/refresh_token.go with 7-day refresh token generation
 
 package gogin

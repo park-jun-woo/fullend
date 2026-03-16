@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=2
 //ff:what returns true if any function uses @publish
 
 package gogin

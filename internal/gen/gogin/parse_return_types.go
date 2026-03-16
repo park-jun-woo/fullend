@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=1
 //ff:what extracts individual return types from a return signature string
 
 package gogin

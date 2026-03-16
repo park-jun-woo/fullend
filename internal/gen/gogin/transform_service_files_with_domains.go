@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration
+//ff:func feature=gen-gogin type=generator control=iteration dimension=3
 //ff:what transforms service files in both flat and domain subdirectories
 
 package gogin

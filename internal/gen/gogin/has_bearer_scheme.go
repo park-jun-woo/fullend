@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=1
 //ff:what checks if the OpenAPI doc has a bearerAuth security scheme
 
 package gogin

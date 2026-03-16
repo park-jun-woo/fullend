@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=parser control=iteration
+//ff:func feature=gen-gogin type=parser control=iteration dimension=1
 //ff:what extracts param count, column names, and cleans up the SQL body
 
 package gogin
@@ -33,23 +33,25 @@ func finishQuery(q *sqlcQuery, sql string, paramRe, insertColRe, updateSetRe *re
 
 	// For UPDATE: extract all column = $N patterns, ordered by $N position.
 	// This maps interface params to the correct $N placeholder positions.
-	if len(q.Columns) == 0 && strings.HasPrefix(strings.TrimSpace(strings.ToUpper(sql)), "UPDATE") {
-		updateColNRe := regexp.MustCompile(`(\w+)\s*=\s*\$(\d+)`)
-		colMatches := updateColNRe.FindAllStringSubmatch(sql, -1)
-		if len(colMatches) > 0 {
-			type colPos struct {
-				col string
-				pos int
-			}
-			var positions []colPos
-			for _, m := range colMatches {
-				pos, _ := strconv.Atoi(m[2])
-				positions = append(positions, colPos{col: m[1], pos: pos})
-			}
-			sort.Slice(positions, func(i, j int) bool { return positions[i].pos < positions[j].pos })
-			for _, cp := range positions {
-				q.Columns = append(q.Columns, cp.col)
-			}
-		}
+	if len(q.Columns) > 0 || !strings.HasPrefix(strings.TrimSpace(strings.ToUpper(sql)), "UPDATE") {
+		return
+	}
+	updateColNRe := regexp.MustCompile(`(\w+)\s*=\s*\$(\d+)`)
+	colMatches := updateColNRe.FindAllStringSubmatch(sql, -1)
+	if len(colMatches) == 0 {
+		return
+	}
+	type colPos struct {
+		col string
+		pos int
+	}
+	var positions []colPos
+	for _, m := range colMatches {
+		pos, _ := strconv.Atoi(m[2])
+		positions = append(positions, colPos{col: m[1], pos: pos})
+	}
+	sort.Slice(positions, func(i, j int) bool { return positions[i].pos < positions[j].pos })
+	for _, cp := range positions {
+		q.Columns = append(q.Columns, cp.col)
 	}
 }

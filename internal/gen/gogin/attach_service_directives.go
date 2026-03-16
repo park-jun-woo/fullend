@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1
 //ff:what scans service .go files and injects //fullend:gen directives
 
 package gogin
@@ -29,17 +29,19 @@ func attachServiceDirectives(intDir string, serviceFuncs []ssacparser.ServiceFun
 	}
 
 	for _, entry := range entries {
-		if entry.IsDir() {
-			// Domain subdirectory.
-			domainDir := filepath.Join(serviceDir, entry.Name())
-			if err := attachDirectivesInDir(domainDir, sfByFile); err != nil {
-				return err
-			}
-		} else if strings.HasSuffix(entry.Name(), ".go") {
-			// Flat file.
-			if err := attachDirectiveToFile(filepath.Join(serviceDir, entry.Name()), sfByFile); err != nil {
-				return err
-			}
+		if !entry.IsDir() {
+			continue
+		}
+		if err := attachDirectivesInDir(filepath.Join(serviceDir, entry.Name()), sfByFile); err != nil {
+			return err
+		}
+	}
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".go") {
+			continue
+		}
+		if err := attachDirectiveToFile(filepath.Join(serviceDir, entry.Name()), sfByFile); err != nil {
+			return err
 		}
 	}
 

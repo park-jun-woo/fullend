@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration
+//ff:func feature=gen-gogin type=generator control=iteration dimension=2
 //ff:what creates service/server.go that composes domain handlers with gin router
 
 package gogin
@@ -72,51 +72,7 @@ func generateCentralServer(serviceDir string, domains []string, serviceFuncs []s
 		b.WriteString("\tauth.Use(middleware.BearerAuth(s.JWTSecret))\n\n")
 	}
 
-	if doc != nil {
-		for pathStr, pathItem := range doc.Paths.Map() {
-			for method, op := range pathItem.Operations() {
-				if op.OperationID == "" {
-					continue
-				}
-				ginPath := convertPathParamsGin(pathStr)
-				handlerName := op.OperationID
-
-				// Determine target: s.Domain.Method or s.Method.
-				domain := opDomains[handlerName]
-				var target string
-				if domain != "" {
-					target = fmt.Sprintf("s.%s.%s", ucFirst(domain), handlerName)
-				} else {
-					target = fmt.Sprintf("s.%s", handlerName)
-				}
-
-				// Determine route group from OpenAPI security field.
-				needsAuth := opHasSecurity(op)
-				ginMethod := strings.ToUpper(method)
-				var routerVar string
-				if needsAuth && hasBearer {
-					routerVar = "auth"
-				} else {
-					routerVar = "r"
-				}
-
-				switch ginMethod {
-				case "GET":
-					b.WriteString(fmt.Sprintf("\t%s.GET(%q, %s)\n", routerVar, ginPath, target))
-				case "POST":
-					b.WriteString(fmt.Sprintf("\t%s.POST(%q, %s)\n", routerVar, ginPath, target))
-				case "PUT":
-					b.WriteString(fmt.Sprintf("\t%s.PUT(%q, %s)\n", routerVar, ginPath, target))
-				case "DELETE":
-					b.WriteString(fmt.Sprintf("\t%s.DELETE(%q, %s)\n", routerVar, ginPath, target))
-				case "PATCH":
-					b.WriteString(fmt.Sprintf("\t%s.PATCH(%q, %s)\n", routerVar, ginPath, target))
-				default:
-					b.WriteString(fmt.Sprintf("\t%s.Handle(%q, %q, %s)\n", routerVar, ginMethod, ginPath, target))
-				}
-			}
-		}
-	}
+	writeCentralRoutes(&b, doc, opDomains, hasBearer)
 
 	b.WriteString("\n\treturn r\n")
 	b.WriteString("}\n")

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=selection
 //ff:what writes a single method implementation based on the interface signature
 
 package gogin
@@ -25,60 +25,10 @@ func generateMethodFromIface(b *strings.Builder, implName, modelName string, m i
 		sqlStr = query.SQL
 	}
 
-	// Build call args from interface params (excluding QueryOpts params).
-	// For INSERT/UPDATE, reorder args to match SQL column order from sqlcQuery.Columns.
-	var callArgNames []string
-	if query != nil && len(query.Columns) > 0 && len(m.Params) > 0 {
-		// Build param lookup: goName (lowercase first) → param name.
-		paramByCol := make(map[string]string) // sql_column → param name
-		for _, p := range m.Params {
-			if p.Type == "QueryOpts" {
-				continue
-			}
-			// Convert param name (camelCase) to snake_case for matching.
-			snakeName := goToSnake(p.Name)
-			paramByCol[snakeName] = p.Name
-		}
-		// Reorder: follow SQL column order, then append unmatched WHERE params.
-		matched := make(map[string]bool)
-		for _, col := range query.Columns {
-			if paramName, ok := paramByCol[col]; ok {
-				callArgNames = append(callArgNames, paramName)
-				matched[paramName] = true
-			}
-		}
-		// Append remaining params not matched by columns (e.g. WHERE id = $N).
-		for _, p := range m.Params {
-			if p.Type == "QueryOpts" {
-				continue
-			}
-			if !matched[p.Name] {
-				callArgNames = append(callArgNames, p.Name)
-			}
-		}
-	} else {
-		for _, p := range m.Params {
-			if p.Type == "QueryOpts" {
-				continue
-			}
-			callArgNames = append(callArgNames, p.Name)
-		}
-	}
-	callArgs := ""
-	if len(callArgNames) > 0 {
-		callArgs = ",\n\t\t" + strings.Join(callArgNames, ", ")
-	}
+	callArgNames := reorderCallArgs(m, query)
+	callArgs := formatCallArgs(callArgNames)
 
-	// Determine method pattern from return signature and seq type.
-	// A List method with QueryOpts uses dynamic SQL with pagination/sort/filter.
-	// A List method without QueryOpts is a simple query returning a slice.
-	hasQueryOpts := false
-	for _, p := range m.Params {
-		if p.Type == "QueryOpts" {
-			hasQueryOpts = true
-			break
-		}
-	}
+	hasQueryOpts := hasQueryOptsParam(m)
 	isList := isListMethod(m.Name) && hasQueryOpts
 	isPageReturn := strings.Contains(m.ReturnSig, "pagination.Page[")
 	isCursorReturn := strings.Contains(m.ReturnSig, "pagination.Cursor[")
@@ -101,17 +51,7 @@ func generateMethodFromIface(b *strings.Builder, implName, modelName string, m i
 			tableName = table.TableName
 		}
 
-		// Determine cursor field name from cursorSpecs.
-		cursorField := "ID"
-		if cursorSpecs != nil {
-			// Try to find operationId by matching method name to known cursor operations.
-			for opID, field := range cursorSpecs {
-				if opID == m.Name || strings.EqualFold(opID, m.Name) {
-					cursorField = field
-					break
-				}
-			}
-		}
+		cursorField := lookupCursorField(cursorSpecs, m.Name)
 
 		b.WriteString(fmt.Sprintf("func (m *%s) %s(%s) %s {\n", implName, m.Name, m.ParamSig, m.ReturnSig))
 
@@ -146,13 +86,7 @@ func generateMethodFromIface(b *strings.Builder, implName, modelName string, m i
 		b.WriteString("\t\treturn nil, err\n")
 		b.WriteString("\t}\n")
 
-		// Include loading.
-		for _, inc := range includes {
-			helperName := "include" + strcase.ToGoPascal(inc.IncludeName)
-			b.WriteString(fmt.Sprintf("\tif err := m.%s(items); err != nil {\n", helperName))
-			b.WriteString("\t\treturn nil, err\n")
-			b.WriteString("\t}\n")
-		}
+		writeIncludeLoads(b, includes)
 
 		// hasNext detection and cursor extraction.
 		b.WriteString("\thasNext := len(items) > requestedLimit\n")

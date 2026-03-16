@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=parser control=iteration
+//ff:func feature=gen-gogin type=parser control=iteration dimension=2
 //ff:what reads models_gen.go and extracts interface method signatures
 
 package gogin
@@ -40,20 +40,22 @@ func parseModelsGen(modelDir string) map[string][]ifaceMethod {
 			currentModel = ""
 			continue
 		}
-		if currentModel != "" {
-			if m := methodRe.FindStringSubmatch(line); m != nil {
-				method := ifaceMethod{
-					Name:      m[1],
-					ParamSig:  m[2],
-					ReturnSig: m[3],
-				}
-				// Parse individual params.
-				for _, pm := range paramRe.FindAllStringSubmatch(m[2], -1) {
-					method.Params = append(method.Params, ifaceParam{Name: pm[1], Type: pm[2]})
-				}
-				result[currentModel] = append(result[currentModel], method)
-			}
+		if currentModel == "" {
+			continue
 		}
+		m := methodRe.FindStringSubmatch(line)
+		if m == nil {
+			continue
+		}
+		method := ifaceMethod{
+			Name:      m[1],
+			ParamSig:  m[2],
+			ReturnSig: m[3],
+		}
+		for _, pm := range paramRe.FindAllStringSubmatch(m[2], -1) {
+			method.Params = append(method.Params, ifaceParam{Name: pm[1], Type: pm[2]})
+		}
+		result[currentModel] = append(result[currentModel], method)
 	}
 
 	return result

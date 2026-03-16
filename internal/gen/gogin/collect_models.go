@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=2
 //ff:what extracts unique model names from service functions
 
 package gogin
@@ -15,16 +15,10 @@ func collectModels(funcs []ssacparser.ServiceFunc) []string {
 	seen := make(map[string]bool)
 	for _, fn := range funcs {
 		for _, seq := range fn.Sequences {
-			// Skip @call — package-level funcs are not models.
-			if seq.Type == "call" {
+			if seq.Type == "call" || seq.Model == "" {
 				continue
 			}
-			if seq.Model != "" {
-				parts := strings.SplitN(seq.Model, ".", 2)
-				if len(parts) >= 1 {
-					seen[parts[0]] = true
-				}
-			}
+			seen[strings.SplitN(seq.Model, ".", 2)[0]] = true
 		}
 	}
 	var result []string

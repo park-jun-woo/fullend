@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=1
 //ff:what returns true if any service function has a non-empty Domain
 
 package gogin

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=1
 //ff:what inserts a file-level directive before the package declaration
 
 package gogin
@@ -14,15 +14,15 @@ func injectFileDirective(src string, d *contract.Directive) string {
 	// Find "package " — skip any "// Code generated" comment.
 	lines := strings.SplitN(src, "\n", -1)
 	for i, line := range lines {
-		if strings.HasPrefix(line, "package ") {
-			// Insert directive before package line.
-			before := strings.Join(lines[:i], "\n")
-			after := strings.Join(lines[i:], "\n")
-			if before != "" {
-				return before + "\n" + d.String() + "\n" + after
-			}
-			return d.String() + "\n" + after
+		if !strings.HasPrefix(line, "package ") {
+			continue
 		}
+		before := strings.Join(lines[:i], "\n")
+		after := strings.Join(lines[i:], "\n")
+		if before != "" {
+			return before + "\n" + d.String() + "\n" + after
+		}
+		return d.String() + "\n" + after
 	}
 	return d.String() + "\n" + src
 }

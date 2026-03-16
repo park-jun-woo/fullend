@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1
 //ff:what converts standalone function source to struct method with receiver, import fixes, and status replacement
 
 package gogin
@@ -86,34 +86,36 @@ func transformSource(src string, models, funcs []string, modulePath string, isDo
 	// Add type assertions for @func results used as string arguments.
 	for _, f := range funcs {
 		callPattern := rcv + "." + ucFirst(f) + "("
-		if idx := strings.Index(src, callPattern); idx > 0 {
-			lineStart := strings.LastIndex(src[:idx], "\n") + 1
-			assignLine := src[lineStart:idx]
-			assignLine = strings.TrimSpace(assignLine)
-			if commaIdx := strings.Index(assignLine, ","); commaIdx > 0 {
-				varName := strings.TrimSpace(assignLine[:commaIdx])
-				if varName != "_" && varName != "" {
-					src = strings.ReplaceAll(src, ", "+varName+",", ", "+varName+".(string),")
-					src = strings.ReplaceAll(src, ", "+varName+")", ", "+varName+".(string))")
-					src = strings.ReplaceAll(src, "("+varName+",", "("+varName+".(string),")
-				}
-			}
+		idx := strings.Index(src, callPattern)
+		if idx <= 0 {
+			continue
 		}
+		lineStart := strings.LastIndex(src[:idx], "\n") + 1
+		assignLine := strings.TrimSpace(src[lineStart:idx])
+		commaIdx := strings.Index(assignLine, ",")
+		if commaIdx <= 0 {
+			continue
+		}
+		varName := strings.TrimSpace(assignLine[:commaIdx])
+		if varName == "_" || varName == "" {
+			continue
+		}
+		src = strings.ReplaceAll(src, ", "+varName+",", ", "+varName+".(string),")
+		src = strings.ReplaceAll(src, ", "+varName+")", ", "+varName+".(string))")
+		src = strings.ReplaceAll(src, "("+varName+",", "("+varName+".(string),")
 	}
 
 	// Replace __RESPONSE_STATUS__ with OpenAPI success code.
-	if strings.Contains(src, "__RESPONSE_STATUS__") && doc != nil && operationID != "" {
-		statusConst := resolveSuccessStatus(doc, operationID)
-		if statusConst != "" {
-			if statusConst == "http.StatusNoContent" {
-				// 204: replace entire c.JSON(__RESPONSE_STATUS__, ...) with c.Status(http.StatusNoContent)
-				re := regexp.MustCompile(`c\.JSON\(__RESPONSE_STATUS__,\s*[^)]+\)`)
-				src = re.ReplaceAllString(src, "c.Status(http.StatusNoContent)")
-			} else {
-				src = strings.ReplaceAll(src, "__RESPONSE_STATUS__", statusConst)
-			}
-		}
+	if !strings.Contains(src, "__RESPONSE_STATUS__") || doc == nil || operationID == "" {
+		return src
 	}
-
-	return src
+	statusConst := resolveSuccessStatus(doc, operationID)
+	if statusConst == "" {
+		return src
+	}
+	if statusConst == "http.StatusNoContent" {
+		re := regexp.MustCompile(`c\.JSON\(__RESPONSE_STATUS__,\s*[^)]+\)`)
+		return re.ReplaceAllString(src, "c.Status(http.StatusNoContent)")
+	}
+	return strings.ReplaceAll(src, "__RESPONSE_STATUS__", statusConst)
 }

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration
+//ff:func feature=gen-gogin type=generator control=iteration dimension=1
 //ff:what creates service/{domain}/handler.go with the Handler struct
 
 package gogin

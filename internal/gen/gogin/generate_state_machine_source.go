@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator
+//ff:func feature=gen-gogin type=generator control=sequence
 //ff:what generates the Go source for a state machine package
 
 package gogin
@@ -24,12 +24,7 @@ func generateStateMachineSource(d *statemachine.StateDiagram, pkgName string) st
 	copy(states, d.States)
 	sort.Strings(states)
 
-	buf.WriteString("// State constants.\nconst (\n")
-	for _, s := range states {
-		constName := ucFirst(s)
-		buf.WriteString(fmt.Sprintf("\tState%s = %q\n", constName, s))
-	}
-	buf.WriteString(")\n\n")
+	writeStateConstants(&buf, states)
 
 	// Determine the status field type from the diagram.
 	fieldType := inferFieldType(d)
@@ -43,34 +38,9 @@ func generateStateMachineSource(d *statemachine.StateDiagram, pkgName string) st
 	// transitionKey type.
 	buf.WriteString("type transitionKey struct {\n\tfrom  string\n\tevent string\n}\n\n")
 
-	// Transitions map.
-	buf.WriteString("var transitions = map[transitionKey]string{\n")
-	for _, t := range d.Transitions {
-		buf.WriteString(fmt.Sprintf("\t{%q, %q}: %q,\n", t.From, t.Event, t.To))
-	}
-	buf.WriteString("}\n\n")
+	writeTransitionMap(&buf, d.Transitions)
 
-	// CanTransition function — accepts Input, resolves state internally.
-	switch fieldType {
-	case "bool":
-		buf.WriteString(generateBoolCanTransition(d))
-	default:
-		// String-based status field.
-		buf.WriteString(`// CanTransition checks if the given event is valid from the current state.
-// Set DISABLE_STATE_CHECK=1 to bypass state transition checks.
-func CanTransition(input Input, event string) error {
-	if os.Getenv("DISABLE_STATE_CHECK") == "1" {
-		return nil
-	}
-	status, _ := input.Status.(string)
-	_, ok := transitions[transitionKey{from: status, event: event}]
-	if !ok {
-		return fmt.Errorf("cannot transition from %q via %q", status, event)
-	}
-	return nil
-}
-`)
-	}
+	writeCanTransition(&buf, d, fieldType)
 
 	return buf.String()
 }

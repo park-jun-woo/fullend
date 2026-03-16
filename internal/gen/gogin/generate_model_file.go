@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration
+//ff:func feature=gen-gogin type=generator control=iteration dimension=2
 //ff:what creates model/{model}.go with the implementation struct using *sql.DB
 
 package gogin
@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/contract"
 )
 
 // generateModelFile creates model/{model}.go with the implementation struct using *sql.DB.
@@ -88,31 +87,7 @@ func generateModelFile(modelDir string, modelName string, methods []ifaceMethod,
 		generateScanFunc(&b, modelName, table)
 	}
 
-	// Generate methods.
-	for _, method := range methods {
-		b.WriteString("\n")
-		// Inject //fullend:gen directive.
-		if table != nil {
-			ssotPath := "db/" + table.TableName + ".sql"
-			params := make([]string, len(method.Params))
-			for i, p := range method.Params {
-				params[i] = p.Type
-			}
-			returns := parseReturnTypes(method.ReturnSig)
-			hash := contract.HashModelMethod(method.Name, params, returns)
-			d := &contract.Directive{Ownership: "gen", SSOT: ssotPath, Contract: hash}
-			b.WriteString(d.String() + "\n")
-		}
-		query := queries[method.Name]
-		seqType := seqTypes[method.Name]
-		generateMethodFromIface(&b, implName, modelName, method, &query, seqType, table, includes, cursorSpecs)
-	}
-
-	// Generate include helper methods.
-	for _, inc := range includes {
-		b.WriteString("\n")
-		generateIncludeHelper(&b, implName, modelName, inc)
-	}
+	writeModelMethods(&b, modelName, methods, table, queries, seqTypes, includes, cursorSpecs, implName)
 
 	fileName := lowerName + ".go"
 	return os.WriteFile(filepath.Join(modelDir, fileName), []byte(b.String()), 0644)

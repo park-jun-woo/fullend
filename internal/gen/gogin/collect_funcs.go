@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=2
 //ff:what extracts @call references without package prefix from service functions
 
 package gogin
@@ -16,10 +16,8 @@ func collectFuncs(funcs []ssacparser.ServiceFunc) []string {
 	seen := make(map[string]bool)
 	for _, fn := range funcs {
 		for _, seq := range fn.Sequences {
-			if seq.Type == "call" && seq.Model != "" {
-				if !strings.Contains(seq.Model, ".") {
-					seen[seq.Model] = true
-				}
+			if seq.Type == "call" && seq.Model != "" && !strings.Contains(seq.Model, ".") {
+				seen[seq.Model] = true
 			}
 		}
 	}

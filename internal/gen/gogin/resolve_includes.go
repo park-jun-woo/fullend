@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=2
 //ff:what resolves x-include specs against DDL FK relationships
 
 package gogin
@@ -36,14 +36,15 @@ func resolveIncludes(modelName string, includeSpecs []string, tables map[string]
 		// Validate: localColumn exists in current table with FK to targetTable.
 		var fkCol *ddlColumn
 		for i, col := range currentTable.Columns {
-			if col.Name == localColumn {
-				if col.FKTable != targetTable {
-					return nil, fmt.Errorf("x-include %q: column %s.%s does not reference %s (references %q)",
-						spec, currentTable.TableName, localColumn, targetTable, col.FKTable)
-				}
-				fkCol = &currentTable.Columns[i]
-				break
+			if col.Name != localColumn {
+				continue
 			}
+			if col.FKTable != targetTable {
+				return nil, fmt.Errorf("x-include %q: column %s.%s does not reference %s (references %q)",
+					spec, currentTable.TableName, localColumn, targetTable, col.FKTable)
+			}
+			fkCol = &currentTable.Columns[i]
+			break
 		}
 		if fkCol == nil {
 			return nil, fmt.Errorf("x-include %q: column %s not found in table %s",

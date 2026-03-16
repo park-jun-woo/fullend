@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=2
 //ff:what extracts @call references without package prefix for a specific domain
 
 package gogin
@@ -18,10 +18,8 @@ func collectFuncsForDomain(funcs []ssacparser.ServiceFunc, domain string) []stri
 			continue
 		}
 		for _, seq := range fn.Sequences {
-			if seq.Type == "call" && seq.Model != "" {
-				if !strings.Contains(seq.Model, ".") {
-					seen[seq.Model] = true
-				}
+			if seq.Type == "call" && seq.Model != "" && !strings.Contains(seq.Model, ".") {
+				seen[seq.Model] = true
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration
+//ff:func feature=gen-gogin type=generator control=iteration dimension=2
 //ff:what creates model/types.go with struct definitions from DDL columns
 
 package gogin

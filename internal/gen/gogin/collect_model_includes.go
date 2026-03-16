@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=4
 //ff:what extracts per-model x-include specs from OpenAPI operations
 
 package gogin

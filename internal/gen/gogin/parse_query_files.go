@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=parser control=iteration
+//ff:func feature=gen-gogin type=parser control=iteration dimension=2
 //ff:what parses query SQL files and extracts sqlc query annotations
 
 package gogin
@@ -52,22 +52,23 @@ func parseQueryFiles(specsDir string) map[string]map[string]sqlcQuery {
 
 		for scanner.Scan() {
 			line := scanner.Text()
-
-			if matches := nameRe.FindStringSubmatch(line); matches != nil {
-				// Save previous query.
-				if currentQuery != nil {
-					finishQuery(currentQuery, sqlBuf.String(), paramRe, insertColRe, updateSetRe)
-					result[modelName][currentQuery.Name] = *currentQuery
-				}
-				currentQuery = &sqlcQuery{
-					Name:        stripModelPrefix(matches[1], modelName),
-					Cardinality: matches[2],
-				}
-				sqlBuf.Reset()
-			} else if currentQuery != nil {
+			matches := nameRe.FindStringSubmatch(line)
+			if matches == nil && currentQuery != nil {
 				sqlBuf.WriteString(line)
 				sqlBuf.WriteString("\n")
 			}
+			if matches == nil {
+				continue
+			}
+			if currentQuery != nil {
+				finishQuery(currentQuery, sqlBuf.String(), paramRe, insertColRe, updateSetRe)
+				result[modelName][currentQuery.Name] = *currentQuery
+			}
+			currentQuery = &sqlcQuery{
+				Name:        stripModelPrefix(matches[1], modelName),
+				Cardinality: matches[2],
+			}
+			sqlBuf.Reset()
 		}
 		// Save last query in file.
 		if currentQuery != nil {

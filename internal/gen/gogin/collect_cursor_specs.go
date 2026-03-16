@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=util control=iteration
+//ff:func feature=gen-gogin type=util control=iteration dimension=2
 //ff:what extracts cursor column Go field name per operationId from OpenAPI x-pagination
 
 package gogin
@@ -25,10 +25,12 @@ func collectCursorSpecs(doc *openapi3.T) map[string]string {
 				continue
 			}
 			cursorField := "ID"
+			def := ""
 			if sortExt := getExtMap(op, "x-sort"); sortExt != nil {
-				if def := getStr(sortExt, "default", ""); def != "" {
-					cursorField = strcase.ToGoPascal(def)
-				}
+				def = getStr(sortExt, "default", "")
+			}
+			if def != "" {
+				cursorField = strcase.ToGoPascal(def)
 			}
 			result[op.OperationID] = cursorField
 		}

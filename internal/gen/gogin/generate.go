@@ -52,13 +52,8 @@ func (g *GoGin) Generate(parsed *genapi.ParsedSSOTs, cfg *genapi.GenConfig) erro
 		if err := generateAuthStubWithDomains(intDir, cfg.ModulePath, claims); err != nil {
 			return fmt.Errorf("auth (domain): %w", err)
 		}
-		if len(claims) > 0 {
-			if err := generateAuthPackage(intDir, cfg.ModulePath, claims, secretEnv); err != nil {
-				return fmt.Errorf("auth package (domain): %w", err)
-			}
-			if err := generateMiddleware(intDir, cfg.ModulePath, claims); err != nil {
-				return fmt.Errorf("middleware (domain): %w", err)
-			}
+		if err := generateAuthIfNeeded(intDir, cfg.ModulePath, claims, secretEnv); err != nil {
+			return err
 		}
 		if err := generateServerStructWithDomains(intDir, parsed.ServiceFuncs, cfg.ModulePath, parsed.OpenAPIDoc); err != nil {
 			return fmt.Errorf("server.go (domain): %w", err)

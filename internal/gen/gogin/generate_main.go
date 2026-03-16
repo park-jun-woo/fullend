@@ -1,4 +1,4 @@
-//ff:func feature=gen-gogin type=generator control=iteration
+//ff:func feature=gen-gogin type=generator control=iteration dimension=2
 //ff:what creates backend/go.mod and backend/cmd/main.go for flat mode
 
 package gogin
@@ -64,23 +64,23 @@ func generateMain(artifactsDir string, models []string, modulePath string, queue
 	queueImport := ""
 	queueInitBlock := ""
 	queueSubscribeBlock := ""
-	if queueBackend != "" {
-		subscribers := collectSubscribers(serviceFuncs)
-		if len(subscribers) > 0 || hasPublishSequence(serviceFuncs) {
-			queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/geul-org/fullend/pkg/queue\""
-			queueInitBlock = fmt.Sprintf(`
+	subscribers := collectSubscribers(serviceFuncs)
+	needsQueue := queueBackend != "" && (len(subscribers) > 0 || hasPublishSequence(serviceFuncs))
+	if needsQueue {
+		queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/geul-org/fullend/pkg/queue\""
+		queueInitBlock = fmt.Sprintf(`
 	if err := queue.Init(context.Background(), %q, conn); err != nil {
 		log.Fatalf("queue init failed: %%v", err)
 	}
 	defer queue.Close()
 `, queueBackend)
 
-			var subLines []string
-			for _, fn := range subscribers {
-				if fn.Param == nil {
-					continue
-				}
-				subLines = append(subLines, fmt.Sprintf(`
+		var subLines []string
+		for _, fn := range subscribers {
+			if fn.Param == nil {
+				continue
+			}
+			subLines = append(subLines, fmt.Sprintf(`
 	queue.Subscribe(%q, func(ctx context.Context, msg []byte) error {
 		var message service.%s
 		if err := json.Unmarshal(msg, &message); err != nil {
@@ -88,12 +88,10 @@ func generateMain(artifactsDir string, models []string, modulePath string, queue
 		}
 		return server.%s(ctx, message)
 	})`, fn.Subscribe.Topic, fn.Param.TypeName, fn.Name))
-			}
-			if len(subLines) > 0 {
-				queueSubscribeBlock = strings.Join(subLines, "\n") + "\n\n\tgo queue.Start(context.Background())\n"
-				// Add fmt import for Errorf.
-				queueImport += "\n\t\"fmt\""
-			}
+		}
+		if len(subLines) > 0 {
+			queueSubscribeBlock = strings.Join(subLines, "\n") + "\n\n\tgo queue.Start(context.Background())\n"
+			queueImport += "\n\t\"fmt\""
 		}
 	}
 
