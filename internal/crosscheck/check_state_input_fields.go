@@ -1,0 +1,20 @@
+//ff:func feature=crosscheck type=rule control=iteration dimension=1
+//ff:what @state Inputs 필드가 DDL 컬럼에 존재하는지 검증
+package crosscheck
+
+import (
+	"github.com/geul-org/fullend/internal/statemachine"
+	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+)
+
+// checkStateInputFields validates that @state input fields map to existing DDL columns.
+func checkStateInputFields(funcs []ssacparser.ServiceFunc, diagramByID map[string]*statemachine.StateDiagram, st *ssacvalidator.SymbolTable) []CrossError {
+	var errs []CrossError
+
+	for _, fn := range funcs {
+		errs = append(errs, checkFuncStateInputs(fn, diagramByID, st)...)
+	}
+
+	return errs
+}
