@@ -1,63 +1,63 @@
 required:
   feature:
-    - orchestrator
-    - crosscheck
-    - ssac-parse
-    - ssac-validate
-    - ssac-gen
-    - stml-parse
-    - stml-validate
-    - stml-gen
-    - funcspec
-    - gen-gogin
-    - gen-hurl
-    - gen-react
-    - genmodel
-    - genapi
-    - projectconfig
-    - statemachine
-    - policy
-    - scenario
-    - reporter
-    - contract
-    - symbol
-    - cli
-    - pkg-auth
-    - pkg-authz
-    - pkg-cache
-    - pkg-config
-    - pkg-crypto
-    - pkg-file
-    - pkg-image
-    - pkg-mail
-    - pkg-pagination
-    - pkg-queue
-    - pkg-session
-    - pkg-storage
-    - pkg-text
+    orchestrator: "CLI 파싱 + 실행 순서 제어 + ParseAll 통합"
+    crosscheck: "SSOT 간 교차 검증"
+    ssac-parse: "SSaC 파서"
+    ssac-validate: "SSaC 검증"
+    ssac-gen: "SSaC Go 코드 생성"
+    stml-parse: "STML 파서"
+    stml-validate: "STML 검증"
+    stml-gen: "STML React TSX 코드 생성"
+    funcspec: "Func 스펙 파서 (Go AST)"
+    gen-gogin: "Go + Gin 백엔드 코드 생성"
+    gen-hurl: "Hurl 테스트 시나리오 생성"
+    gen-react: "React 프론트엔드 코드 생성"
+    genmodel: "외부 OpenAPI → Go model 생성"
+    genapi: "코드 생성 공통 타입"
+    projectconfig: "fullend.yaml 파서"
+    statemachine: "Mermaid stateDiagram 파서"
+    policy: "OPA Rego 정책 파서"
+    scenario: "Hurl 시나리오 파서"
+    reporter: "검증 결과 출력 포매터"
+    contract: "코드 산출물 계약 관리"
+    symbol: "심볼 테이블"
+    cli: "CLI 엔트리포인트"
+    pkg-auth: "인증 유틸 (bcrypt, JWT)"
+    pkg-authz: "OPA 인가 검사"
+    pkg-cache: "캐시 모델 (PostgreSQL, Memory)"
+    pkg-config: "환경 변수 설정"
+    pkg-crypto: "암호화 유틸 (AES, OTP)"
+    pkg-file: "파일 스토리지 모델 (S3, Local)"
+    pkg-image: "이미지 처리 (OG, Thumbnail)"
+    pkg-mail: "이메일 발송"
+    pkg-pagination: "페이지네이션 타입"
+    pkg-queue: "메시지 큐 (PostgreSQL, Memory)"
+    pkg-session: "세션 모델 (PostgreSQL, Memory)"
+    pkg-storage: "S3 호환 스토리지"
+    pkg-text: "텍스트 처리 (slug, sanitize, truncate)"
   type:
-    - command
-    - rule
-    - parser
-    - generator
-    - model
-    - formatter
-    - loader
-    - util
-    - walker
+    command: "CLI 명령 엔트리포인트"
+    rule: "검증 규칙"
+    parser: "파서"
+    generator: "코드 생성기"
+    model: "데이터 모델/타입"
+    formatter: "출력 포매터"
+    loader: "초기화/로더"
+    util: "유틸리티 함수"
+    walker: "파일/디렉토리 순회"
 
 optional:
   ssot:
-    - openapi
-    - ddl
-    - ssac
-    - stml
-    - states
-    - policy
-    - scenario
-    - funcspec
-    - config
+    openapi: ""
+    ddl: ""
+    ssac: ""
+    stml: ""
+    states: ""
+    policy: ""
+    scenario: ""
+    funcspec: ""
+    config: ""
   pattern:
-    - error-collection
-    - early-return
-    - symbol-table
+    error-collection: ""
+    early-return: ""
+    symbol-table: ""

@@ -1,11 +1,7 @@
-//ff:func feature=gen-gogin type=generator control=sequence
-//ff:what queryopts.go 생성 템플릿 문자열을 반환한다
-
 package gogin
 
-// queryOptsTemplate returns the source code template for model/queryopts.go.
-func queryOptsTemplate() string {
-	return `package model
+// queryOptsTemplate is the source code template for model/queryopts.go.
+var queryOptsTemplate = `package model
 
 import (
 	"fmt"
@@ -218,4 +214,3 @@ func containsStr(ss []string, s string) bool {
 	return false
 }
 `
-}

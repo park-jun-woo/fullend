@@ -10,6 +10,6 @@ import (
 
 // generateQueryOpts creates model/queryopts.go with parseQueryOpts, buildSelectQuery, buildCountQuery.
 func generateQueryOpts(modelDir string) error {
-	src := queryOptsTemplate()
+	src := queryOptsTemplate
 	return os.WriteFile(filepath.Join(modelDir, "queryopts.go"), []byte(src), 0644)
 }

@@ -1,5 +1,5 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=2
-//ff:what creates cmd/main.go with domain handler initialization
+//ff:func feature=gen-gogin type=generator control=sequence
+//ff:what domain 모드 cmd/main.go를 생성한다
 
 package gogin
 
@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/geul-org/fullend/internal/policy"
 	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
@@ -36,68 +35,11 @@ func generateMainWithDomains(artifactsDir string, serviceFuncs []ssacparser.Serv
 	}
 
 	domains := uniqueDomains(serviceFuncs)
-	flatModels := collectModelsForDomain(serviceFuncs, "")
-	anyNeedsAuth := false
-	for _, d := range domains {
-		if domainNeedsAuth(serviceFuncs, d) {
-			anyNeedsAuth = true
-			break
-		}
-	}
+	anyNeedsAuth := anyDomainNeedsAuth(serviceFuncs, domains)
 
-	// Build init block.
-	var initLines []string
+	initBlock := buildDomainInitBlock(serviceFuncs, domains, anyNeedsAuth)
+	importBlock := buildDomainImportsBlock(domains, modulePath, anyNeedsAuth)
 
-	// Flat model fields.
-	for _, m := range flatModels {
-		fieldName := ucFirst(lcFirst(m) + "Model")
-		initLines = append(initLines, fmt.Sprintf("\t\t%s: model.New%sModel(conn),", fieldName, m))
-	}
-
-	// Domain handler fields.
-	for _, domain := range domains {
-		domainModels := collectModelsForDomain(serviceFuncs, domain)
-		fieldName := ucFirst(domain)
-
-		var handlerLines []string
-		if domainNeedsDB(serviceFuncs, domain) {
-			handlerLines = append(handlerLines, "\t\t\tDB: conn,")
-		}
-		for _, m := range domainModels {
-			mFieldName := ucFirst(lcFirst(m) + "Model")
-			handlerLines = append(handlerLines, fmt.Sprintf("\t\t\t%s: model.New%sModel(conn),", mFieldName, m))
-		}
-		if domainNeedsJWTSecret(serviceFuncs, domain) {
-			handlerLines = append(handlerLines, "\t\t\tJWTSecret: *jwtSecret,")
-		}
-		initLines = append(initLines, fmt.Sprintf("\t\t%s: &%ssvc.Handler{", fieldName, domain))
-		initLines = append(initLines, handlerLines...)
-		initLines = append(initLines, "\t\t},")
-	}
-
-	// Add JWTSecret to Server struct if bearer auth is used.
-	if anyNeedsAuth {
-		initLines = append(initLines, "\t\tJWTSecret: *jwtSecret,")
-	}
-
-	initBlock := strings.Join(initLines, "\n")
-	if initBlock == "" {
-		initBlock = "\t\t// No models detected"
-	}
-
-	// Build domain imports.
-	var extraImports []string
-	extraImports = append(extraImports, fmt.Sprintf("\n\t\"%s/internal/model\"", modulePath))
-	extraImports = append(extraImports, fmt.Sprintf("\t\"%s/internal/service\"", modulePath))
-	if anyNeedsAuth {
-		extraImports = append(extraImports, "\t\"github.com/geul-org/fullend/pkg/authz\"")
-	}
-	for _, d := range domains {
-		extraImports = append(extraImports, fmt.Sprintf("\t%ssvc \"%s/internal/service/%s\"", d, modulePath, d))
-	}
-	importBlock := strings.Join(extraImports, "\n")
-
-	// Authz init block.
 	authzBlock := ""
 	if anyNeedsAuth {
 		ownershipsCode := buildOwnershipsLiteral(policies)
@@ -110,46 +52,10 @@ func generateMainWithDomains(artifactsDir string, serviceFuncs []ssacparser.Serv
 `, ownershipsCode)
 	}
 
-	// Queue code blocks.
-	queueImport := ""
-	queueInitBlock := ""
-	queueSubscribeBlock := ""
-	subscribers := collectSubscribers(serviceFuncs)
-	needsQueue := queueBackend != "" && (len(subscribers) > 0 || hasPublishSequence(serviceFuncs))
-	if needsQueue {
-		queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/geul-org/fullend/pkg/queue\"\n\t\"fmt\""
-		queueInitBlock = fmt.Sprintf(`
-	if err := queue.Init(context.Background(), %q, conn); err != nil {
-		log.Fatalf("queue init failed: %%v", err)
-	}
-	defer queue.Close()
-`, queueBackend)
+	queueImport, queueInitBlock, queueSubscribeBlock := buildQueueBlocks(serviceFuncs, queueBackend)
 
-		var subLines []string
-		for _, fn := range subscribers {
-			if fn.Param == nil {
-				continue
-			}
-			svcPkg := "service"
-			if fn.Domain != "" {
-				svcPkg = fn.Domain + "svc"
-			}
-			subLines = append(subLines, fmt.Sprintf(`
-	queue.Subscribe(%q, func(ctx context.Context, msg []byte) error {
-		var message %s.%s
-		if err := json.Unmarshal(msg, &message); err != nil {
-			return fmt.Errorf("unmarshal: %%w", err)
-		}
-		return server.%s.%s(ctx, message)
-	})`, fn.Subscribe.Topic, svcPkg, fn.Param.TypeName, ucFirst(fn.Domain), fn.Name))
-		}
-		if len(subLines) > 0 {
-			queueSubscribeBlock = strings.Join(subLines, "\n") + "\n\n\tgo queue.Start(context.Background())\n"
-		}
-	}
-
-	// JWT flag line.
 	jwtFlagLine := ""
+	osImport := ""
 	if anyNeedsAuth {
 		jwtFlagLine = `
 	jwtSecretDefault := os.Getenv("JWT_SECRET")
@@ -157,10 +63,6 @@ func generateMainWithDomains(artifactsDir string, serviceFuncs []ssacparser.Serv
 		jwtSecretDefault = "secret"
 	}
 	jwtSecret := flag.String("jwt-secret", jwtSecretDefault, "JWT signing secret")`
-	}
-
-	osImport := ""
-	if anyNeedsAuth {
 		osImport = "\n\t\"os\""
 	}
 
