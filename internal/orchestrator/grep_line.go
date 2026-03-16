@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util control=iteration
+//ff:func feature=orchestrator type=util control=iteration dimension=1
 //ff:what grepLine returns the first line number containing substr, or 0 if not found.
 
 package orchestrator

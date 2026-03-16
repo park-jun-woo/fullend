@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command control=sequence
+//ff:func feature=orchestrator type=command control=iteration dimension=1
 //ff:what Contract 검증 — artifacts 디렉토리의 gen/preserve 계약 검사
 package orchestrator
 
@@ -57,15 +57,15 @@ func runContractValidate(specsDir string) reporter.StepResult {
 	}
 	step.Summary = strings.Join(parts, ", ")
 
-	if broken > 0 || orphan > 0 {
-		step.Status = reporter.Fail
-		for _, f := range funcs {
-			if f.Status == "broken" || f.Status == "orphan" {
-				step.Errors = append(step.Errors, fmt.Sprintf("%s: %s %s — %s", f.Status, f.File, f.Function, f.Detail))
-			}
-		}
-	} else {
+	if broken == 0 && orphan == 0 {
 		step.Status = reporter.Pass
+		return step
+	}
+	step.Status = reporter.Fail
+	for _, f := range funcs {
+		if f.Status == "broken" || f.Status == "orphan" {
+			step.Errors = append(step.Errors, fmt.Sprintf("%s: %s %s — %s", f.Status, f.File, f.Function, f.Detail))
+		}
 	}
 
 	return step

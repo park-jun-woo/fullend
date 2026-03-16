@@ -36,12 +36,7 @@ func writeAuthPair(buf *strings.Builder, registerOp *openapi3.Operation, registe
 
 		respSchema := getResponseSchema(registerOp)
 		asserts := generateResponseAssertions(respSchema, nil)
-		if len(asserts) > 0 {
-			buf.WriteString("[Asserts]\n")
-			for _, a := range asserts {
-				buf.WriteString(a + "\n")
-			}
-		}
+		writeAssertLines(buf, asserts)
 		buf.WriteString("\n")
 	}
 

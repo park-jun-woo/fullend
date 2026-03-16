@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule control=iteration
+//ff:func feature=orchestrator type=rule control=iteration dimension=2
 //ff:what 경로 파라미터 이름 충돌 감지 — 같은 세그먼트 위치에서 다른 파라미터 이름 검출
 package orchestrator
 
@@ -28,17 +28,15 @@ func checkPathParamConflicts(doc *openapi3.T) []string {
 	for path := range doc.Paths.Map() {
 		segments := strings.Split(strings.Trim(path, "/"), "/")
 		for i, seg := range segments {
-			if strings.HasPrefix(seg, "{") && strings.HasSuffix(seg, "}") {
-				paramName := seg[1 : len(seg)-1]
-				key := segKey{
-					prefix:   strings.Join(segments[:i], "/"),
-					position: i,
-				}
-				if paramAt[key] == nil {
-					paramAt[key] = make(map[string][]string)
-				}
-				paramAt[key][paramName] = append(paramAt[key][paramName], path)
+			if !strings.HasPrefix(seg, "{") || !strings.HasSuffix(seg, "}") {
+				continue
 			}
+			paramName := seg[1 : len(seg)-1]
+			key := segKey{prefix: strings.Join(segments[:i], "/"), position: i}
+			if paramAt[key] == nil {
+				paramAt[key] = make(map[string][]string)
+			}
+			paramAt[key][paramName] = append(paramAt[key][paramName], path)
 		}
 	}
 

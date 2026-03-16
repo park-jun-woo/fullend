@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=2
 //ff:what Returns operationIDs that have @state annotations in SSaC.
 package hurl
 

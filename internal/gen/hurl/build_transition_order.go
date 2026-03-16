@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=3
 //ff:what Walks stateDiagrams BFS from initial state, returning event -> order index for sorting.
 package hurl
 
@@ -18,14 +18,15 @@ func buildTransitionOrder(diagrams []*statemachine.StateDiagram) map[string]int 
 			state := queue[0]
 			queue = queue[1:]
 			for _, t := range d.Transitions {
-				if t.From == state && !visited[t.To] {
-					if _, exists := order[t.Event]; !exists {
-						order[t.Event] = idx
-						idx++
-					}
-					visited[t.To] = true
-					queue = append(queue, t.To)
+				if t.From != state || visited[t.To] {
+					continue
 				}
+				if _, exists := order[t.Event]; !exists {
+					order[t.Event] = idx
+					idx++
+				}
+				visited[t.To] = true
+				queue = append(queue, t.To)
 			}
 		}
 	}

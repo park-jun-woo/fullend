@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator control=iteration
+//ff:func feature=gen-hurl type=generator control=iteration dimension=2
 //ff:what Scenario ordering logic — dependency-aware sorting of endpoints for smoke tests.
 package hurl
 
@@ -54,12 +54,6 @@ func buildScenarioOrder(doc *openapi3.T, specsDir string, diagrams []*statemachi
 	// Build resource -> first transition order (for nested create placement).
 	resourceFirstTransition := buildResourceFirstTransition(diagrams, transitionOrder)
 
-	// Assign a sort key to each non-auth, non-read, non-delete step.
-	type orderedStep struct {
-		step  scenarioStep
-		order float64
-	}
-
 	var authSteps []scenarioStep
 	var midSteps []orderedStep
 	var readSteps, deleteSteps []scenarioStep
@@ -75,27 +69,8 @@ func buildScenarioOrder(doc *openapi3.T, specsDir string, diagrams []*statemachi
 		case "DELETE":
 			deleteSteps = append(deleteSteps, s)
 		default:
-			if stateOps[s.OperationID] {
-				// Skip branching transitions (only first path in smoke).
-				if branchSkip[s.OperationID] {
-					continue
-				}
-				// State transition: use diagram BFS order.
-				midSteps = append(midSteps, orderedStep{s, float64(transitionOrder[s.OperationID])})
-			} else if s.Method == "POST" {
-				parentResource := findParentResource(s.Path)
-				if parentResource == "" {
-					// Top-level create: before all transitions.
-					midSteps = append(midSteps, orderedStep{s, -1.0})
-				} else if firstOrd, ok := resourceFirstTransition[parentResource]; ok {
-					// Nested create: after parent's first transition.
-					midSteps = append(midSteps, orderedStep{s, float64(firstOrd) + 0.5})
-				} else {
-					midSteps = append(midSteps, orderedStep{s, -0.5})
-				}
-			} else {
-				// PUT/PATCH without @state: after transitions.
-				midSteps = append(midSteps, orderedStep{s, 900.0})
+			if ms, ok := classifyMidStep(s, stateOps, branchSkip, transitionOrder, resourceFirstTransition); ok {
+				midSteps = append(midSteps, ms)
 			}
 		}
 	}
@@ -121,21 +96,7 @@ func buildScenarioOrder(doc *openapi3.T, specsDir string, diagrams []*statemachi
 	// Sort deletes by FK dependency.
 	deleteSteps = sortDeletesByFK(deleteSteps, specsDir)
 
-	// Detect auth FK prerequisites: if Register request body has _id fields,
-	// move the corresponding top-level create endpoints before auth.
-	var prereqSteps []orderedStep
-	var remainMidSteps []orderedStep
-	authFKPrefixes := collectAuthFKResources(authSteps, doc)
-	for _, ms := range midSteps {
-		if ms.step.Method == "POST" && ms.order < 0 {
-			resource := inferResource(ms.step.Path)
-			if matchFKPrefix(resource, authFKPrefixes) {
-				prereqSteps = append(prereqSteps, ms)
-				continue
-			}
-		}
-		remainMidSteps = append(remainMidSteps, ms)
-	}
+	prereqSteps, remainMidSteps := splitPrereqSteps(midSteps, authSteps, doc)
 
 	// Final order: prereq creates -> auth -> mid -> read -> delete
 	var result []scenarioStep

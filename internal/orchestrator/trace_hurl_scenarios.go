@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util control=iteration
+//ff:func feature=orchestrator type=util control=iteration dimension=2
 //ff:what traceHurlScenarios finds .hurl files referencing the given endpoint.
 
 package orchestrator

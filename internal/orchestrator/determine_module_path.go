@@ -4,9 +4,7 @@
 package orchestrator
 
 import (
-	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/geul-org/fullend/internal/projectconfig"
 )
@@ -19,12 +17,8 @@ func determineModulePath(specsDir, artifactsDir string, cfg *projectconfig.Proje
 
 	// 2. Fallback: check existing backend/go.mod.
 	goModPath := filepath.Join(artifactsDir, "backend", "go.mod")
-	if data, err := os.ReadFile(goModPath); err == nil {
-		for _, line := range strings.Split(string(data), "\n") {
-			if strings.HasPrefix(line, "module ") {
-				return strings.TrimSpace(strings.TrimPrefix(line, "module "))
-			}
-		}
+	if mod := moduleFromGoMod(goModPath); mod != "" {
+		return mod
 	}
 
 	// 3. Last resort: derive from directory name.

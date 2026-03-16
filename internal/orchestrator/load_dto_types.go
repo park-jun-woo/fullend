@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=loader control=iteration
+//ff:func feature=orchestrator type=loader control=iteration dimension=2
 //ff:what 모델 파일에서 @dto 타입 로드 — model/*.go 스캔
 package orchestrator
 
@@ -28,13 +28,13 @@ func loadDTOTypes(modelDir string) map[string]bool {
 				dtoNext = true
 				continue
 			}
-			if dtoNext && strings.HasPrefix(trimmed, "type ") {
-				parts := strings.Fields(trimmed)
-				if len(parts) >= 2 {
-					dtoTypes[parts[1]] = true
-				}
+			if !dtoNext {
+				continue
+			}
+			if strings.HasPrefix(trimmed, "type ") {
+				dtoTypes[strings.Fields(trimmed)[1]] = true
 				dtoNext = false
-			} else if dtoNext && trimmed != "" && !strings.HasPrefix(trimmed, "//") {
+			} else if trimmed != "" && !strings.HasPrefix(trimmed, "//") {
 				dtoNext = false
 			}
 		}

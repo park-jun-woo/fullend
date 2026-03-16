@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=2
 //ff:what Maps plural resource name -> first transition order index.
 package hurl
 
@@ -15,12 +15,15 @@ func buildResourceFirstTransition(diagrams []*statemachine.StateDiagram, transit
 		// Pluralize diagram ID: "gig" -> "gigs".
 		resource := inflection.Plural(d.ID)
 		for _, t := range d.Transitions {
-			if t.From == d.InitialState {
-				if ord, ok := transitionOrder[t.Event]; ok {
-					if existing, exists := result[resource]; !exists || ord < existing {
-						result[resource] = ord
-					}
-				}
+			if t.From != d.InitialState {
+				continue
+			}
+			ord, ok := transitionOrder[t.Event]
+			if !ok {
+				continue
+			}
+			if existing, exists := result[resource]; !exists || ord < existing {
+				result[resource] = ord
 			}
 		}
 	}

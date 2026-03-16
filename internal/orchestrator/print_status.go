@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=formatter control=iteration
+//ff:func feature=orchestrator type=formatter control=iteration dimension=1
 //ff:what PrintStatus writes the status lines to a writer.
 
 package orchestrator

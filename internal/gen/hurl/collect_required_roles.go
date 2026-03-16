@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=1
 //ff:what Returns sorted unique roles needed by operations.
 package hurl
 

@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule control=iteration
+//ff:func feature=orchestrator type=rule control=iteration dimension=1
 //ff:what Mermaid stateDiagram 검증 — 다이어그램 수 + 전이 수 집계
 package orchestrator
 

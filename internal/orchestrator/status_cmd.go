@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command control=iteration
+//ff:func feature=orchestrator type=command control=iteration dimension=3
 //ff:what Status collects SSOT stats and returns lines to display.
 
 package orchestrator
@@ -27,24 +27,13 @@ func Status(root string, detected []DetectedSSOT) []StatusLine {
 		case KindOpenAPI:
 			summary := "?"
 			if parsed.OpenAPIDoc != nil {
-				count := 0
-				for _, pi := range parsed.OpenAPIDoc.Paths.Map() {
-					for range pi.Operations() {
-						count++
-					}
-				}
-				summary = fmt.Sprintf("%d endpoints", count)
+				summary = fmt.Sprintf("%d endpoints", countEndpoints(parsed.OpenAPIDoc))
 			}
 			lines = append(lines, StatusLine{Kind: KindOpenAPI, Path: relPath, Summary: summary})
 		case KindDDL:
 			summary := "?"
 			if parsed.SymbolTable != nil {
-				tables := len(parsed.SymbolTable.DDLTables)
-				cols := 0
-				for _, t := range parsed.SymbolTable.DDLTables {
-					cols += len(t.Columns)
-				}
-				summary = fmt.Sprintf("%d tables, %d columns", tables, cols)
+				summary = fmt.Sprintf("%d tables, %d columns", len(parsed.SymbolTable.DDLTables), countDDLColumns(parsed.SymbolTable.DDLTables))
 			}
 			lines = append(lines, StatusLine{Kind: KindDDL, Path: relPath, Summary: summary})
 		case KindSSaC:
@@ -62,21 +51,13 @@ func Status(root string, detected []DetectedSSOT) []StatusLine {
 		case KindStates:
 			summary := "?"
 			if parsed.StateDiagrams != nil {
-				totalTransitions := 0
-				for _, d := range parsed.StateDiagrams {
-					totalTransitions += len(d.Transitions)
-				}
-				summary = fmt.Sprintf("%d diagrams, %d transitions", len(parsed.StateDiagrams), totalTransitions)
+				summary = fmt.Sprintf("%d diagrams, %d transitions", len(parsed.StateDiagrams), countTransitions(parsed.StateDiagrams))
 			}
 			lines = append(lines, StatusLine{Kind: KindStates, Path: relPath, Summary: summary})
 		case KindPolicy:
 			summary := "?"
 			if parsed.Policies != nil {
-				totalRules := 0
-				for _, p := range parsed.Policies {
-					totalRules += len(p.Rules)
-				}
-				summary = fmt.Sprintf("%d files, %d rules", len(parsed.Policies), totalRules)
+				summary = fmt.Sprintf("%d files, %d rules", len(parsed.Policies), countPolicyRules(parsed.Policies))
 			}
 			lines = append(lines, StatusLine{Kind: KindPolicy, Path: relPath, Summary: summary})
 		case KindScenario:
@@ -87,12 +68,7 @@ func Status(root string, detected []DetectedSSOT) []StatusLine {
 		case KindFunc:
 			summary := "?"
 			if parsed.ProjectFuncSpecs != nil {
-				stubs := 0
-				for _, s := range parsed.ProjectFuncSpecs {
-					if !s.HasBody {
-						stubs++
-					}
-				}
+				stubs := countFuncStubs(parsed.ProjectFuncSpecs)
 				if stubs > 0 {
 					summary = fmt.Sprintf("%d funcs (%d TODO)", len(parsed.ProjectFuncSpecs), stubs)
 				} else {

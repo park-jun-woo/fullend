@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=2
 //ff:what Returns tables in deletion order (children before parents) via topological sort.
 package hurl
 

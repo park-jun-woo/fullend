@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator control=iteration
+//ff:func feature=gen-hurl type=generator control=iteration dimension=1
 //ff:what jsonpath 어설션을 생성한다
 package hurl
 
@@ -19,19 +19,14 @@ func generateResponseAssertions(schema *openapi3.Schema, sentValues map[string]i
 	for name, propRef := range schema.Properties {
 		prop := propRef.Value
 		prefix := "$." + name
-
-		if prop.Type.Slice()[0] == "array" {
+		typeName := prop.Type.Slice()[0]
+		if typeName == "array" {
 			asserts = append(asserts, fmt.Sprintf("jsonpath %q isCollection", prefix))
-		} else if prop.Type.Slice()[0] == "object" {
-			asserts = append(asserts, fmt.Sprintf("jsonpath %q exists", prefix))
-			// Check nested ID field (use snake_case for sqlc JSON tags).
-			if nested := prop.Properties; nested != nil {
-				if _, hasID := nested["ID"]; hasID {
-					asserts = append(asserts, fmt.Sprintf("jsonpath %q exists", prefix+".id"))
-				}
-			}
-		} else {
-			asserts = append(asserts, fmt.Sprintf("jsonpath %q exists", prefix))
+			continue
+		}
+		asserts = append(asserts, fmt.Sprintf("jsonpath %q exists", prefix))
+		if typeName == "object" && prop.Properties != nil && prop.Properties["ID"] != nil {
+			asserts = append(asserts, fmt.Sprintf("jsonpath %q exists", prefix+".id"))
 		}
 	}
 

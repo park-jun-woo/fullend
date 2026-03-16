@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util control=iteration
+//ff:func feature=orchestrator type=util control=iteration dimension=1
 //ff:what stmlMatchAttr returns the STML attribute that references the operationId.
 
 package orchestrator
@@ -19,12 +19,13 @@ func stmlMatchAttr(filePath, opID string) string {
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if strings.Contains(line, opID) {
-			if strings.Contains(line, "data-action") {
-				return "data-action"
-			}
-			return "data-fetch"
+		if !strings.Contains(line, opID) {
+			continue
 		}
+		if strings.Contains(line, "data-action") {
+			return "data-action"
+		}
+		return "data-fetch"
 	}
 	return "data-fetch"
 }

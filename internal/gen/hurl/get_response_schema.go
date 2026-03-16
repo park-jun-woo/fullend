@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=1
 //ff:what 응답 스키마를 추출한다
 package hurl
 
@@ -11,11 +11,12 @@ func getResponseSchema(op *openapi3.Operation) *openapi3.Schema {
 	}
 	// Try explicit 2xx codes first, then fall back to 200.
 	for code, respRef := range op.Responses.Map() {
-		if len(code) == 3 && code[0] == '2' && respRef != nil && respRef.Value != nil && respRef.Value.Content != nil {
-			ct := respRef.Value.Content.Get("application/json")
-			if ct != nil && ct.Schema != nil {
-				return resolveSchema(ct.Schema)
-			}
+		if len(code) != 3 || code[0] != '2' || respRef == nil || respRef.Value == nil || respRef.Value.Content == nil {
+			continue
+		}
+		ct := respRef.Value.Content.Get("application/json")
+		if ct != nil && ct.Schema != nil {
+			return resolveSchema(ct.Schema)
 		}
 	}
 	return nil

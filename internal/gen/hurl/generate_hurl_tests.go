@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=generator control=iteration
+//ff:func feature=gen-hurl type=generator control=iteration dimension=1
 //ff:what Main orchestrator — builds scenario order, writes auth + steps, outputs smoke.hurl.
 package hurl
 
@@ -54,11 +54,11 @@ func generateHurlTests(doc *openapi3.T, outDir, specsDir string, diagrams []*sta
 	authWritten := false
 	currentResource := ""
 	for _, step := range steps {
+		if step.IsAuth && !authWritten && hasAuth {
+			writeAuthSection(&buf, doc, captures, roles, checkEnums)
+			authWritten = true
+		}
 		if step.IsAuth {
-			if !authWritten && hasAuth {
-				writeAuthSection(&buf, doc, captures, roles, checkEnums)
-				authWritten = true
-			}
 			continue
 		}
 

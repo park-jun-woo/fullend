@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=2
 //ff:what 응답 스키마에서 토큰 필드 JSON path를 찾는다
 package hurl
 
@@ -38,17 +38,18 @@ func findTokenJSONPath(respSchema *openapi3.Schema) string {
 		if !strings.Contains(lname, "token") {
 			continue
 		}
-		if len(prop.Type.Slice()) > 0 && prop.Type.Slice()[0] == "object" && prop.Properties != nil {
-			for innerName := range prop.Properties {
-				innerLname := strings.ToLower(innerName)
-				innerProp := prop.Properties[innerName].Value
-				if innerProp == nil {
-					continue
-				}
-				if (strings.Contains(innerLname, "token") || strings.Contains(innerLname, "access")) &&
-					len(innerProp.Type.Slice()) > 0 && innerProp.Type.Slice()[0] == "string" {
-					return name + "." + innerName
-				}
+		if len(prop.Type.Slice()) == 0 || prop.Type.Slice()[0] != "object" || prop.Properties == nil {
+			continue
+		}
+		for innerName := range prop.Properties {
+			innerProp := prop.Properties[innerName].Value
+			if innerProp == nil {
+				continue
+			}
+			innerLname := strings.ToLower(innerName)
+			if (strings.Contains(innerLname, "token") || strings.Contains(innerLname, "access")) &&
+				len(innerProp.Type.Slice()) > 0 && innerProp.Type.Slice()[0] == "string" {
+				return name + "." + innerName
 			}
 		}
 	}

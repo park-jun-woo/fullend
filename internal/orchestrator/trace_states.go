@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util control=iteration
+//ff:func feature=orchestrator type=util control=iteration dimension=1
 //ff:what traceStates finds state diagrams referenced by @state sequences.
 
 package orchestrator

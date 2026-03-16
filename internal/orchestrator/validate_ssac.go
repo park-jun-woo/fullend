@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule control=sequence
+//ff:func feature=orchestrator type=rule control=iteration dimension=1
 //ff:what SSaC 서비스 함수 검증 — 심볼 테이블 기반 시퀀스 유효성 검사
 package orchestrator
 
@@ -29,23 +29,19 @@ func validateSSaC(root string, funcs []ssacparser.ServiceFunc, st *ssacvalidator
 	}
 
 	verrs := ssacvalidator.ValidateWithSymbols(funcs, st)
-	if len(verrs) > 0 {
-		hasError := false
-		for _, ve := range verrs {
-			prefix := ""
-			if ve.Level == "WARNING" {
-				prefix = "[WARN] "
-			} else {
-				hasError = true
-			}
-			step.Errors = append(step.Errors, fmt.Sprintf("%s%s:%s seq[%d] %s — %s",
-				prefix, ve.FileName, ve.FuncName, ve.SeqIndex, ve.Tag, ve.Message))
-		}
-		if hasError {
-			step.Status = reporter.Fail
+	hasError := false
+	for _, ve := range verrs {
+		prefix := ""
+		if ve.Level == "WARNING" {
+			prefix = "[WARN] "
 		} else {
-			step.Status = reporter.Pass
+			hasError = true
 		}
+		step.Errors = append(step.Errors, fmt.Sprintf("%s%s:%s seq[%d] %s — %s",
+			prefix, ve.FileName, ve.FuncName, ve.SeqIndex, ve.Tag, ve.Message))
+	}
+	if hasError {
+		step.Status = reporter.Fail
 	} else {
 		step.Status = reporter.Pass
 	}

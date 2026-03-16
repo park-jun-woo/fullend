@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util control=iteration
+//ff:func feature=orchestrator type=util control=iteration dimension=2
 //ff:what traceOpenAPI finds the OpenAPI path/method for an operationId.
 
 package orchestrator

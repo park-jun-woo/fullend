@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule control=iteration
+//ff:func feature=orchestrator type=rule control=iteration dimension=2
 //ff:what sqlc 쿼리 이름 중복 감지 — db/queries/*.sql 스캔
 package orchestrator
 

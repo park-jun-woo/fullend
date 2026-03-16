@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=1
 //ff:what Infers the resource name from the first non-parameter path segment.
 package hurl
 

@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command control=iteration
+//ff:func feature=orchestrator type=command control=iteration dimension=1
 //ff:what DetectSSOTs scans root for known SSOT directories and returns what exists.
 
 package orchestrator
@@ -38,19 +38,21 @@ func DetectSSOTs(root string) ([]DetectedSSOT, error) {
 
 	for _, c := range checks {
 		matches, _ := filepath.Glob(filepath.Join(abs, c.pattern))
-		if len(matches) > 0 {
-			dir := filepath.Dir(matches[0])
-			if c.kind == KindOpenAPI {
-				dir = matches[0] // file path, not dir
-			}
-			found = append(found, DetectedSSOT{Kind: c.kind, Path: dir})
-		} else if c.kind == KindSSaC {
-			// Also check for domain folder structure: service/{domain}/*.ssac
-			subMatches, _ := filepath.Glob(filepath.Join(abs, "service", "*", "*.ssac"))
-			if len(subMatches) > 0 {
-				found = append(found, DetectedSSOT{Kind: c.kind, Path: filepath.Join(abs, "service")})
-			}
+		dir := ""
+		if len(matches) == 0 && c.kind == KindSSaC {
+			matches, _ = filepath.Glob(filepath.Join(abs, "service", "*", "*.ssac"))
+			dir = filepath.Join(abs, "service")
 		}
+		if len(matches) == 0 {
+			continue
+		}
+		if dir == "" {
+			dir = filepath.Dir(matches[0])
+		}
+		if c.kind == KindOpenAPI {
+			dir = matches[0]
+		}
+		found = append(found, DetectedSSOT{Kind: c.kind, Path: dir})
 	}
 
 	// Check for states/ directory (Mermaid stateDiagram files).

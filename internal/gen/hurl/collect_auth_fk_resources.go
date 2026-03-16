@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=2
 //ff:what Detects FK-like fields in auth operation request bodies for pre-auth resource creation.
 package hurl
 

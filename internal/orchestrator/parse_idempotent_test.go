@@ -46,19 +46,13 @@ func findSpecsDir(t *testing.T) string {
 // consolidation in Phase017.
 func TestParseIdempotency(t *testing.T) {
 	specsDir := findSpecsDir(t)
-
 	t.Run("OpenAPI", func(t *testing.T) {
-		path := filepath.Join(specsDir, "api", "openapi.yaml")
-		doc1, err1 := openapi3.NewLoader().LoadFromFile(path)
-		doc2, err2 := openapi3.NewLoader().LoadFromFile(path)
-		if err1 != nil || err2 != nil {
-			t.Fatalf("load errors: %v / %v", err1, err2)
-		}
-		if !reflect.DeepEqual(doc1, doc2) {
-			t.Error("OpenAPI: two parses produced different results")
-		}
+		p := filepath.Join(specsDir, "api", "openapi.yaml")
+		d1, e1 := openapi3.NewLoader().LoadFromFile(p)
+		d2, e2 := openapi3.NewLoader().LoadFromFile(p)
+		if e1 != nil || e2 != nil { t.Fatalf("load errors: %v / %v", e1, e2) }
+		if !reflect.DeepEqual(d1, d2) { t.Error("OpenAPI: two parses differ") }
 	})
-
 	t.Run("SymbolTable", func(t *testing.T) {
 		st1, err1 := ssacvalidator.LoadSymbolTable(specsDir)
 		st2, err2 := ssacvalidator.LoadSymbolTable(specsDir)
@@ -66,10 +60,9 @@ func TestParseIdempotency(t *testing.T) {
 			t.Fatalf("load errors: %v / %v", err1, err2)
 		}
 		if !reflect.DeepEqual(st1, st2) {
-			diffSymbolTables(t, st1, st2)
+			t.Error("SymbolTable: two parses produced different results")
 		}
 	})
-
 	t.Run("SSaC", func(t *testing.T) {
 		serviceDir := filepath.Join(specsDir, "service")
 		f1, err1 := ssacparser.ParseDir(serviceDir)
@@ -79,17 +72,8 @@ func TestParseIdempotency(t *testing.T) {
 		}
 		if !reflect.DeepEqual(f1, f2) {
 			t.Errorf("SSaC: two parses differ — len %d vs %d", len(f1), len(f2))
-			for i := range f1 {
-				if i >= len(f2) {
-					break
-				}
-				if !reflect.DeepEqual(f1[i], f2[i]) {
-					t.Errorf("  diff at [%d]: %s vs %s", i, f1[i].Name, f2[i].Name)
-				}
-			}
 		}
 	})
-
 	t.Run("STML", func(t *testing.T) {
 		frontendDir := filepath.Join(specsDir, "frontend")
 		if _, err := os.Stat(frontendDir); err != nil {
@@ -104,7 +88,6 @@ func TestParseIdempotency(t *testing.T) {
 			t.Errorf("STML: two parses differ — len %d vs %d", len(p1), len(p2))
 		}
 	})
-
 	t.Run("States", func(t *testing.T) {
 		statesDir := filepath.Join(specsDir, "states")
 		if _, err := os.Stat(statesDir); err != nil {
@@ -119,7 +102,6 @@ func TestParseIdempotency(t *testing.T) {
 			t.Errorf("States: two parses differ — len %d vs %d", len(d1), len(d2))
 		}
 	})
-
 	t.Run("Policy", func(t *testing.T) {
 		policyDir := filepath.Join(specsDir, "policy")
 		if _, err := os.Stat(policyDir); err != nil {
@@ -134,7 +116,6 @@ func TestParseIdempotency(t *testing.T) {
 			t.Errorf("Policy: two parses differ — len %d vs %d", len(p1), len(p2))
 		}
 	})
-
 	t.Run("FuncSpec", func(t *testing.T) {
 		funcDir := filepath.Join(specsDir, "func")
 		if _, err := os.Stat(funcDir); err != nil {
@@ -149,7 +130,6 @@ func TestParseIdempotency(t *testing.T) {
 			t.Errorf("FuncSpec: two parses differ — len %d vs %d", len(s1), len(s2))
 		}
 	})
-
 	t.Run("ProjectConfig", func(t *testing.T) {
 		c1, err1 := projectconfig.Load(specsDir)
 		c2, err2 := projectconfig.Load(specsDir)
@@ -160,36 +140,4 @@ func TestParseIdempotency(t *testing.T) {
 			t.Error("ProjectConfig: two parses produced different results")
 		}
 	})
-}
-
-// diffSymbolTables reports which fields differ between two SymbolTables.
-func diffSymbolTables(t *testing.T, a, b *ssacvalidator.SymbolTable) {
-	t.Helper()
-	t.Error("SymbolTable: two parses produced different results")
-
-	if !reflect.DeepEqual(a.DDLTables, b.DDLTables) {
-		t.Error("  DDLTables differ")
-		for k := range a.DDLTables {
-			if !reflect.DeepEqual(a.DDLTables[k], b.DDLTables[k]) {
-				t.Errorf("    table %q differs", k)
-			}
-		}
-		for k := range b.DDLTables {
-			if _, ok := a.DDLTables[k]; !ok {
-				t.Errorf("    table %q only in second parse", k)
-			}
-		}
-	}
-	if !reflect.DeepEqual(a.Models, b.Models) {
-		t.Error("  Models differ")
-	}
-	if !reflect.DeepEqual(a.Operations, b.Operations) {
-		t.Error("  Operations differ")
-	}
-	if !reflect.DeepEqual(a.DTOs, b.DTOs) {
-		t.Error("  DTOs differ")
-	}
-	if !reflect.DeepEqual(a.Funcs, b.Funcs) {
-		t.Error("  Funcs differ")
-	}
 }

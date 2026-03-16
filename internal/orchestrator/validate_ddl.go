@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule control=iteration
+//ff:func feature=orchestrator type=rule control=iteration dimension=2
 //ff:what DDL 검증 — 테이블/컬럼 파싱 + sqlc 쿼리 중복·NOT NULL 체크
 package orchestrator
 

@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule control=iteration
+//ff:func feature=orchestrator type=rule control=iteration dimension=1
 //ff:what STML 페이지 스펙 검증 — 바인딩 수 집계 + stml validator 실행
 package orchestrator
 

@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=1
 //ff:what Path parameter handling — checks if all path parameters can be resolved from captured variables.
 package hurl
 
@@ -21,13 +21,8 @@ func canResolvePathParams(path string, captures map[string]bool) bool {
 		}
 
 		// Check derived from preceding segment: /gigs/{ID} -> gig_id.
-		if i > 0 {
-			resource := segments[i-1]
-			singular := strings.TrimSuffix(resource, "s")
-			derivedVar := singular + "_" + snakeParam
-			if captures[derivedVar] {
-				continue
-			}
+		if i > 0 && captures[strings.TrimSuffix(segments[i-1], "s")+"_"+snakeParam] {
+			continue
 		}
 
 		// Unresolvable param found.

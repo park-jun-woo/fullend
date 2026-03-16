@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command control=iteration
+//ff:func feature=orchestrator type=command control=iteration dimension=1
 //ff:what ParseAll parses all detected SSOTs once and returns the cached results.
 
 package orchestrator

@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util control=iteration
+//ff:func feature=orchestrator type=util control=iteration dimension=2
 //ff:what scanFuncImports scans SSaC files for import statements that reference func packages.
 
 package orchestrator

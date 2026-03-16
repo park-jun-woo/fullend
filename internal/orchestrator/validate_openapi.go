@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=rule control=iteration
+//ff:func feature=orchestrator type=rule control=iteration dimension=2
 //ff:what OpenAPI 스펙 검증 — 엔드포인트 수 집계 + 경로 파라미터 충돌 검사
 package orchestrator
 

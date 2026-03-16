@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=command control=iteration
+//ff:func feature=orchestrator type=command control=iteration dimension=1
 //ff:what 교차 검증 실행 — OpenAPI+DDL+SSaC 교차 정합성 검증 오케스트레이션
 package orchestrator
 

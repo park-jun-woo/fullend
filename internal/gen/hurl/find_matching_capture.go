@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=1
 //ff:what Finds a captured variable that matches an FK field name via direct or prefix match.
 package hurl
 
@@ -18,11 +18,11 @@ func findMatchingCapture(fieldName string, captures map[string]bool) string {
 	}
 	prefix := strings.TrimSuffix(fieldName, "_id")
 	for cap := range captures {
-		if strings.HasSuffix(cap, "_id") {
-			capPrefix := strings.TrimSuffix(cap, "_id")
-			if strings.HasPrefix(capPrefix, prefix) {
-				return cap
-			}
+		if !strings.HasSuffix(cap, "_id") {
+			continue
+		}
+		if strings.HasPrefix(strings.TrimSuffix(cap, "_id"), prefix) {
+			return cap
 		}
 	}
 	return ""

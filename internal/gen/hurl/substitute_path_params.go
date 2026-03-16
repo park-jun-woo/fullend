@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=1
 //ff:what Replaces {ParamName} with {{captured_var}} using captured variables.
 package hurl
 
@@ -22,14 +22,13 @@ func substitutePathParams(path string, captures map[string]bool) string {
 		}
 
 		// Derive from preceding segment: /gigs/{ID} -> gig_id.
+		derivedVar := ""
 		if i > 0 {
-			resource := segments[i-1]
-			singular := strings.TrimSuffix(resource, "s")
-			derivedVar := singular + "_" + snakeParam
-			if captures[derivedVar] {
-				segments[i] = "{{" + derivedVar + "}}"
-				continue
-			}
+			derivedVar = strings.TrimSuffix(segments[i-1], "s") + "_" + snakeParam
+		}
+		if derivedVar != "" && captures[derivedVar] {
+			segments[i] = "{{" + derivedVar + "}}"
+			continue
 		}
 
 		// Fallback: use plain snake param.

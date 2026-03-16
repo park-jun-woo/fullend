@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=3
 //ff:what Role mapping — extracts operation -> required role from OPA policies.
 package hurl
 

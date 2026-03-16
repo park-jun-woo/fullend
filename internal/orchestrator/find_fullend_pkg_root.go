@@ -1,11 +1,10 @@
-//ff:func feature=orchestrator type=util control=iteration
+//ff:func feature=orchestrator type=util control=iteration dimension=2
 //ff:what fullend pkg/ 디렉토리 탐색 — CWD에서 상위로 go.mod 검색
 package orchestrator
 
 import (
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 // findFullendPkgRoot locates the fullend pkg/ directory.
@@ -17,16 +16,12 @@ func findFullendPkgRoot() string {
 	}
 	for {
 		goModPath := filepath.Join(dir, "go.mod")
-		if data, err := os.ReadFile(goModPath); err == nil {
-			for _, line := range strings.Split(string(data), "\n") {
-				if strings.TrimSpace(line) == "module github.com/geul-org/fullend" {
-					pkgDir := filepath.Join(dir, "pkg")
-					if fi, err := os.Stat(pkgDir); err == nil && fi.IsDir() {
-						return pkgDir
-					}
-					return ""
-				}
+		if data, err := os.ReadFile(goModPath); err == nil && isFullendGoMod(data) {
+			pkgDir := filepath.Join(dir, "pkg")
+			if fi, err := os.Stat(pkgDir); err == nil && fi.IsDir() {
+				return pkgDir
 			}
+			return ""
 		}
 		parent := filepath.Dir(dir)
 		if parent == dir {

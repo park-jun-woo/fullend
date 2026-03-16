@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=1
 //ff:what Checks if a table can be safely deleted (all FK children also have DELETE endpoints).
 package hurl
 

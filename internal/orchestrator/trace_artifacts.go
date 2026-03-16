@@ -1,4 +1,4 @@
-//ff:func feature=orchestrator type=util control=iteration
+//ff:func feature=orchestrator type=util control=iteration dimension=2
 //ff:what traceArtifacts finds generated code artifacts connected to the operationId.
 
 package orchestrator
@@ -59,19 +59,17 @@ func traceArtifacts(artifactsDir, operationID string, sf *ssacparser.ServiceFunc
 		modelName := parts[0]
 		methodName := parts[1]
 
+		tableName := inflection.Plural(strings.ToLower(modelName))
 		for _, f := range funcs {
-			if f.Function == methodName && strings.Contains(f.File, "/model/") {
-				// Check if it's for this model (DDL table).
-				tableName := inflection.Plural(strings.ToLower(modelName))
-				if strings.Contains(f.Directive.SSOT, tableName) {
-					links = append(links, ChainLink{
-						Kind:      "Model",
-						File:      f.File,
-						Summary:   modelName + "." + methodName,
-						Ownership: f.Status,
-					})
-				}
+			if f.Function != methodName || !strings.Contains(f.File, "/model/") || !strings.Contains(f.Directive.SSOT, tableName) {
+				continue
 			}
+			links = append(links, ChainLink{
+				Kind:      "Model",
+				File:      f.File,
+				Summary:   modelName + "." + methodName,
+				Ownership: f.Status,
+			})
 		}
 	}
 

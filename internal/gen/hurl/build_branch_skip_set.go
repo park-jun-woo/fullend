@@ -1,4 +1,4 @@
-//ff:func feature=gen-hurl type=util control=iteration
+//ff:func feature=gen-hurl type=util control=iteration dimension=3
 //ff:what Finds branching state transitions and marks all but the first as skippable in smoke tests.
 package hurl
 
