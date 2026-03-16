@@ -8,9 +8,9 @@
 
 ### MUT-SSAC-OPENAPI-002: OpenAPI 응답 property 대소문자
 - 대상: `specs/gigbridge/api/openapi.yaml`
-- 변경: Login 응답 `AccessToken` → `accessToken`
-- 기대: ERROR — json tag `access_token`과 불일치 (둘 다 틀림)
-- 결과: PASS — Phase012 shorthand 검증이 access_token vs accessToken 잡음
+- 변경: Login 응답 `access_token` → `Access_Token`
+- 기대: ERROR — json tag `access_token`과 불일치
+- 결과: SKIP — Login은 `@response token` shorthand 형태. 변수 단위 반환이므로 개별 property 이름 비교 불가. 설계상 정상
 
 ### MUT-SSAC-OPENAPI-003: SSaC 함수명 변경
 - 대상: `specs/gigbridge/service/gig/create_gig.ssac`

@@ -97,6 +97,13 @@ func validateFetchBlock(f parser.FetchBlock, file string, st *SymbolTable, cs *C
 		errs = append(errs, validateFetchBlock(child, file, st, cs, frontendDir)...)
 	}
 
+	// Validate actions nested inside this fetch block
+	for _, child := range f.Children {
+		if child.Kind == "action" && child.Action != nil {
+			errs = append(errs, validateActionBlock(*child.Action, file, st, frontendDir)...)
+		}
+	}
+
 	return errs
 }
 

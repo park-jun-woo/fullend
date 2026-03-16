@@ -18,6 +18,12 @@ func validateModel(sf parser.ServiceFunc, st *SymbolTable) []ValidationError {
 			continue // @call은 외부 패키지이므로 교차검증 스킵
 		}
 		ctx := errCtx{sf.FileName, sf.Name, i}
+
+		// Result 타입이 대문자로 시작하는지 검증 (Go exported type 규칙)
+		if seq.Result != nil && seq.Result.Type != "" && seq.Result.Type[0] >= 'a' && seq.Result.Type[0] <= 'z' {
+			errs = append(errs, ctx.err("@"+seq.Type, fmt.Sprintf("Result 타입 %q — 대문자로 시작해야 합니다 (예: %s)", seq.Result.Type, strings.Title(seq.Result.Type))))
+		}
+
 		parts := strings.SplitN(seq.Model, ".", 2)
 		if len(parts) < 2 {
 			continue

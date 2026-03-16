@@ -12,9 +12,14 @@ import (
 func validateScenarioHurl(testsDir string, specsRoot string) (reporter.StepResult, []string) {
 	step := reporter.StepResult{Name: string(KindScenario)}
 
-	// Check for deprecated .feature files anywhere under specs root.
-	scenarioDir := filepath.Join(specsRoot, "scenario")
-	if featureFiles, _ := filepath.Glob(filepath.Join(scenarioDir, "*.feature")); len(featureFiles) > 0 {
+	// Check for deprecated .feature files in both scenario/ (old) and tests/ (current).
+	var featureFiles []string
+	for _, dir := range []string{filepath.Join(specsRoot, "scenario"), testsDir} {
+		if matches, _ := filepath.Glob(filepath.Join(dir, "*.feature")); len(matches) > 0 {
+			featureFiles = append(featureFiles, matches...)
+		}
+	}
+	if len(featureFiles) > 0 {
 		step.Status = reporter.Fail
 		for _, f := range featureFiles {
 			rel, _ := filepath.Rel(specsRoot, f)
