@@ -11,3 +11,15 @@
 - 변경: `password_hash` → `pw_hash` (@sensitive 어노테이션 유지)
 - 기대: 무경고 — @sensitive가 붙어있으므로 이미 인지된 것으로 간주, 패턴 매칭 스킵
 - 결과: PASS — @sensitive 어노테이션이 있으면 경고하지 않는 정상 동작 확인
+
+### MUT-DDL-003: NOT NULL 누락
+- 대상: `specs/gigbridge/db/gigs.sql`
+- 변경: `title VARCHAR(255) NOT NULL` → `title VARCHAR(255)` (NOT NULL 제거)
+- 기대: ERROR — 컬럼에 NOT NULL이 없음
+- 결과: 미실행
+
+### MUT-DDL-004: sqlc query 이름 중복
+- 대상: `specs/gigbridge/db/queries/gigs.sql`
+- 변경: 동일 파일에 `-- name: GetGig :one` 두 번 선언
+- 기대: ERROR — sqlc query 이름 "GetGig" 중복
+- 결과: 미실행

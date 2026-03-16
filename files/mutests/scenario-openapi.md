@@ -11,3 +11,9 @@
 - 변경: `POST {{host}}/auth/login` → `GET {{host}}/auth/login`
 - 기대: ERROR — OpenAPI /auth/login에 GET 메서드 미정의
 - 결과: PASS — Hurl method↔OpenAPI method 불일치 검출
+
+### MUT-SCENARIO-OPENAPI-003: Hurl 기대 status code가 OpenAPI에 미정의
+- 대상: `specs/gigbridge/tests/scenario-gig-lifecycle.hurl`
+- 변경: `HTTP 201` → `HTTP 202`
+- 기대: WARNING — OpenAPI에 202 응답 코드 미정의
+- 결과: 미실행

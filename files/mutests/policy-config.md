@@ -11,3 +11,9 @@
 - 변경: `claims.ID: user_id` → `claims.ID: userId`
 - 기대: ERROR — Rego input.claims 참조와 fullend.yaml claims 불일치
 - 결과: PASS — Phase014: CheckClaimsRego 추가로 검출
+
+### MUT-POLICY-CONFIG-003: config에 정의된 role이 Rego에서 미사용
+- 대상: `specs/gigbridge/fullend.yaml`
+- 변경: roles에 `admin` 추가 (Rego에서 미참조)
+- 기대: WARNING — fullend.yaml roles "admin"이 Rego에서 미사용
+- 결과: 미실행
