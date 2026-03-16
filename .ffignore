@@ -1,20 +1,2 @@
 artifacts/
-pkg/
-cmd/
-
-# Non-filefunc packages
-internal/crosscheck/
-internal/funcspec/
-internal/genmodel/
-internal/genapi/
-internal/projectconfig/
-internal/statemachine/
-internal/policy/
-internal/scenario/
-internal/reporter/
-internal/contract/
-internal/stml/
-internal/ssac/parser/
-internal/ssac/generator/
-internal/gen/react/
 specs/

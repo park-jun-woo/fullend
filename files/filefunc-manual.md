@@ -142,14 +142,21 @@ filefunc validate                                    # current dir as project ro
 filefunc validate /path/to/project                   # explicit project root
 filefunc validate --format json
 filefunc chain func RunAll --chon 2                  # call relationships
+filefunc chain func RunAll --chon 2 --meta what      # with //ff:what annotations
+filefunc chain func RunAll --chon 2 --meta all       # with all annotations
+filefunc chain func RunAll --chon 2 --meta what \
+  --prompt "nesting depth 수정" --rate 0.8            # reranker filtering
 filefunc chain feature validate                      # feature-wide chain
 filefunc chain func RunAll --root /path/to/project   # explicit project root
+filefunc context "nesting depth 수정"                   # LLM 4-stage context search
 filefunc llmc                                        # LLM what-body verification
 filefunc llmc /path/to/project
 filefunc llmc --model qwen3:8b --threshold 0.9
 ```
 
 Project root must contain `go.mod` and `codebook.yaml`. Omit to use current directory.
+
+`--prompt` requires vLLM server: `pip install vllm && vllm serve Qwen/Qwen3-Reranker-0.6B --task score --hf_overrides '{"architectures":["Qwen3ForSequenceClassification"],"classifier_from_token":["no","yes"],"is_original_qwen3_reranker":true}'`
 
 Exit code 1 on violations. Zero violations required before committing.
 
