@@ -1,4 +1,4 @@
-//ff:func feature=crosscheck type=util control=sequence
+//ff:func feature=crosscheck type=util control=sequence topic=ssac-openapi
 //ff:what OpenAPI SchemaRef에서 Schema 값 추출
 package crosscheck
 

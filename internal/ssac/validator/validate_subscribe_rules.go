@@ -1,4 +1,4 @@
-//ff:func feature=ssac-validate type=rule control=sequence
+//ff:func feature=ssac-validate type=rule control=sequence topic=subscribe
 //ff:what subscribe/HTTP 트리거 관련 규칙 검증
 package validator
 

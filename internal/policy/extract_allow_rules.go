@@ -1,4 +1,4 @@
-//ff:func feature=policy type=parser control=iteration dimension=1
+//ff:func feature=policy type=parser control=iteration dimension=1 topic=policy-check
 //ff:what Rego 소스에서 allow 블록들을 분리하고 AllowRule을 추출한다
 package policy
 

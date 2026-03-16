@@ -1,4 +1,4 @@
-//ff:func feature=symbol type=util control=iteration dimension=1
+//ff:func feature=symbol type=util control=iteration dimension=1 topic=openapi
 //ff:what 단일 OpenAPI operation에서 OperationSymbol을 구성한다
 package validator
 
