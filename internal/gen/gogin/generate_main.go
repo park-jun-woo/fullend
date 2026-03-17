@@ -10,11 +10,12 @@ import (
 	"strings"
 
 	"github.com/park-jun-woo/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // generateMain creates backend/go.mod (if missing) and backend/cmd/main.go.
-func generateMain(artifactsDir string, models []string, modulePath string, queueBackend string, serviceFuncs []ssacparser.ServiceFunc, policies []*policy.Policy) error {
+func generateMain(artifactsDir string, models []string, modulePath string, queueBackend string, serviceFuncs []ssacparser.ServiceFunc, policies []*policy.Policy, sessionBackend, cacheBackend string, fileConfig *projectconfig.FileBackend) error {
 	if modulePath == "" {
 		base := filepath.Base(artifactsDir)
 		modulePath = base + "/backend"
@@ -95,7 +96,12 @@ func generateMain(artifactsDir string, models []string, modulePath string, queue
 		}
 	}
 
-	src := mainTemplate(modulePath, authzImport, queueImport, authzInitBlock, queueInitBlock, initBlock, queueSubscribeBlock)
+	builtinImport, builtinInitBlock := buildBuiltinInitBlocks(sessionBackend, cacheBackend, fileConfig)
+	if strings.Contains(queueImport, `"context"`) {
+		builtinImport = strings.Replace(builtinImport, "\n\t\"context\"", "", 1)
+	}
+
+	src := mainTemplate(modulePath, authzImport, queueImport, builtinImport, authzInitBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock)
 
 	path := filepath.Join(artifactsDir, "backend", "cmd", "main.go")
 	return os.WriteFile(path, []byte(src), 0644)

@@ -982,6 +982,129 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /workflows/{id}/schedule:
+    post:
+      operationId: SetSchedule
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cron]
+              properties:
+                cron:
+                  type: string
+                  maxLength: 100
+      responses:
+        "200":
+          description: Schedule set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cron:
+                    type: string
+                  next_run:
+                    type: string
+        "400":
+          description: Invalid cron expression
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Workflow not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      operationId: GetSchedule
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Current schedule
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cron:
+                    type: string
+                  next_run:
+                    type: string
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Workflow not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: DeleteSchedule
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Schedule deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Workflow not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /workflows/{id}/logs:
     get:
       operationId: ListExecutionLogs

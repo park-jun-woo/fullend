@@ -16,6 +16,8 @@ backend:
       Email: email
       Role: role
       OrgID: org_id:int64
+session:
+  backend: postgres
 queue:
   backend: postgres
 file:

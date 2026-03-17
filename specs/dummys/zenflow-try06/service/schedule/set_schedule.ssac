@@ -1,0 +1,10 @@
+package service
+
+import "github.com/example/zenflow/internal/schedule"
+
+// @get Workflow wf = Workflow.FindByIDAndOrgID({ID: request.id, OrgID: currentUser.OrgID})
+// @empty wf "Workflow not found" 404
+// @auth "SetSchedule" "workflow" {ResourceID: wf.ID} "Not authorized" 403
+// @call schedule.SetScheduleResponse result = schedule.SetSchedule({WorkflowID: wf.ID, Cron: request.cron}) 400
+// @response { cron: result.Cron, next_run: result.NextRun }
+func SetSchedule() {}

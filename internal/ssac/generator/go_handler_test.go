@@ -417,7 +417,8 @@ func TestGeneratePostBodySingleField(t *testing.T) {
 		},
 		Operations: map[string]validator.OperationSymbol{
 			"SubmitProposal": {
-				PathParams: []validator.PathParam{{Name: "ID", GoType: "int64"}},
+				PathParams:     []validator.PathParam{{Name: "ID", GoType: "int64"}},
+				HasRequestBody: true,
 			},
 		},
 	}

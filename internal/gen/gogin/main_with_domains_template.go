@@ -6,7 +6,7 @@ package gogin
 import "fmt"
 
 // mainWithDomainsTemplate returns the fmt.Sprintf template for domain-mode cmd/main.go.
-func mainWithDomainsTemplate(osImport, importBlock, queueImport, jwtFlagLine, authzBlock, queueInitBlock, initBlock, queueSubscribeBlock string) string {
+func mainWithDomainsTemplate(osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock string) string {
 	return fmt.Sprintf(`package main
 
 import (
@@ -15,7 +15,7 @@ import (
 	"log"%s
 
 	_ "github.com/lib/pq"
-%s%s
+%s%s%s
 )
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 	if err := conn.Ping(); err != nil {
 		log.Fatalf("database ping failed: %%v", err)
 	}
-%s%s
+%s%s%s
 	server := &service.Server{
 %s
 	}
@@ -42,5 +42,5 @@ func main() {
 	log.Printf("server listening on %%s", *addr)
 	log.Fatal(r.Run(*addr))
 }
-`, osImport, importBlock, queueImport, jwtFlagLine, authzBlock, queueInitBlock, initBlock, queueSubscribeBlock)
+`, osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock)
 }

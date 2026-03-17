@@ -6,7 +6,7 @@ package gogin
 import "fmt"
 
 // mainTemplate returns the fmt.Sprintf template for flat-mode cmd/main.go.
-func mainTemplate(modulePath, authzImport, queueImport, authzInitBlock, queueInitBlock, initBlock, queueSubscribeBlock string) string {
+func mainTemplate(modulePath, authzImport, queueImport, builtinImport, authzInitBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock string) string {
 	return fmt.Sprintf(`package main
 
 import (
@@ -18,7 +18,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"%s/internal/model"
-	"%s/internal/service"%s%s
+	"%s/internal/service"%s%s%s
 )
 
 func main() {
@@ -36,7 +36,7 @@ func main() {
 	if err := conn.Ping(); err != nil {
 		log.Fatalf("database ping failed: %%v", err)
 	}
-%s%s
+%s%s%s
 	server := &service.Server{
 %s
 	}
@@ -45,5 +45,5 @@ func main() {
 	log.Printf("server listening on %%s", *addr)
 	log.Fatal(http.ListenAndServe(*addr, handler))
 }
-`, modulePath, modulePath, authzImport, queueImport, authzInitBlock, queueInitBlock, initBlock, queueSubscribeBlock)
+`, modulePath, modulePath, authzImport, queueImport, builtinImport, authzInitBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock)
 }

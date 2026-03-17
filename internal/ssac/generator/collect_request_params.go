@@ -11,7 +11,7 @@ import (
 func collectRequestParams(seqs []parser.Sequence, st *validator.SymbolTable, pathParamSet map[string]bool, operationID string) []typedRequestParam {
 	rawParams := collectRawRequestParams(seqs, st, pathParamSet)
 
-	if shouldUseJSONBody(seqs, st, rawParams) {
+	if shouldUseJSONBody(seqs, st, operationID, rawParams) {
 		var rs *validator.RequestSchema
 		if st != nil && st.RequestSchemas != nil {
 			if schema, ok := st.RequestSchemas[operationID]; ok {

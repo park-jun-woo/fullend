@@ -1,5 +1,5 @@
 //ff:func feature=ssac-gen type=util control=iteration dimension=1 topic=request-params
-//ff:what POST/PUT 또는 2+ 파라미터일 때 JSON body 사용 여부를 판단
+//ff:what OpenAPI requestBody 또는 @post/@put 시퀀스로 JSON body 사용 여부를 판단
 package generator
 
 import (
@@ -7,13 +7,21 @@ import (
 	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
-func shouldUseJSONBody(seqs []parser.Sequence, st *validator.SymbolTable, rawParams []rawParam) bool {
-	hasBodySeq := false
-	for _, seq := range seqs {
-		if seq.Type == parser.SeqPost || seq.Type == parser.SeqPut {
-			hasBodySeq = true
-			break
+func shouldUseJSONBody(seqs []parser.Sequence, st *validator.SymbolTable, operationID string, rawParams []rawParam) bool {
+	if len(rawParams) == 0 {
+		return false
+	}
+	// 1차: OpenAPI에 requestBody가 있으면 JSON body
+	if st != nil {
+		if op, ok := st.Operations[operationID]; ok {
+			return op.HasRequestBody
 		}
 	}
-	return (st != nil && len(rawParams) >= 2) || (hasBodySeq && len(rawParams) >= 1)
+	// 2차 fallback: Operations 미등록 시 @post/@put 시퀀스로 판단 (테스트 호환)
+	for _, seq := range seqs {
+		if seq.Type == parser.SeqPost || seq.Type == parser.SeqPut {
+			return true
+		}
+	}
+	return false
 }

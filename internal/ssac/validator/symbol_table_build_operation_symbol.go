@@ -28,6 +28,7 @@ func (st *SymbolTable) buildOperationSymbol(op *openAPIOperation, schemas map[st
 	if op.RequestBody == nil {
 		return opSym
 	}
+	opSym.HasRequestBody = true
 	content, ok := op.RequestBody.Content["application/json"]
 	if !ok {
 		return opSym

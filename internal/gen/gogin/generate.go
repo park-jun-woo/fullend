@@ -22,6 +22,8 @@ func (g *GoGin) Generate(parsed *genapi.ParsedSSOTs, cfg *genapi.GenConfig) erro
 	var claims map[string]projectconfig.ClaimDef
 	var secretEnv string
 	var queueBackend string
+	var sessionBackend, cacheBackend string
+	var fileConfig *projectconfig.FileBackend
 	if parsed.Config != nil {
 		if parsed.Config.Backend.Auth != nil {
 			claims = parsed.Config.Backend.Auth.Claims
@@ -30,6 +32,13 @@ func (g *GoGin) Generate(parsed *genapi.ParsedSSOTs, cfg *genapi.GenConfig) erro
 		if parsed.Config.Queue != nil {
 			queueBackend = parsed.Config.Queue.Backend
 		}
+		if parsed.Config.Session != nil {
+			sessionBackend = parsed.Config.Session.Backend
+		}
+		if parsed.Config.Cache != nil {
+			cacheBackend = parsed.Config.Cache.Backend
+		}
+		fileConfig = parsed.Config.File
 	}
 
 	// Validate: bearerAuth requires claims config.
@@ -58,7 +67,7 @@ func (g *GoGin) Generate(parsed *genapi.ParsedSSOTs, cfg *genapi.GenConfig) erro
 		if err := generateServerStructWithDomains(intDir, parsed.ServiceFuncs, cfg.ModulePath, parsed.OpenAPIDoc); err != nil {
 			return fmt.Errorf("server.go (domain): %w", err)
 		}
-		if err := generateMainWithDomains(cfg.ArtifactsDir, parsed.ServiceFuncs, cfg.ModulePath, queueBackend, parsed.Policies); err != nil {
+		if err := generateMainWithDomains(cfg.ArtifactsDir, parsed.ServiceFuncs, cfg.ModulePath, queueBackend, parsed.Policies, sessionBackend, cacheBackend, fileConfig); err != nil {
 			return fmt.Errorf("main.go (domain): %w", err)
 		}
 	} else {
@@ -77,7 +86,7 @@ func (g *GoGin) Generate(parsed *genapi.ParsedSSOTs, cfg *genapi.GenConfig) erro
 		if err := generateAuthStub(intDir); err != nil {
 			return fmt.Errorf("auth.go: %w", err)
 		}
-		if err := generateMain(cfg.ArtifactsDir, models, cfg.ModulePath, queueBackend, parsed.ServiceFuncs, parsed.Policies); err != nil {
+		if err := generateMain(cfg.ArtifactsDir, models, cfg.ModulePath, queueBackend, parsed.ServiceFuncs, parsed.Policies, sessionBackend, cacheBackend, fileConfig); err != nil {
 			return fmt.Errorf("main.go: %w", err)
 		}
 	}

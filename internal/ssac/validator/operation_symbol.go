@@ -4,8 +4,9 @@ package validator
 
 // OperationSymbol은 API 엔드포인트의 request/response 필드 목록이다.
 type OperationSymbol struct {
-	RequestFields map[string]bool
-	PathParams    []PathParam // path parameter (순서 보존)
+	RequestFields  map[string]bool
+	PathParams     []PathParam // path parameter (순서 보존)
+	HasRequestBody bool        // OpenAPI requestBody 존재 여부
 	XPagination    *XPagination
 	XSort          *XSort
 	XFilter        *XFilter
