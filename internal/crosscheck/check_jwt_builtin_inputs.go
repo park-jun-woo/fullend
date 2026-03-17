@@ -3,8 +3,6 @@
 package crosscheck
 
 import (
-	"fmt"
-
 	"github.com/park-jun-woo/fullend/internal/projectconfig"
 	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
@@ -15,41 +13,13 @@ func CheckJWTBuiltinInputs(serviceFuncs []ssacparser.ServiceFunc, claims map[str
 	if claims == nil {
 		return nil
 	}
-
 	claimFields := make(map[string]bool, len(claims))
 	for field := range claims {
 		claimFields[field] = true
 	}
-
 	var errs []CrossError
 	for _, sf := range serviceFuncs {
-		for seqIdx, seq := range sf.Sequences {
-			if seq.Type != "call" || seq.Model == "" {
-				continue
-			}
-			_, _, key := parseCallKey(seq.Model)
-			if !jwtBuiltinFuncs[key] {
-				continue
-			}
-			for inputKey := range seq.Inputs {
-				if !claimFields[inputKey] {
-					errs = append(errs, CrossError{
-						Rule:    "SSaC @call → Claims",
-						Context: fmt.Sprintf("%s seq[%d] @call %s", sf.Name, seqIdx, seq.Model),
-						Message: fmt.Sprintf("@call input key %q가 claims 필드에 없습니다 (유효: %s)", inputKey, claimFieldList(claims)),
-						Level:   "ERROR",
-					})
-				}
-			}
-		}
+		errs = append(errs, checkJWTInputsForFunc(sf, claimFields, claims)...)
 	}
 	return errs
-}
-
-func claimFieldList(claims map[string]projectconfig.ClaimDef) string {
-	var keys []string
-	for k := range claims {
-		keys = append(keys, k)
-	}
-	return fmt.Sprintf("%v", keys)
 }

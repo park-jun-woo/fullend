@@ -3,7 +3,6 @@
 package funcspec
 
 import (
-	"go/ast"
 	"go/parser"
 	"go/token"
 	"os"
@@ -29,23 +28,7 @@ func collectPackageTypes(dir string) map[string][]Field {
 		if err != nil {
 			continue
 		}
-		for _, decl := range f.Decls {
-			gd, ok := decl.(*ast.GenDecl)
-			if !ok || gd.Tok != token.TYPE {
-				continue
-			}
-			for _, spec := range gd.Specs {
-				ts, ok := spec.(*ast.TypeSpec)
-				if !ok {
-					continue
-				}
-				st, ok := ts.Type.(*ast.StructType)
-				if !ok {
-					continue
-				}
-				result[ts.Name.Name] = extractFields(st)
-			}
-		}
+		collectStructsFromFile(f, result)
 	}
 	return result
 }

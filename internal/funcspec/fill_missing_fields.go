@@ -16,17 +16,6 @@ func fillMissingFields(specs []FuncSpec, specDirs []string) {
 			typeMap = collectPackageTypes(dir)
 			cache[dir] = typeMap
 		}
-		expectedReq := ucFirst(specs[i].Name) + "Request"
-		expectedResp := ucFirst(specs[i].Name) + "Response"
-		if len(specs[i].RequestFields) == 0 {
-			if fields, ok := typeMap[expectedReq]; ok {
-				specs[i].RequestFields = fields
-			}
-		}
-		if len(specs[i].ResponseFields) == 0 {
-			if fields, ok := typeMap[expectedResp]; ok {
-				specs[i].ResponseFields = fields
-			}
-		}
+		fillSpecFromTypeMap(&specs[i], typeMap)
 	}
 }

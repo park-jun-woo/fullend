@@ -13,9 +13,6 @@ func defaultMessage(seq parser.Sequence) string {
 	if seq.Model != "" {
 		parts := strings.SplitN(seq.Model, ".", 2)
 		modelName = parts[0]
-		if seq.Package != "" {
-			modelName = seq.Package + "." + modelName
-		}
 	}
 
 	switch seq.Type {

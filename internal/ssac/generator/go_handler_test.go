@@ -499,19 +499,6 @@ func TestGeneratePublishWithOptions(t *testing.T) {
 	assertContains(t, code, `queue.WithDelay(1800)`)
 }
 
-func TestGeneratePackageModelCall(t *testing.T) {
-	sf := parser.ServiceFunc{
-		Name: "GetSession", FileName: "get_session.go",
-		Sequences: []parser.Sequence{
-			{Type: parser.SeqGet, Package: "session", Model: "Session.Get", Inputs: map[string]string{"token": "request.Token"}, Result: &parser.Result{Type: "Session", Var: "session"}},
-			{Type: parser.SeqResponse, Fields: map[string]string{"session": "session"}},
-		},
-	}
-	code := mustGenerate(t, sf, nil)
-	assertContains(t, code, `h.SessionModel.Get(token)`)
-	assertContains(t, code, `"session": session`)
-}
-
 func TestGenerateAuthCallStyle(t *testing.T) {
 	sf := parser.ServiceFunc{
 		Name: "AcceptProposal", FileName: "accept_proposal.go",

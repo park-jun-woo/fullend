@@ -11,7 +11,7 @@ import (
 func collectModelUsagesFromFunc(sf parser.ServiceFunc) []modelUsage {
 	var usages []modelUsage
 	for _, seq := range sf.Sequences {
-		if seq.Model == "" || seq.Type == parser.SeqCall || seq.Package != "" {
+		if seq.Model == "" || seq.Type == parser.SeqCall {
 			continue
 		}
 		parts := strings.SplitN(seq.Model, ".", 2)

@@ -8,11 +8,7 @@ import ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 func collectDDLRoleValues(st *ssacvalidator.SymbolTable) map[string]bool {
 	values := make(map[string]bool)
 	for _, table := range st.DDLTables {
-		if vals, ok := table.CheckEnums["role"]; ok {
-			for _, v := range vals {
-				values[v] = true
-			}
-		}
+		collectRoleValuesFromTable(table, values)
 	}
 	return values
 }

@@ -2,7 +2,8 @@
 //ff:what I/O 금지 import 목록과 대조하여 위반 패키지 반환
 package crosscheck
 
-// forbiddenImportPrefixes are I/O packages that @call func must not import.
+// forbiddenImportPrefixes are DB/network packages that @call func must not import.
+// File I/O (io, bufio, os) and session/cache read/write are allowed for all @call funcs.
 var forbiddenImportPrefixes = []string{
 	"database/sql",
 	"github.com/lib/pq",
@@ -10,9 +11,6 @@ var forbiddenImportPrefixes = []string{
 	"net/http",
 	"net/rpc",
 	"google.golang.org/grpc",
-	"io",
-	"io/ioutil",
-	"bufio",
 }
 
 // checkForbiddenImports returns any forbidden I/O imports found in the list.

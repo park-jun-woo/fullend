@@ -31,7 +31,8 @@ func validateModel(sf parser.ServiceFunc, st *SymbolTable) []ValidationError {
 		modelName, methodName := parts[0], parts[1]
 
 		if seq.Package != "" {
-			errs = append(errs, validatePackageModel(ctx, sf.Name, seq, modelName, methodName, st)...)
+			errs = append(errs, ctx.err("@"+seq.Type,
+				fmt.Sprintf("%s.%s — package-prefix @model은 지원하지 않습니다. @call Func을 사용하세요", seq.Package, modelName)))
 			continue
 		}
 

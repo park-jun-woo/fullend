@@ -7,24 +7,3 @@ type errCtx struct {
 	funcName string
 	seqIndex int
 }
-
-func (c errCtx) err(tag, msg string) ValidationError {
-	return ValidationError{
-		FileName: c.fileName,
-		FuncName: c.funcName,
-		SeqIndex: c.seqIndex,
-		Tag:      tag,
-		Message:  msg,
-	}
-}
-
-func (c errCtx) warn(tag, msg string) ValidationError {
-	return ValidationError{
-		FileName: c.fileName,
-		FuncName: c.funcName,
-		SeqIndex: c.seqIndex,
-		Tag:      tag,
-		Message:  msg,
-		Level:    "WARNING",
-	}
-}
