@@ -1,0 +1,11 @@
+package service
+
+// @get Gig gig = Gig.FindByID({ID: request.id})
+// @empty gig "Gig not found" 404
+// @auth "RaiseDispute" "gig" {ResourceID: gig.ID} "Not authorized" 403
+// @state gig {status: gig.Status} "RaiseDispute" "Cannot raise dispute" 409
+// @put Gig.UpdateStatus({ID: gig.ID, Status: "disputed"})
+// @get Gig updated = Gig.FindByID({ID: gig.ID})
+// @empty updated "Gig not found" 404
+// @response { gig: updated }
+func RaiseDispute() {}

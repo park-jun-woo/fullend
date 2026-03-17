@@ -1,0 +1,6 @@
+package service
+
+// @auth "ListWorkflows" "workflow" {ResourceID: currentUser.ID} "Not authorized" 403
+// @get []Workflow workflows = Workflow.ListByOrgID({OrgID: currentUser.OrgID})
+// @response { workflows: workflows }
+func ListWorkflows() {}

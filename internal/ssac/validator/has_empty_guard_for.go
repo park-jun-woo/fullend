@@ -10,6 +10,10 @@ func hasEmptyGuardFor(seqs []parser.Sequence, varName string) bool {
 		if s.Type == parser.SeqEmpty && rootVar(s.Target) == varName {
 			return true
 		}
+		// @exists는 "있으면 탈출" — 통과 후 변수는 nil 확정이므로 이후 필드 접근 없음
+		if s.Type == parser.SeqExists && rootVar(s.Target) == varName {
+			return true
+		}
 	}
 	return false
 }

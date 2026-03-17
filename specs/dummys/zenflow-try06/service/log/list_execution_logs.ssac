@@ -1,0 +1,8 @@
+package service
+
+// @get Workflow wf = Workflow.FindByIDAndOrgID({ID: request.id, OrgID: currentUser.OrgID})
+// @empty wf "Workflow not found" 404
+// @auth "ListExecutionLogs" "workflow" {ResourceID: wf.ID} "Not authorized" 403
+// @get []ExecutionLog logs = ExecutionLog.ListByWorkflowID({WorkflowID: wf.ID})
+// @response { logs: logs }
+func ListExecutionLogs() {}

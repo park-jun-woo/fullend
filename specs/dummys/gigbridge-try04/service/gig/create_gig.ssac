@@ -1,0 +1,6 @@
+package service
+
+// @auth "CreateGig" "gig" {ResourceID: currentUser.ID} "Not authorized" 403
+// @post Gig gig = Gig.Create({ClientID: currentUser.ID, Title: request.title, Description: request.description, Budget: request.budget, Status: "draft"})
+// @response { gig: gig }
+func CreateGig() {}

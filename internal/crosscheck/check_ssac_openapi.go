@@ -19,6 +19,9 @@ func CheckSSaCOpenAPI(funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTa
 
 	funcNames := make(map[string]string)
 	for _, fn := range funcs {
+		if fn.Subscribe != nil {
+			continue // @subscribe는 HTTP endpoint가 아니므로 operationId 불필요
+		}
 		funcNames[fn.Name] = fn.FileName
 	}
 

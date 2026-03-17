@@ -1,0 +1,15 @@
+package gig
+
+import (
+	"database/sql"
+
+	"github.com/example/gigbridge/internal/model"
+)
+
+// Handler handles requests for the gig domain.
+type Handler struct {
+	DB *sql.DB
+	GigModel model.GigModel
+	TransactionModel model.TransactionModel
+	UserModel model.UserModel
+}

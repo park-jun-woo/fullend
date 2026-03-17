@@ -1,0 +1,10 @@
+package service
+
+// @get Workflow wf = Workflow.FindByIDAndOrgID({ID: request.source_workflow_id, OrgID: currentUser.OrgID})
+// @empty wf "Workflow not found" 404
+// @auth "PublishTemplate" "template" {ResourceID: currentUser.ID} "Not authorized" 403
+// @get Template existing = Template.FindBySourceWorkflowID({SourceWorkflowID: wf.ID})
+// @exists existing "Template already published for this workflow" 409
+// @post Template tmpl = Template.Create({SourceWorkflowID: wf.ID, OrgID: currentUser.OrgID, Title: request.title, Description: request.description, Category: request.category})
+// @response { template: tmpl }
+func PublishTemplate() {}

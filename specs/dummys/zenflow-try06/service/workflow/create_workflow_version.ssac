@@ -1,0 +1,13 @@
+package service
+
+import "github.com/example/zenflow/internal/workflow"
+
+// @get Workflow source = Workflow.FindByIDAndOrgID({ID: request.id, OrgID: currentUser.OrgID})
+// @empty source "Workflow not found" 404
+// @auth "CreateWorkflowVersion" "workflow" {ResourceID: source.ID} "Not authorized" 403
+// @call workflow.ResolveRootIDResponse root = workflow.ResolveRootID({WorkflowID: source.ID, RootWorkflowID: source.RootWorkflowID})
+// @call workflow.NextVersionResponse ver = workflow.NextVersion({CurrentVersion: source.Version})
+// @post Workflow newWf = Workflow.CreateVersion({OrgID: source.OrgID, Title: source.Title, TriggerEvent: source.TriggerEvent, Status: "draft", Version: ver.NextVersion, RootWorkflowID: root.ResolvedRootID})
+// @put Action.CopyToWorkflow({WorkflowID: newWf.ID, SourceWorkflowID: source.ID})
+// @response { workflow: newWf }
+func CreateWorkflowVersion() {}

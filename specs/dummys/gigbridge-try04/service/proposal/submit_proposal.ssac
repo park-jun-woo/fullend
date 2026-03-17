@@ -1,0 +1,8 @@
+package service
+
+// @get Gig gig = Gig.FindByID({ID: request.id})
+// @empty gig "Gig not found" 404
+// @auth "SubmitProposal" "proposal" {ResourceID: currentUser.ID} "Not authorized" 403
+// @post Proposal proposal = Proposal.Create({GigID: gig.ID, FreelancerID: currentUser.ID, BidAmount: request.bid_amount, Status: "pending"})
+// @response { proposal: proposal }
+func SubmitProposal() {}

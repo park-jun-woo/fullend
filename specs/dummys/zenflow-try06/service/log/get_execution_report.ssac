@@ -1,0 +1,7 @@
+package service
+
+// @get ExecutionLog execLog = ExecutionLog.FindByIDAndOrgID({ID: request.id, OrgID: currentUser.OrgID})
+// @empty execLog "Execution log not found" 404
+// @auth "GetExecutionReport" "workflow" {ResourceID: execLog.ID} "Not authorized" 403
+// @response { report_key: execLog.ReportKey, status: execLog.Status, credits_spent: execLog.CreditsSpent }
+func GetExecutionReport() {}

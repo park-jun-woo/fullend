@@ -1,0 +1,13 @@
+package service
+
+// @get Proposal proposal = Proposal.FindByID({ID: request.id})
+// @empty proposal "Proposal not found" 404
+// @get Gig gig = Gig.FindByID({ID: proposal.GigID})
+// @empty gig "Gig not found" 404
+// @auth "RejectProposal" "gig" {ResourceID: gig.ID} "Not authorized" 403
+// @state proposal {status: proposal.Status} "RejectProposal" "Cannot reject proposal" 409
+// @put Proposal.UpdateStatus({ID: proposal.ID, Status: "rejected"})
+// @get Proposal updated = Proposal.FindByID({ID: proposal.ID})
+// @empty updated "Proposal not found" 404
+// @response { proposal: updated }
+func RejectProposal() {}

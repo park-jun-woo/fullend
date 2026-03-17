@@ -1,0 +1,5 @@
+package service
+
+// @get Cursor[Template] tmplCursor = Template.List({Query: query})
+// @response tmplCursor
+func ListTemplates() {}
