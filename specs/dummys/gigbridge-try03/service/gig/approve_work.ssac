@@ -1,0 +1,16 @@
+package service
+
+import "github.com/park-jun-woo/fullend/pkg/mail"
+import "github.com/example/gigbridge/internal/billing"
+
+// @get Gig gig = Gig.FindByID({ID: request.id})
+// @empty gig "Gig not found" 404
+// @auth "ApproveWork" "gig" {ResourceID: gig.ID} "Not authorized" 403
+// @state gig {Status: gig.Status} "ApproveWork" "Cannot approve work" 409
+// @call billing.ReleaseFundsResponse released = billing.ReleaseFunds({GigID: gig.ID, Amount: gig.Budget, FreelancerID: gig.FreelancerID})
+// @call mail.SendTemplateEmail({To: currentUser.Email, Subject: "Work Approved", TemplateName: "work_approved"})
+// @put Gig.UpdateStatus({ID: gig.ID, Status: "completed"})
+// @get Gig updated = Gig.FindByID({ID: gig.ID})
+// @empty updated "Gig not found after update" 404
+// @response { gig: updated }
+func ApproveWork() {}

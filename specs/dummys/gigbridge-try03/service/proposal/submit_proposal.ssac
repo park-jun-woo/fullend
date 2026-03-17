@@ -1,0 +1,6 @@
+package service
+
+// @auth "SubmitProposal" "proposal" {} "Not authorized" 403
+// @post Proposal proposal = Proposal.Create({GigID: request.id, FreelancerID: currentUser.ID, BidAmount: request.bid_amount, Status: "pending"})
+// @response { proposal: proposal }
+func SubmitProposal() {}

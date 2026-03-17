@@ -13,6 +13,7 @@ import (
 // Returns a flat list of FuncSpecs.
 func ParseDir(dir string) ([]FuncSpec, error) {
 	var specs []FuncSpec
+	var specDirs []string
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() || !strings.HasSuffix(d.Name(), ".go") {
 			return err
@@ -29,8 +30,13 @@ func ParseDir(dir string) ([]FuncSpec, error) {
 				fs.Package = parts[0]
 			}
 			specs = append(specs, *fs)
+			specDirs = append(specDirs, filepath.Dir(path))
 		}
 		return nil
 	})
-	return specs, err
+	if err != nil {
+		return nil, err
+	}
+	fillMissingFields(specs, specDirs)
+	return specs, nil
 }

@@ -62,7 +62,7 @@ func ValidateWith(root string, detected []DetectedSSOT, parsed *genapi.ParsedSSO
 			report.Steps = append(report.Steps, step)
 			parsed.HurlFiles = files
 		case KindFunc:
-			report.Steps = append(report.Steps, validateFunc(parsed.ProjectFuncSpecs))
+			report.Steps = append(report.Steps, validateFunc(parsed.ProjectFuncSpecs, parsed.FullendPkgSpecs))
 		case KindModel:
 			report.Steps = append(report.Steps, validateModel(d.Path))
 		}
