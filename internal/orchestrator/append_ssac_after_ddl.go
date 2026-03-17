@@ -4,8 +4,8 @@
 package orchestrator
 
 import (
-	"github.com/geul-org/fullend/internal/genapi"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 // appendSSaCAfterDDL runs SSaC validation right after DDL if SSaC is detected.

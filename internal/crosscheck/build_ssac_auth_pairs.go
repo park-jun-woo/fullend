@@ -2,7 +2,7 @@
 //ff:what SSaC 함수에서 authorize (action, resource) 쌍을 수집
 package crosscheck
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func buildSSaCAuthPairs(funcs []ssacparser.ServiceFunc) map[[2]string]bool {
 	ssacPairs := make(map[[2]string]bool)

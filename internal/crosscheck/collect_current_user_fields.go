@@ -2,7 +2,7 @@
 //ff:what SSaC 시퀀스에서 currentUser.X 참조 필드를 수집
 package crosscheck
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // collectCurrentUserFields scans all SSaC sequences for currentUser.X references.
 // Returns map[fieldName][]location.

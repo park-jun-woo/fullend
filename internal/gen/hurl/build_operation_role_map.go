@@ -2,7 +2,7 @@
 //ff:what Role mapping — extracts operation -> required role from OPA policies.
 package hurl
 
-import "github.com/geul-org/fullend/internal/policy"
+import "github.com/park-jun-woo/fullend/internal/policy"
 
 // buildOperationRoleMap extracts operation -> required role from OPA policies.
 func buildOperationRoleMap(policies []*policy.Policy) map[string]string {

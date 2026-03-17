@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 // renderFieldJSX generates JSX for a form field.

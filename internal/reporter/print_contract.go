@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/geul-org/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/internal/contract"
 )
 
 // PrintContract writes the contract status report to w.

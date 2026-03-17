@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // attachServiceDirectives scans service .go files and injects //fullend:gen directives.

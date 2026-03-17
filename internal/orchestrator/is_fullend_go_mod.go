@@ -8,7 +8,7 @@ import "strings"
 // isFullendGoMod checks if go.mod data declares the fullend module.
 func isFullendGoMod(data []byte) bool {
 	for _, line := range strings.Split(string(data), "\n") {
-		if strings.TrimSpace(line) == "module github.com/geul-org/fullend" {
+		if strings.TrimSpace(line) == "module github.com/park-jun-woo/fullend" {
 			return true
 		}
 	}

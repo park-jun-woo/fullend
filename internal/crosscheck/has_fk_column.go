@@ -2,7 +2,7 @@
 //ff:what 소스 테이블에 특정 FK 컬럼이 대상 테이블을 참조하는지 확인
 package crosscheck
 
-import ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+import ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 // hasFKColumn checks if srcTable has a FK column named colName that references dstTable.
 func hasFKColumn(srcTable, colName, dstTable string, st *ssacvalidator.SymbolTable) bool {

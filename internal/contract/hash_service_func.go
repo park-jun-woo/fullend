@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // HashServiceFunc computes a contract hash for an SSaC service function.

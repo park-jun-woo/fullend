@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/geul-org/fullend/pkg/auth"
+	"github.com/park-jun-woo/fullend/pkg/auth"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

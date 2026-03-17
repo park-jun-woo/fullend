@@ -2,8 +2,8 @@ package gig
 
 import (
 	"github.com/gigbridge/api/internal/model"
-	"github.com/geul-org/fullend/pkg/authz"
-	"github.com/geul-org/fullend/pkg/mail"
+	"github.com/park-jun-woo/fullend/pkg/authz"
+	"github.com/park-jun-woo/fullend/pkg/mail"
 	"github.com/gigbridge/api/internal/billing"
 	"github.com/gin-gonic/gin"
 	"net/http"

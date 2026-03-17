@@ -5,7 +5,7 @@ package generator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func collectUsedVarsFromSeq(seq parser.Sequence, used map[string]bool) {

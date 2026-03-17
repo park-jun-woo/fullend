@@ -3,7 +3,7 @@
 
 package gogin
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // hasPublishSequence returns true if any function uses @publish.
 func hasPublishSequence(funcs []ssacparser.ServiceFunc) bool {

@@ -24,24 +24,24 @@ func fixImports(src string, modulePath string) string {
 		src = strings.ReplaceAll(src, "\"states/", fmt.Sprintf("\"%s/internal/states/", modulePath))
 	}
 
-	// Fix authz import: "authz" -> "github.com/geul-org/fullend/pkg/authz"
+	// Fix authz import: "authz" -> "github.com/park-jun-woo/fullend/pkg/authz"
 	if strings.Contains(src, "\t\"authz\"\n") {
-		src = strings.ReplaceAll(src, "\t\"authz\"\n", "\t\"github.com/geul-org/fullend/pkg/authz\"\n")
+		src = strings.ReplaceAll(src, "\t\"authz\"\n", "\t\"github.com/park-jun-woo/fullend/pkg/authz\"\n")
 	}
 
-	// Fix queue import: "queue" -> "github.com/geul-org/fullend/pkg/queue"
+	// Fix queue import: "queue" -> "github.com/park-jun-woo/fullend/pkg/queue"
 	if strings.Contains(src, "\t\"queue\"\n") {
-		src = strings.ReplaceAll(src, "\t\"queue\"\n", "\t\"github.com/geul-org/fullend/pkg/queue\"\n")
+		src = strings.ReplaceAll(src, "\t\"queue\"\n", "\t\"github.com/park-jun-woo/fullend/pkg/queue\"\n")
 	}
 
-	// Fix config import: "config" -> "github.com/geul-org/fullend/pkg/config"
+	// Fix config import: "config" -> "github.com/park-jun-woo/fullend/pkg/config"
 	if strings.Contains(src, "\t\"config\"\n") {
-		src = strings.ReplaceAll(src, "\t\"config\"\n", "\t\"github.com/geul-org/fullend/pkg/config\"\n")
+		src = strings.ReplaceAll(src, "\t\"config\"\n", "\t\"github.com/park-jun-woo/fullend/pkg/config\"\n")
 	}
 
 	// Fix auth import: pkg/auth -> project internal/auth (reexport.go bridges pkg/auth utilities)
-	if strings.Contains(src, "\"github.com/geul-org/fullend/pkg/auth\"") {
-		src = strings.ReplaceAll(src, "\"github.com/geul-org/fullend/pkg/auth\"",
+	if strings.Contains(src, "\"github.com/park-jun-woo/fullend/pkg/auth\"") {
+		src = strings.ReplaceAll(src, "\"github.com/park-jun-woo/fullend/pkg/auth\"",
 			fmt.Sprintf("\"%s/internal/auth\"", modulePath))
 	}
 

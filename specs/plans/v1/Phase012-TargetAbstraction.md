@@ -44,8 +44,8 @@ Target 쌍을 묶는 `TargetProfile`을 정의한다.
 package orchestrator
 
 import (
-    ssacgenerator "github.com/geul-org/ssac/generator"
-    stmlgenerator "github.com/geul-org/stml/generator"
+    ssacgenerator "github.com/park-jun-woo/ssac/generator"
+    stmlgenerator "github.com/park-jun-woo/stml/generator"
 )
 
 // TargetProfile defines the backend + frontend code generation targets.

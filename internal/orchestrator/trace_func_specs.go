@@ -6,8 +6,8 @@ package orchestrator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/funcspec"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func traceFuncSpecs(sf *ssacparser.ServiceFunc, specs []funcspec.FuncSpec, specsDir string) []ChainLink {

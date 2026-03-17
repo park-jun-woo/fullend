@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // collectFuncsForDomain extracts @call references (without package prefix) for a specific domain.

@@ -5,8 +5,8 @@ package main
 import (
 	"os"
 
-	"github.com/geul-org/fullend/internal/orchestrator"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/orchestrator"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func runGen(specsDir, artifactsDir string, skipKinds map[orchestrator.SSOTKind]bool, reset bool) {

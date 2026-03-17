@@ -3,8 +3,8 @@
 package crosscheck
 
 import (
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func checkSSaCDDLFunc(fn ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable, ctx string, dtoTypes map[string]bool) []CrossError {

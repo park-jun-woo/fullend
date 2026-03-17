@@ -5,7 +5,7 @@ package contract
 import (
 	"sort"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // collectRespFields returns sorted "key:type" strings from response sequences.

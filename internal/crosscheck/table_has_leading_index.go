@@ -2,7 +2,7 @@
 //ff:what 테이블에서 컬럼이 인덱스의 선행 컬럼인지 확인
 package crosscheck
 
-import ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+import ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 // tableHasLeadingIndex checks if a column is a leading column in any index of the table.
 func tableHasLeadingIndex(col string, table ssacvalidator.DDLTable) bool {

@@ -128,7 +128,7 @@ service/
 ```go
 package service
 
-import "github.com/geul-org/fullend/pkg/auth"
+import "github.com/park-jun-woo/fullend/pkg/auth"
 
 // @call auth.HashPasswordResponse hp = auth.HashPassword({Password: request.Password})
 // @post User user = User.Create({Email: request.Email, PasswordHash: hp.HashedPassword})

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // Chain traces all SSOT nodes connected to the given operationId.

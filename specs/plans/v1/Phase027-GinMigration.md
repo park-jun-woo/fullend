@@ -70,7 +70,7 @@ auth.POST("/courses", s.Course.CreateCourse)  // security: [{bearerAuth}] → au
 #### 2. model/auth.go 생성
 
 ```go
-import "github.com/geul-org/fullend/pkg/middleware"
+import "github.com/park-jun-woo/fullend/pkg/middleware"
 
 type CurrentUser = middleware.CurrentUser
 
@@ -125,7 +125,7 @@ src = strings.ReplaceAll(src, "authz.Check(currentUser,", rcv+".Authz.Check(curr
 ```go
 import (
     "net/http"
-    _ "github.com/geul-org/fullend/pkg/auth"
+    _ "github.com/park-jun-woo/fullend/pkg/auth"
 )
 ```
 

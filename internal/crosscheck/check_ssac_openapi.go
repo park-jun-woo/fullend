@@ -7,9 +7,9 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 
-	"github.com/geul-org/fullend/internal/funcspec"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // CheckSSaCOpenAPI validates SSaC function names match OpenAPI operationIds and vice versa,

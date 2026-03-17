@@ -5,8 +5,8 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/policy"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func validatePolicy(policies []*policy.Policy) reporter.StepResult {

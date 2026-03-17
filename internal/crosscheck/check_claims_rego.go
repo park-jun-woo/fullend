@@ -5,8 +5,8 @@ package crosscheck
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/policy"
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 // CheckClaimsRego validates that Rego input.claims.xxx references match fullend.yaml claims values.

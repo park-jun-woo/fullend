@@ -3,7 +3,7 @@
 
 package validator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // validateStaleResponse는 put/delete 이후 갱신 없이 response에서 사용되는 변수를 경고한다.
 func validateStaleResponse(sf parser.ServiceFunc) []ValidationError {

@@ -5,8 +5,8 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/reporter"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/reporter"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func validateDDL(root string, st *ssacvalidator.SymbolTable) reporter.StepResult {

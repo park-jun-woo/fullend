@@ -6,7 +6,7 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func genSqlc(specsDir, artifactsDir string) reporter.StepResult {

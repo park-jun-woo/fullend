@@ -8,7 +8,7 @@ import (
 )
 
 // findFullendPkgRoot locates the fullend pkg/ directory.
-// Walks up from CWD looking for go.mod with module github.com/geul-org/fullend.
+// Walks up from CWD looking for go.mod with module github.com/park-jun-woo/fullend.
 func findFullendPkgRoot() string {
 	dir, err := os.Getwd()
 	if err != nil {

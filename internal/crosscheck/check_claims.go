@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/projectconfig"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // CheckClaims validates that all currentUser field references in SSaC specs

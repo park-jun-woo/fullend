@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/policy"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/policy"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // generateMain creates backend/go.mod (if missing) and backend/cmd/main.go.
@@ -51,7 +51,7 @@ func generateMain(artifactsDir string, models []string, modulePath string, queue
 	authzImport := ""
 	authzInitBlock := ""
 	if hasAuthSequence(serviceFuncs) {
-		authzImport = "\n\t\"github.com/geul-org/fullend/pkg/authz\""
+		authzImport = "\n\t\"github.com/park-jun-woo/fullend/pkg/authz\""
 		ownershipsCode := buildOwnershipsLiteral(policies)
 		authzInitBlock = fmt.Sprintf(`
 	if err := authz.Init(conn, %s); err != nil {
@@ -67,7 +67,7 @@ func generateMain(artifactsDir string, models []string, modulePath string, queue
 	subscribers := collectSubscribers(serviceFuncs)
 	needsQueue := queueBackend != "" && (len(subscribers) > 0 || hasPublishSequence(serviceFuncs))
 	if needsQueue {
-		queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/geul-org/fullend/pkg/queue\""
+		queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/park-jun-woo/fullend/pkg/queue\""
 		queueInitBlock = fmt.Sprintf(`
 	if err := queue.Init(context.Background(), %q, conn); err != nil {
 		log.Fatalf("queue init failed: %%v", err)

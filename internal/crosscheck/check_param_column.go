@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func checkParamColumn(key, value, modelName, tableName string, table ssacvalidator.DDLTable, ctx string, seqIdx int) []CrossError {

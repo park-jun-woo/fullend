@@ -2,7 +2,7 @@
 //ff:what FetchBlock의 flat 슬라이스(Binds, Eaches, States, Components) JSX를 생성한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 // renderFetchJSXFlatChildren renders flat slices for backward compatibility.
 func renderFetchJSXFlatChildren(f parser.FetchBlock, alias string, indent int) []string {

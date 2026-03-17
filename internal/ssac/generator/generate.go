@@ -3,9 +3,9 @@
 package generator
 
 import (
-	"github.com/geul-org/fullend/internal/funcspec"
-	"github.com/geul-org/fullend/internal/ssac/parser"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // Generate는 []ServiceFunc를 받아 outDir에 Go 파일을 생성한다.

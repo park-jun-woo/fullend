@@ -2,7 +2,7 @@
 //ff:what 시퀀스에서 result 변수의 타입과 출처 정보를 수집
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func collectResultInfo(seqs []parser.Sequence) (map[string]string, map[string]varSource) {
 	resultTypes := map[string]string{}

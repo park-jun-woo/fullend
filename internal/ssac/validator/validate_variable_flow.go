@@ -3,7 +3,7 @@
 
 package validator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // validateVariableFlow는 변수가 선언 전에 참조되지 않는지 검증한다.
 func validateVariableFlow(sf parser.ServiceFunc) []ValidationError {

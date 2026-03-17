@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 // HashClaims computes a contract hash for middleware claims (CurrentUser).

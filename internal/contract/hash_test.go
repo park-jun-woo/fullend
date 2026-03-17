@@ -3,10 +3,10 @@ package contract
 import (
 	"testing"
 
-	"github.com/geul-org/fullend/internal/projectconfig"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
-	"github.com/geul-org/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
 func TestHashServiceFunc_Deterministic(t *testing.T) {

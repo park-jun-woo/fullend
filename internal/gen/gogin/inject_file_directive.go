@@ -6,7 +6,7 @@ package gogin
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/internal/contract"
 )
 
 // injectFileDirective inserts a file-level directive before the package declaration.

@@ -2,7 +2,7 @@ package workflow
 
 import (
 	"github.com/zenflow/zenflow/internal/model"
-	"github.com/geul-org/fullend/pkg/authz"
+	"github.com/park-jun-woo/fullend/pkg/authz"
 	"github.com/gin-gonic/gin"
 	"github.com/zenflow/zenflow/internal/billing"
 	"net/http"

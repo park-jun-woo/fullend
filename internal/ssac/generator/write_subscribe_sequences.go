@@ -6,8 +6,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func writeSubscribeSequences(buf *bytes.Buffer, sf parser.ServiceFunc, st *validator.SymbolTable, resultTypes map[string]string, resolver *FieldTypeResolver, useTx bool) {

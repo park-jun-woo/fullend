@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validateModel은 Model이 심볼 테이블에 존재하는지 검증한다.

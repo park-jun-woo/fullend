@@ -27,7 +27,7 @@ Phase 006에서 claims config 기반 미들웨어 생성을 도입했으나, cla
 if len(claims) > 0 {
     imports = append(imports, fmt.Sprintf("\"%s/internal/middleware\"", modulePath))
 } else {
-    imports = append(imports, "\"github.com/geul-org/fullend/pkg/middleware\"")
+    imports = append(imports, "\"github.com/park-jun-woo/fullend/pkg/middleware\"")
 }
 
 // 변경 후

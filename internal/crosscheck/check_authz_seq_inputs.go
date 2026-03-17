@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"fmt"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func checkAuthzSeqInputs(funcName string, seqIdx int, seq ssacparser.Sequence, expectedFields map[string]bool) []CrossError {

@@ -2,7 +2,7 @@ package log
 
 import (
 	"github.com/example/zenflow/internal/model"
-	"github.com/geul-org/fullend/pkg/authz"
+	"github.com/park-jun-woo/fullend/pkg/authz"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

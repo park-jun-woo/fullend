@@ -7,7 +7,7 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func validateOpenAPI(path string, doc *openapi3.T) reporter.StepResult {

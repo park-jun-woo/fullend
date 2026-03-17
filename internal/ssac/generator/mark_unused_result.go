@@ -2,7 +2,7 @@
 //ff:what 사용되지 않는 result 변수에 Unused/ReAssign 플래그를 설정
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func markUnusedResult(d *templateData, seq parser.Sequence, usedVars map[string]bool) {
 	if seq.Result == nil {

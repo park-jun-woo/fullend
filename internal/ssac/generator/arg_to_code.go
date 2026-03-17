@@ -4,7 +4,7 @@ package generator
 
 import (
 	"github.com/ettle/strcase"
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func argToCode(a parser.Arg) string {

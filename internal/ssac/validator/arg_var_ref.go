@@ -2,7 +2,7 @@
 //ff:what Arg가 변수 참조인 경우 루트 변수명을 반환한다
 package validator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // argVarRef는 Arg가 변수 참조인 경우 루트 변수명을 반환한다.
 func argVarRef(a parser.Arg) string {

@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/reporter"
-	stmlgenerator "github.com/geul-org/fullend/internal/stml/generator"
-	stmlparser "github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/reporter"
+	stmlgenerator "github.com/park-jun-woo/fullend/internal/stml/generator"
+	stmlparser "github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 func genSTML(profile *TargetProfile, specsDir, artifactsDir string, pages []stmlparser.PageSpec) (reporter.StepResult, map[string]string, []string, map[string]string) {

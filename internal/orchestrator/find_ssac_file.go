@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func findSSaCFile(sf *ssacparser.ServiceFunc, specsDir string) string {

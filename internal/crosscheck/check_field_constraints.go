@@ -2,7 +2,7 @@
 //ff:what OpenAPI 필드별 제약을 DDL VARCHAR/CHECK와 대조하여 누락·불일치 검출
 package crosscheck
 
-import ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+import ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 func checkFieldConstraints(st *ssacvalidator.SymbolTable) []CrossError {
 	var errs []CrossError

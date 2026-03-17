@@ -4,7 +4,7 @@ package generator
 
 import (
 	"github.com/ettle/strcase"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func deriveMethod(methodName string, usage modelUsage, mi validator.MethodInfo, st *validator.SymbolTable) derivedMethod {

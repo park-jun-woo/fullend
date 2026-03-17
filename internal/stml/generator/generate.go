@@ -2,7 +2,7 @@
 //ff:what 기본 Target으로 페이지 목록의 프레임워크별 파일을 생성한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 // Generate produces framework-specific files using the default target.
 func Generate(pages []parser.PageSpec, specsDir, outDir string, opts ...GenerateOptions) (*GenerateResult, error) {

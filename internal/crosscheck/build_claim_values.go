@@ -2,7 +2,7 @@
 //ff:what fullend.yaml claims에서 claim key 집합을 생성
 package crosscheck
 
-import "github.com/geul-org/fullend/internal/projectconfig"
+import "github.com/park-jun-woo/fullend/internal/projectconfig"
 
 func buildClaimValues(claims map[string]projectconfig.ClaimDef) map[string]bool {
 	claimValues := make(map[string]bool)

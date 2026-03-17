@@ -3,9 +3,9 @@ package crosscheck
 import (
 	"testing"
 
-	"github.com/geul-org/fullend/internal/genapi"
-	"github.com/geul-org/fullend/internal/policy"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/policy"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func TestRunRules_SkipRules(t *testing.T) {

@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 // generateAuthStubWithDomains creates model/auth.go with CurrentUser type and Authorizer interface.

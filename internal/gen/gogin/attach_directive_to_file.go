@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/contract"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/contract"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // attachDirectiveToFile injects a //fullend:gen directive into a single service .go file.

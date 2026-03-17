@@ -2,7 +2,7 @@
 //ff:what FetchBlock의 필터/정렬/자식/페이지네이션 UI를 생성한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 // renderFetchJSXBody generates the inner content of a fetch JSX block.
 func renderFetchJSXBody(f parser.FetchBlock, alias string, indent int) []string {

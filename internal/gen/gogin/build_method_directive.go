@@ -3,7 +3,7 @@
 
 package gogin
 
-import "github.com/geul-org/fullend/internal/contract"
+import "github.com/park-jun-woo/fullend/internal/contract"
 
 // buildMethodDirective builds a contract directive for a model method.
 func buildMethodDirective(table *ddlTable, method ifaceMethod) *contract.Directive {

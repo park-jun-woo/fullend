@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func writeSortConfig(buf *bytes.Buffer, op validator.OperationSymbol) {

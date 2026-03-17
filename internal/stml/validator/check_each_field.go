@@ -2,7 +2,7 @@
 //ff:what 단일 data-each 필드가 응답에 존재하고 배열인지 확인
 package validator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 func checkEachField(e parser.EachBlock, opID, file string, api APISymbol) *ValidationError {
 	fs, ok := api.ResponseFields[e.Field]

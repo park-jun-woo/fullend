@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validateCallSourceVars checks that source variables in inputs are defined in prior sequences.

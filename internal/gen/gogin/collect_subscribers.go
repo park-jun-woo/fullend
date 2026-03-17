@@ -3,7 +3,7 @@
 
 package gogin
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // collectSubscribers returns service functions that have @subscribe.
 func collectSubscribers(funcs []ssacparser.ServiceFunc) []ssacparser.ServiceFunc {

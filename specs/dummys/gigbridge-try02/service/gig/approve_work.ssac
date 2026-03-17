@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/gigbridge/api/internal/billing"
-	"github.com/geul-org/fullend/pkg/mail"
+	"github.com/park-jun-woo/fullend/pkg/mail"
 )
 
 // @get Gig gig = Gig.FindByID({ID: request.id})

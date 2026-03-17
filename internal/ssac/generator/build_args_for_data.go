@@ -3,8 +3,8 @@
 package generator
 
 import (
-	"github.com/geul-org/fullend/internal/ssac/parser"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func buildArgsForData(d *templateData, seq parser.Sequence, st *validator.SymbolTable) {

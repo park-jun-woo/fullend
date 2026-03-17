@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validateCallInputTypes는 @call inputs의 필드 타입을 func Request struct 필드 타입과 비교한다.

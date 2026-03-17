@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 // GenerateWith produces files using the given Target.

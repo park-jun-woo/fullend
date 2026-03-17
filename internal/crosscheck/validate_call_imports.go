@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/funcspec"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
 )
 
 // validateCallImports checks that a func spec does not import forbidden I/O packages.

@@ -3,7 +3,7 @@
 
 package gogin
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // domainNeedsAuth returns true if any func in the domain uses authz or currentUser.
 func domainNeedsAuth(funcs []ssacparser.ServiceFunc, domain string) bool {

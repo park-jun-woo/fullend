@@ -5,8 +5,8 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/funcspec"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func validateFunc(specs []funcspec.FuncSpec) reporter.StepResult {

@@ -2,7 +2,7 @@
 //ff:what 모든 정책의 action-resource 쌍과 ownership 정보를 병합
 package crosscheck
 
-import "github.com/geul-org/fullend/internal/policy"
+import "github.com/park-jun-woo/fullend/internal/policy"
 
 func mergePolicies(policies []*policy.Policy) (map[[2]string]bool, map[string]bool, []policy.OwnershipMapping) {
 	allPairs := make(map[[2]string]bool)

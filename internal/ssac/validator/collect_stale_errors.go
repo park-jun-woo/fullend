@@ -5,7 +5,7 @@ package validator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func collectStaleErrors(seq parser.Sequence, getVars map[string]string, mutated map[string]bool, ctx errCtx, errs []ValidationError) []ValidationError {

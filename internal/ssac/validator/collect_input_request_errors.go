@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func collectInputRequestErrors(seq parser.Sequence, op OperationSymbol, ctx errCtx, used map[string]bool, errs []ValidationError) []ValidationError {

@@ -2,7 +2,7 @@
 //ff:what 도메인별로 사용되는 모델 이름을 수집
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // collectDomainModels는 도메인별로 사용되는 모델 이름을 수집한다.
 func collectDomainModels(funcs []parser.ServiceFunc) map[string][]string {

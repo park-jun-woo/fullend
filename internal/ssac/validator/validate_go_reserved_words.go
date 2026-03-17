@@ -3,7 +3,7 @@
 
 package validator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // goReservedWords는 Go 예약어 25개다.
 var goReservedWords = map[string]bool{

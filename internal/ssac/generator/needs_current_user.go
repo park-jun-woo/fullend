@@ -2,7 +2,7 @@
 //ff:what 시퀀스에서 currentUser 참조가 필요한지 확인
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func needsCurrentUser(seqs []parser.Sequence) bool {
 	for _, seq := range seqs {

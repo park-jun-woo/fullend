@@ -2,7 +2,7 @@
 //ff:what Action 컨텍스트에서 ChildNode를 Kind별로 분기하여 렌더링한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 // renderActionChildNodes renders ChildNode slice in DOM order for action context.
 func renderActionChildNodes(nodes []parser.ChildNode, formName string, indent int) []string {

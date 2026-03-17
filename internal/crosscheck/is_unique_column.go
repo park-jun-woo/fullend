@@ -2,7 +2,7 @@
 //ff:what 컬럼이 PRIMARY KEY 또는 UNIQUE 제약인지 확인
 package crosscheck
 
-import ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+import ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 // isUniqueColumn checks if a column is PRIMARY KEY or has a UNIQUE constraint.
 func isUniqueColumn(col, tableName string, st *ssacvalidator.SymbolTable) bool {

@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 // collectImports analyzes a PageSpec and determines required imports.

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func checkSingleFieldConstraint(opID, fieldName, col string, fc ssacvalidator.FieldConstraint, varcharLen int, checkEnums []string, found bool) []CrossError {

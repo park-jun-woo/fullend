@@ -4,8 +4,8 @@ package generator
 
 import (
 	"github.com/ettle/strcase"
-	"github.com/geul-org/fullend/internal/ssac/parser"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func collectRequestParams(seqs []parser.Sequence, st *validator.SymbolTable, pathParamSet map[string]bool, operationID string) []typedRequestParam {

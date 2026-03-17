@@ -2,7 +2,7 @@
 //ff:what 단일 Rego 정책에서 claims 참조를 수집
 package crosscheck
 
-import "github.com/geul-org/fullend/internal/policy"
+import "github.com/park-jun-woo/fullend/internal/policy"
 
 func collectPolicyClaimsRefs(p *policy.Policy, regoRefs map[string]string) {
 	for _, ref := range p.ClaimsRefs {

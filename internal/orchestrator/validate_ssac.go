@@ -5,9 +5,9 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/reporter"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/reporter"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func validateSSaC(root string, funcs []ssacparser.ServiceFunc, st *ssacvalidator.SymbolTable) reporter.StepResult {

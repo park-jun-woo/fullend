@@ -3,7 +3,7 @@
 
 package orchestrator
 
-import ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+import ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 // countDDLColumns counts total columns across all DDL tables.
 func countDDLColumns(tables map[string]ssacvalidator.DDLTable) int {

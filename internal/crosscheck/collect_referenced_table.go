@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func collectReferencedTable(seq ssacparser.Sequence, tables map[string]bool) {

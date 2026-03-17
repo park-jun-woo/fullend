@@ -2,7 +2,7 @@
 //ff:what HTTP 함수 생성에 필요한 분석 컨텍스트 구조체
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/validator"
+import "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 type httpFuncContext struct {
 	pathParams    []validator.PathParam

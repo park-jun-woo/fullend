@@ -5,7 +5,7 @@ package validator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func trackMutation(seq parser.Sequence, mutated map[string]bool) {

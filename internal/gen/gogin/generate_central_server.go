@@ -11,7 +11,7 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // generateCentralServer creates service/server.go that composes domain handlers with gin router.

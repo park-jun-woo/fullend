@@ -1,6 +1,6 @@
 package service
 
-import "github.com/geul-org/fullend/pkg/auth"
+import "github.com/park-jun-woo/fullend/pkg/auth"
 
 // @get User user = User.FindByEmail({Email: request.email})
 // @empty user "User not found" 404

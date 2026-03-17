@@ -5,8 +5,8 @@ package crosscheck
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/statemachine"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // checkFuncGuardStates validates guard states for a single SSaC function.

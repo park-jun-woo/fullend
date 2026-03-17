@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
 // checkDiagramEvents validates events of a single diagram against SSaC functions.

@@ -3,7 +3,7 @@
 
 package orchestrator
 
-import "github.com/geul-org/fullend/internal/reporter"
+import "github.com/park-jun-woo/fullend/internal/reporter"
 
 // missingSSOTStep returns a StepResult for a missing SSOT kind.
 func missingSSOTStep(kind SSOTKind) reporter.StepResult {

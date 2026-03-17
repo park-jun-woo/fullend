@@ -7,8 +7,8 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 
-	"github.com/geul-org/fullend/internal/statemachine"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // buildScenarioOrder sorts endpoints into a dependency-aware execution order.

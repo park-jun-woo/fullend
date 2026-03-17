@@ -3,8 +3,8 @@
 package generator
 
 import (
-	"github.com/geul-org/fullend/internal/funcspec"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // FieldTypeResolver는 "변수.필드"의 Go 타입을 조회한다.

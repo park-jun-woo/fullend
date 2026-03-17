@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func buildQueueBlocks(serviceFuncs []ssacparser.ServiceFunc, queueBackend string) (queueImport, queueInitBlock, queueSubscribeBlock string) {
@@ -17,7 +17,7 @@ func buildQueueBlocks(serviceFuncs []ssacparser.ServiceFunc, queueBackend string
 		return "", "", ""
 	}
 
-	queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/geul-org/fullend/pkg/queue\"\n\t\"fmt\""
+	queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/park-jun-woo/fullend/pkg/queue\"\n\t\"fmt\""
 	queueInitBlock = fmt.Sprintf(`
 	if err := queue.Init(context.Background(), %q, conn); err != nil {
 		log.Fatalf("queue init failed: %%v", err)

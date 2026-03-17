@@ -175,7 +175,7 @@ injectFuncErrStatus(genST, specsDir)
     --- PASS: TestParseIdempotency/FuncSpec (0.00s)
     --- PASS: TestParseIdempotency/ProjectConfig (0.00s)
 PASS
-ok  	github.com/geul-org/fullend/internal/orchestrator	0.016s
+ok  	github.com/park-jun-woo/fullend/internal/orchestrator	0.016s
 ```
 
 **결론**: 8개 파서 모두 멱등성 확인. 1회 파싱 후 결과를 공유해도 안전하다.

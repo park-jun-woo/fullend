@@ -6,8 +6,8 @@ package orchestrator
 import (
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/statemachine"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func traceStates(sf *ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagram, specsDir string) []ChainLink {

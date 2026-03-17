@@ -3,8 +3,8 @@ package crosscheck
 import (
 	"testing"
 
-	"github.com/geul-org/fullend/internal/policy"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/policy"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func TestCheckRegoRoleDDL_CaseMismatch(t *testing.T) {

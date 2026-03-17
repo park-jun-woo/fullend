@@ -2,7 +2,7 @@
 //ff:what empty/exists 가드의 제로값 비교 코드를 templateData에 설정
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func buildGuard(d *templateData, seq parser.Sequence, resolver *FieldTypeResolver, resultTypes map[string]string) {
 	d.Target = seq.Target

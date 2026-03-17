@@ -2,7 +2,7 @@
 //ff:what 소스 테이블에서 대상 테이블로의 FK 존재 확인
 package crosscheck
 
-import ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+import ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 // hasFKTo checks if srcTable has a FK pointing to dstTable.
 func hasFKTo(srcTable, dstTable string, st *ssacvalidator.SymbolTable) bool {

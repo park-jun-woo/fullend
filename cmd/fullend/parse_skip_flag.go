@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/geul-org/fullend/internal/orchestrator"
+	"github.com/park-jun-woo/fullend/internal/orchestrator"
 )
 
 // parseSkipFlag extracts --skip flag and returns (skipKinds, remainingArgs).

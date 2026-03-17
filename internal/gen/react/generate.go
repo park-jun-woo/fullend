@@ -4,7 +4,7 @@
 package react
 
 import (
-	"github.com/geul-org/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/genapi"
 )
 
 // Generate creates React + Vite frontend from parsed SSOTs.

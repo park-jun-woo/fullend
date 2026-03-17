@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
 // writeTransitionMap writes the transitions map literal.

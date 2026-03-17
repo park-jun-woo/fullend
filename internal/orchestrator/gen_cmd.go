@@ -4,7 +4,7 @@
 package orchestrator
 
 import (
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 // Gen runs validate first, then generates code from all detected SSOTs.

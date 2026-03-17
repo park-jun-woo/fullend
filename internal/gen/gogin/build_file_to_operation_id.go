@@ -6,7 +6,7 @@ package gogin
 import (
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // buildFileToOperationID builds a map from generated .go filename to operationID.

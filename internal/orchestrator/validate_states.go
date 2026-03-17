@@ -5,8 +5,8 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/reporter"
-	"github.com/geul-org/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
 func validateStates(diagrams []*statemachine.StateDiagram, parseErr error) reporter.StepResult {

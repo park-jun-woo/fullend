@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/internal/contract"
 )
 
 // attachTSXDirectives scans pages/*.tsx files and injects // fullend:gen directive.

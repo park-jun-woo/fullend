@@ -4,7 +4,7 @@
 package validator
 
 import (
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validateQueryUsage는 SSaC의 query 사용과 OpenAPI x-extensions 간 교차 검증을 수행한다.

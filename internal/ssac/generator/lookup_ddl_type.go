@@ -2,7 +2,7 @@
 //ff:what DDL 테이블 전체에서 파라미터명에 해당하는 Go 타입을 조회
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/validator"
+import "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 func lookupDDLType(paramName string, st *validator.SymbolTable) string {
 	snakeName := toSnakeCase(paramName)

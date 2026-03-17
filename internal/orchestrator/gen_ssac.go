@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/genapi"
-	"github.com/geul-org/fullend/internal/reporter"
-	ssacgenerator "github.com/geul-org/fullend/internal/ssac/generator"
+	"github.com/park-jun-woo/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/reporter"
+	ssacgenerator "github.com/park-jun-woo/fullend/internal/ssac/generator"
 )
 
 func genSSaC(profile *TargetProfile, specsDir, artifactsDir string, parsed *genapi.ParsedSSOTs) []reporter.StepResult {

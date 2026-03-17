@@ -5,8 +5,8 @@ package crosscheck
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/funcspec"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validateCallInputCount checks that input field count matches request field count.

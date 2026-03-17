@@ -5,7 +5,7 @@ package validator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validatePaginationType은 x-pagination style과 Result.Wrapper 타입의 일치를 검증한다.

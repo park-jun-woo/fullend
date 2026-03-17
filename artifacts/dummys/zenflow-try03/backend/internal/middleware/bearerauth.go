@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/geul-org/fullend/pkg/auth"
+	"github.com/park-jun-woo/fullend/pkg/auth"
 	"github.com/zenflow/zenflow/internal/model"
 )
 

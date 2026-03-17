@@ -252,7 +252,7 @@ SSaC `@call auth.IssueToken` 생성 시 import 경로 처리:
 현재 SSaC codegen(`go_templates.go`)은 `@call` 패키지명으로 import를 생성한다:
 ```go
 // 현재: 항상 pkg/auth import
-"github.com/geul-org/fullend/pkg/auth"
+"github.com/park-jun-woo/fullend/pkg/auth"
 ```
 
 변경: `auth.IssueToken`, `auth.VerifyToken`, `auth.RefreshToken`은 generated `internal/auth` 참조, 나머지(`auth.HashPassword` 등)는 기존 `pkg/auth` 참조.
@@ -260,13 +260,13 @@ SSaC `@call auth.IssueToken` 생성 시 import 경로 처리:
 **분기 로직** (SSaC codegen 또는 gogin transform에서):
 - claims 의존 함수 목록: `IssueToken`, `VerifyToken`, `RefreshToken`
 - `@call auth.{위 함수}` → import `"{modulePath}/internal/auth"`
-- `@call auth.{그 외}` → import `"github.com/geul-org/fullend/pkg/auth"`
+- `@call auth.{그 외}` → import `"github.com/park-jun-woo/fullend/pkg/auth"`
 
 동일 파일에서 양쪽 모두 사용하면 import alias 필요:
 ```go
 import (
     auth "{modulePath}/internal/auth"           // IssueToken, VerifyToken
-    pkgauth "github.com/geul-org/fullend/pkg/auth"  // HashPassword, VerifyPassword
+    pkgauth "github.com/park-jun-woo/fullend/pkg/auth"  // HashPassword, VerifyPassword
 )
 ```
 
@@ -278,7 +278,7 @@ import (
 // generated: internal/auth/reexport.go
 package auth
 
-import pkgauth "github.com/geul-org/fullend/pkg/auth"
+import pkgauth "github.com/park-jun-woo/fullend/pkg/auth"
 
 // Re-export pkg/auth utilities for unified import.
 var HashPassword = pkgauth.HashPassword
@@ -302,13 +302,13 @@ type GenerateResetTokenResponse = pkgauth.GenerateResetTokenResponse
 
 #### import 치환 구현
 
-SSaC 파일은 기존대로 `import "github.com/geul-org/fullend/pkg/auth"` 유지한다.
+SSaC 파일은 기존대로 `import "github.com/park-jun-woo/fullend/pkg/auth"` 유지한다.
 codegen이 생성한 `.go` 파일에서 `transformSource()` (`internal/gen/gogin/gogin.go`)가 치환:
 
 ```go
-// Fix auth import: "github.com/geul-org/fullend/pkg/auth" → "{modulePath}/internal/auth"
-if strings.Contains(src, "\"github.com/geul-org/fullend/pkg/auth\"") {
-    src = strings.ReplaceAll(src, "\"github.com/geul-org/fullend/pkg/auth\"",
+// Fix auth import: "github.com/park-jun-woo/fullend/pkg/auth" → "{modulePath}/internal/auth"
+if strings.Contains(src, "\"github.com/park-jun-woo/fullend/pkg/auth\"") {
+    src = strings.ReplaceAll(src, "\"github.com/park-jun-woo/fullend/pkg/auth\"",
         fmt.Sprintf("\"%s/internal/auth\"", modulePath))
 }
 ```
@@ -429,7 +429,7 @@ internal/
 
 ## 리스크
 
-- `pkg/auth` 부분 삭제로 기존 SSaC `import "github.com/geul-org/fullend/pkg/auth"` 유지 가능 (HashPassword 등은 잔류). JWT 함수만 generated `internal/auth`로 이동하며, `reexport.go`가 통합 import 보장.
+- `pkg/auth` 부분 삭제로 기존 SSaC `import "github.com/park-jun-woo/fullend/pkg/auth"` 유지 가능 (HashPassword 등은 잔류). JWT 함수만 generated `internal/auth`로 이동하며, `reexport.go`가 통합 import 보장.
 - `auth.type` 필수화 — 기존 fullend.yaml에 `type` 없으면 validate ERROR. 마이그레이션: `type: jwt` 한 줄 추가.
 - `golang-jwt/jwt/v5`가 산출물 의존성 — 생성된 프로젝트의 `go.mod`에 자동 추가 필요. gluegen의 `go.mod` 생성 로직 확인.
 - `reexport.go`가 type alias(`=`)를 사용하므로 `pkg/auth`의 Request/Response struct 변경 시 산출물 재생성 필요 — contract hash로 감지.

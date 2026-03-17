@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func traceSSaC(sf *ssacparser.ServiceFunc, specsDir string) ChainLink {

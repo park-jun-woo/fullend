@@ -5,7 +5,7 @@ package hurl
 import (
 	"github.com/jinzhu/inflection"
 
-	"github.com/geul-org/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
 // buildResourceFirstTransition maps plural resource name -> first transition order index.

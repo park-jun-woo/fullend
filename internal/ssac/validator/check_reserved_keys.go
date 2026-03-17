@@ -5,7 +5,7 @@ package validator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // checkReservedKeys는 단일 시퀀스의 Inputs 키에서 Go 예약어 충돌을 검사한다.

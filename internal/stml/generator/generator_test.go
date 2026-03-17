@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 func TestGenerateLoginPage(t *testing.T) {

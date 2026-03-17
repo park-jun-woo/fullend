@@ -5,7 +5,7 @@ package generator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 func collectActionImports(a parser.ActionBlock, is *importSet, compSet map[string]bool) {

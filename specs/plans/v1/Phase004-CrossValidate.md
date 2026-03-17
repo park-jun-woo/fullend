@@ -50,8 +50,8 @@ Phase 3 완료
 | 패키지 | 용도 |
 |---|---|
 | `github.com/getkin/kin-openapi/openapi3` | x-extensions 추출 |
-| `github.com/geul-org/ssac/parser` | ServiceFunc 타입 |
-| `github.com/geul-org/ssac/validator` | SymbolTable, DDLTable 타입 |
+| `github.com/park-jun-woo/ssac/parser` | ServiceFunc 타입 |
+| `github.com/park-jun-woo/ssac/validator` | SymbolTable, DDLTable 타입 |
 
 ## 실행 조건
 

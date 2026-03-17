@@ -2,7 +2,7 @@
 //ff:what ParamBind 슬라이스에서 route. 접두사를 가진 고유 파라미터 이름을 추출한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 func extractRouteParamNames(params []parser.ParamBind) []string {
 	var routeParams []string

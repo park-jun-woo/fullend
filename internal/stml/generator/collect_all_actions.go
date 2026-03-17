@@ -2,7 +2,7 @@
 //ff:what ChildNode 트리를 순회하여 모든 ActionBlock을 수집한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 // collectAllActions walks the ChildNode tree and collects all ActionBlocks.
 func collectAllActions(nodes []parser.ChildNode) []parser.ActionBlock {

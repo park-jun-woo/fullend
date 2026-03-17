@@ -9,13 +9,13 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 
-	"github.com/geul-org/fullend/internal/funcspec"
-	"github.com/geul-org/fullend/internal/policy"
-	"github.com/geul-org/fullend/internal/projectconfig"
-	"github.com/geul-org/fullend/internal/statemachine"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
-	stmlparser "github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
+	"github.com/park-jun-woo/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
+	stmlparser "github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 // findSpecsDir locates specs/gigbridge relative to the project root.

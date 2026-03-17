@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"sort"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // extractResponseFieldKeys returns the @response field keys for a function,

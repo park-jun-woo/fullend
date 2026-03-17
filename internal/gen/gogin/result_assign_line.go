@@ -6,7 +6,7 @@ package gogin
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 // resultAssignLine generates the struct field assignment for VerifyToken result.

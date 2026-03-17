@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/policy"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/policy"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func tracePolicy(sf *ssacparser.ServiceFunc, policies []*policy.Policy, specsDir string) []ChainLink {

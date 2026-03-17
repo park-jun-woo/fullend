@@ -3,8 +3,8 @@ package crosscheck
 import (
 	"testing"
 
-	"github.com/geul-org/fullend/internal/statemachine"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func TestCheckFuncGuardStates_TransitionMismatch(t *testing.T) {

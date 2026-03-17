@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/internal/contract"
 )
 
 // confirmReset checks for preserve funcs and prompts user. Returns false if user cancels.

@@ -2,7 +2,7 @@
 //ff:what DDL 테이블에서 컬럼의 VARCHAR 길이와 CHECK enum을 조회
 package crosscheck
 
-import ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+import ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 func findDDLColumnConstraints(st *ssacvalidator.SymbolTable, col string) (varcharLen int, checkEnums []string, found bool) {
 	for _, table := range st.DDLTables {

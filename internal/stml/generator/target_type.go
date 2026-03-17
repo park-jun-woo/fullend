@@ -2,7 +2,7 @@
 //ff:what 코드 생성 백엔드를 추상화하는 인터페이스
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 // Target abstracts the code generation backend.
 // Implement this interface to support a new framework (e.g. Vue, Svelte).

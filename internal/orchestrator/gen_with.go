@@ -8,8 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/contract"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 // GenWith runs code generation with the specified TargetProfile.

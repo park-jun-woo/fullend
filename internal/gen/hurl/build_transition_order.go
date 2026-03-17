@@ -2,7 +2,7 @@
 //ff:what Walks stateDiagrams BFS from initial state, returning event -> order index for sorting.
 package hurl
 
-import "github.com/geul-org/fullend/internal/statemachine"
+import "github.com/park-jun-woo/fullend/internal/statemachine"
 
 // buildTransitionOrder walks stateDiagrams BFS from initial state,
 // returning event -> order index for sorting.

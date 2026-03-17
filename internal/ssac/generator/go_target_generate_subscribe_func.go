@@ -3,8 +3,8 @@
 package generator
 
 import (
-	"github.com/geul-org/fullend/internal/ssac/parser"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // generateSubscribeFunc는 큐 구독 핸들러 함수를 생성한다.

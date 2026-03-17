@@ -5,9 +5,9 @@ package crosscheck
 import (
 	"github.com/getkin/kin-openapi/openapi3"
 
-	"github.com/geul-org/fullend/internal/funcspec"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // checkResponseFields validates that SSaC @response field keys match OpenAPI response schema properties.

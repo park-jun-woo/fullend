@@ -7,7 +7,7 @@ fullend CLI의 뼈대를 만든다. `fullend validate`, `fullend gen`, `fullend 
 
 | 파일 | 작업 |
 |---|---|
-| `go.mod` | 생성. module github.com/geul-org/fullend, Go 1.22+ |
+| `go.mod` | 생성. module github.com/park-jun-woo/fullend, Go 1.22+ |
 | `go.sum` | 생성 (go mod tidy) |
 | `artifacts/cmd/fullend/main.go` | 생성. 서브커맨드 라우팅 (validate/gen/status) |
 
@@ -15,14 +15,14 @@ fullend CLI의 뼈대를 만든다. `fullend validate`, `fullend gen`, `fullend 
 
 | 패키지 | 용도 |
 |---|---|
-| `github.com/geul-org/ssac` | parser, validator, generator |
-| `github.com/geul-org/stml` | parser, validator, generator |
+| `github.com/park-jun-woo/ssac` | parser, validator, generator |
+| `github.com/park-jun-woo/stml` | parser, validator, generator |
 | `github.com/getkin/kin-openapi` | OpenAPI 3.x 파싱/검증 |
 
 go.mod에 replace 디렉티브:
 ```
-replace github.com/geul-org/ssac => ../ssac
-replace github.com/geul-org/stml => ../stml
+replace github.com/park-jun-woo/ssac => ../ssac
+replace github.com/park-jun-woo/stml => ../stml
 ```
 
 ## 서브커맨드 인터페이스

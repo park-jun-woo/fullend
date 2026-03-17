@@ -8,8 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/contract"
-	"github.com/geul-org/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
 // GenerateStateMachines generates Go state machine packages from stateDiagrams.

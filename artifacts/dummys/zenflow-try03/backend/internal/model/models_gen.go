@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 
-	"github.com/geul-org/fullend/pkg/pagination"
+	"github.com/park-jun-woo/fullend/pkg/pagination"
 )
 
 type ActionModel interface {

@@ -3,8 +3,8 @@
 package crosscheck
 
 import (
-	"github.com/geul-org/fullend/internal/genapi"
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 // CrossValidateInput holds the pre-loaded data from individual validations.

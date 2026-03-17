@@ -5,7 +5,7 @@ package validator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validateNoMessageInHTTP는 HTTP 함수에서 message 사용을 검증한다.

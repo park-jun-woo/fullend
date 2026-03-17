@@ -3,7 +3,7 @@
 
 package gogin
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // hasDomains returns true if any service function has a non-empty Domain.
 func hasDomains(funcs []ssacparser.ServiceFunc) bool {

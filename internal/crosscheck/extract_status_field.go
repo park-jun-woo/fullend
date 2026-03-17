@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // extractStatusField extracts the status field name from @state Inputs.

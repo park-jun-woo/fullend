@@ -5,7 +5,7 @@ package generator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 // renderInfraApiArgs builds the API call arguments with infra params.

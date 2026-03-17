@@ -2,7 +2,7 @@
 //ff:what 기본 Target으로 단일 페이지의 소스 코드를 생성한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 // GeneratePage generates source code for a single page using the default target.
 func GeneratePage(page parser.PageSpec, specsDir string, opts ...GenerateOptions) string {

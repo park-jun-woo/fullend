@@ -6,7 +6,7 @@ package gogin
 import (
 	"sort"
 
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 // sortedClaimFields returns claim field names in sorted order.

@@ -12,7 +12,7 @@ fullend.yaml의 `backend`/`frontend` 단수 형태를 `backends`/`frontends`/`da
 backend:
   lang: go
   framework: gin
-  module: github.com/geul-org/dummy-lesson
+  module: github.com/park-jun-woo/dummy-lesson
   middleware:
     - bearerAuth
 
@@ -29,7 +29,7 @@ backends:
   api:
     lang: go
     framework: gin
-    module: github.com/geul-org/dummy-lesson
+    module: github.com/park-jun-woo/dummy-lesson
     middleware:
       - bearerAuth
 
@@ -101,5 +101,5 @@ go build ./artifacts/cmd/fullend/
 fullend validate specs/dummy-lesson
 fullend validate specs/dummy-study
 fullend gen specs/dummy-lesson /tmp/gen-lesson
-head -1 /tmp/gen-lesson/backend/go.mod  # → module github.com/geul-org/dummy-lesson
+head -1 /tmp/gen-lesson/backend/go.mod  # → module github.com/park-jun-woo/dummy-lesson
 ```

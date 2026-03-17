@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/geul-org/fullend/internal/genapi"
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 // Generate creates Go+Gin backend code from parsed SSOTs.

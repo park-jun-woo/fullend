@@ -29,7 +29,7 @@ metadata:
 backend:
   lang: go
   framework: gin
-  module: github.com/geul-org/dummy-lesson
+  module: github.com/park-jun-woo/dummy-lesson
   middleware:
     - bearerAuth
 
@@ -40,7 +40,7 @@ frontend:
   name: dummy-lesson-web
 
 deploy:
-  image: ghcr.io/geul-org/dummy-lesson
+  image: ghcr.io/park-jun-woo/dummy-lesson
   domain: dummy-lesson.geul.org
 ```
 
@@ -112,7 +112,7 @@ metadata:
 backend:
   lang: go
   framework: gin
-  module: github.com/geul-org/dummy-lesson
+  module: github.com/park-jun-woo/dummy-lesson
   middleware:
     - bearerAuth
 
@@ -134,7 +134,7 @@ metadata:
 backend:
   lang: go
   framework: gin
-  module: github.com/geul-org/dummy-study
+  module: github.com/park-jun-woo/dummy-study
   middleware:
     - bearerAuth
 
@@ -182,7 +182,7 @@ fullend validate specs/dummy-study
 # 3. gen + build — module path 정상 반영 확인
 fullend gen specs/dummy-lesson /tmp/gen-lesson
 cd /tmp/gen-lesson/backend
-head -1 go.mod  # → module github.com/geul-org/dummy-lesson
+head -1 go.mod  # → module github.com/park-jun-woo/dummy-lesson
 go build ./...  # → model import 에러 없음
 
 # 4. dummy-study 동일

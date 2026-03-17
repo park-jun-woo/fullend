@@ -2,7 +2,7 @@
 //ff:what data-param 바인딩이 OpenAPI parameters에 존재하는지 검증
 package validator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 func validateParams(params []parser.ParamBind, opID, file string, api APISymbol) []ValidationError {
 	var errs []ValidationError

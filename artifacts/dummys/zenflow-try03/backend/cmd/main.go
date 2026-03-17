@@ -10,7 +10,7 @@ import (
 
 	"github.com/zenflow/zenflow/internal/model"
 	"github.com/zenflow/zenflow/internal/service"
-	"github.com/geul-org/fullend/pkg/authz"
+	"github.com/park-jun-woo/fullend/pkg/authz"
 	actionsvc "github.com/zenflow/zenflow/internal/service/action"
 	authsvc "github.com/zenflow/zenflow/internal/service/auth"
 	workflowsvc "github.com/zenflow/zenflow/internal/service/workflow"

@@ -2,7 +2,7 @@
 //ff:what 전체 DDL 테이블을 순회하여 컬럼 타입을 조회
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/validator"
+import "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 func lookupAllTablesColumn(snakeName string, st *validator.SymbolTable) string {
 	for _, table := range st.DDLTables {

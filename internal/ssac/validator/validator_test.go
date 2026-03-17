@@ -3,7 +3,7 @@ package validator
 import (
 	"testing"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // --- 내부 검증: 필수 필드 ---

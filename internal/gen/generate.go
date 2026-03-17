@@ -3,9 +3,9 @@
 package gen
 
 import (
-	"github.com/geul-org/fullend/internal/gen/hurl"
-	"github.com/geul-org/fullend/internal/gen/react"
-	"github.com/geul-org/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/gen/hurl"
+	"github.com/park-jun-woo/fullend/internal/gen/react"
+	"github.com/park-jun-woo/fullend/internal/genapi"
 )
 
 // Generate creates all artifacts from parsed SSOTs.

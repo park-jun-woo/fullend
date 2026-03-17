@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/contract"
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 // generateMiddleware creates internal/middleware/bearerauth.go with claims-based CurrentUser mapping.

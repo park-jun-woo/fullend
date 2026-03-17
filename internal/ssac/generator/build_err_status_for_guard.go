@@ -2,7 +2,7 @@
 //ff:what 시퀀스 타입별 가드 에러 상태 코드를 templateData에 설정
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func buildErrStatusForGuard(d *templateData, seq parser.Sequence) {
 	switch seq.Type {

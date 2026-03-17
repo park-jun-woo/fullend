@@ -6,7 +6,7 @@ package validator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validateRequest는 request 필드가 OpenAPI와 일치하는지 검증한다.

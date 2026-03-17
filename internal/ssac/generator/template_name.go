@@ -2,7 +2,7 @@
 //ff:what HTTP 함수 내 시퀀스의 템플릿 이름을 반환
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // templateName은 HTTP 함수 내 시퀀스의 템플릿 이름을 반환한다.
 func templateName(seq parser.Sequence) string {

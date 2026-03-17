@@ -5,9 +5,9 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/reporter"
-	stmlparser "github.com/geul-org/fullend/internal/stml/parser"
-	stmlvalidator "github.com/geul-org/fullend/internal/stml/validator"
+	"github.com/park-jun-woo/fullend/internal/reporter"
+	stmlparser "github.com/park-jun-woo/fullend/internal/stml/parser"
+	stmlvalidator "github.com/park-jun-woo/fullend/internal/stml/validator"
 )
 
 func validateSTML(root string, pages []stmlparser.PageSpec) reporter.StepResult {

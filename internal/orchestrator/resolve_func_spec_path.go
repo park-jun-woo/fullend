@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/funcspec"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
 )
 
 // resolveFuncSpecPath finds the actual file path for a func spec.

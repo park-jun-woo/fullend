@@ -3,10 +3,10 @@
 package crosscheck
 
 import (
-	"github.com/geul-org/fullend/internal/policy"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
-	"github.com/geul-org/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/internal/policy"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
 // CheckPolicy validates policy against SSaC, DDL, and States.

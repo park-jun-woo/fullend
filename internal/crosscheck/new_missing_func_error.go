@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"fmt"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // newMissingFuncError creates a CrossError for a missing func implementation.

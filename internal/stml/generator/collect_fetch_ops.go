@@ -2,7 +2,7 @@
 //ff:what FetchBlock의 OperationID를 재귀적으로 수집한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 func collectFetchOps(f parser.FetchBlock, ops []string) []string {
 	ops = append(ops, f.OperationID)

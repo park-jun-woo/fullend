@@ -5,7 +5,7 @@ package generator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // lookupParamOrder는 심볼 테이블에서 모델 메서드의 파라미터 순서를 조회한다.

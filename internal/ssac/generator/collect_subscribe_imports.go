@@ -5,7 +5,7 @@ package generator
 import (
 	"sort"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // collectSubscribeImports는 subscribe 함수에 필요한 import를 수집한다.

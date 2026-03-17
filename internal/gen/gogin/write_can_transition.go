@@ -6,7 +6,7 @@ package gogin
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
 // writeCanTransition writes the CanTransition function appropriate for the field type.

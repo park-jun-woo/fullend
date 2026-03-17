@@ -6,9 +6,9 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/gen/gogin"
-	"github.com/geul-org/fullend/internal/genapi"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/gen/gogin"
+	"github.com/park-jun-woo/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func genStateMachines(specsDir, artifactsDir string, parsed *genapi.ParsedSSOTs) reporter.StepResult {

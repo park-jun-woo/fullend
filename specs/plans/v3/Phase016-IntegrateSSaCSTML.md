@@ -20,17 +20,17 @@ SSaC(parser/validator/generator)와 STML(parser/validator/generator)을 fullend 
 ### fullend → SSaC 의존 (33개 파일, 51회 참조)
 
 ```
-github.com/geul-org/ssac/parser       → ssacparser.ServiceFunc 등
-github.com/geul-org/ssac/validator     → ssacvalidator.DDLTable, Index, SymbolTable 등
-github.com/geul-org/ssac/generator     → ssacgenerator.Generate 등
+github.com/park-jun-woo/ssac/parser       → ssacparser.ServiceFunc 등
+github.com/park-jun-woo/ssac/validator     → ssacvalidator.DDLTable, Index, SymbolTable 등
+github.com/park-jun-woo/ssac/generator     → ssacgenerator.Generate 등
 ```
 
 ### fullend → STML 의존 (4개 파일, 6회 참조)
 
 ```
-github.com/geul-org/stml/parser        → stmlparser.Page 등
-github.com/geul-org/stml/validator     → stmlvalidator.Validate 등
-github.com/geul-org/stml/generator     → stmlgenerator.Generate 등
+github.com/park-jun-woo/stml/parser        → stmlparser.Page 등
+github.com/park-jun-woo/stml/validator     → stmlvalidator.Validate 등
+github.com/park-jun-woo/stml/generator     → stmlgenerator.Generate 등
 ```
 
 ### SSaC 코드 구조 (이동 대상)
@@ -74,25 +74,25 @@ stml/generator/  → fullend/internal/stml/generator/
 모든 fullend Go 파일에서:
 
 ```
-github.com/geul-org/ssac/parser     → github.com/geul-org/fullend/internal/ssac/parser
-github.com/geul-org/ssac/validator  → github.com/geul-org/fullend/internal/ssac/validator
-github.com/geul-org/ssac/generator  → github.com/geul-org/fullend/internal/ssac/generator
-github.com/geul-org/stml/parser     → github.com/geul-org/fullend/internal/stml/parser
-github.com/geul-org/stml/validator  → github.com/geul-org/fullend/internal/stml/validator
-github.com/geul-org/stml/generator  → github.com/geul-org/fullend/internal/stml/generator
+github.com/park-jun-woo/ssac/parser     → github.com/park-jun-woo/fullend/internal/ssac/parser
+github.com/park-jun-woo/ssac/validator  → github.com/park-jun-woo/fullend/internal/ssac/validator
+github.com/park-jun-woo/ssac/generator  → github.com/park-jun-woo/fullend/internal/ssac/generator
+github.com/park-jun-woo/stml/parser     → github.com/park-jun-woo/fullend/internal/stml/parser
+github.com/park-jun-woo/stml/validator  → github.com/park-jun-woo/fullend/internal/stml/validator
+github.com/park-jun-woo/stml/generator  → github.com/park-jun-woo/fullend/internal/stml/generator
 ```
 
 SSaC/STML 내부 파일의 상호 import도 변경:
 
 ```
-github.com/geul-org/ssac/parser     → github.com/geul-org/fullend/internal/ssac/parser
+github.com/park-jun-woo/ssac/parser     → github.com/park-jun-woo/fullend/internal/ssac/parser
 (ssac generator → ssac parser 참조 등)
 ```
 
 ### 3단계: go.mod 정리
 
-- `github.com/geul-org/ssac` require + replace 제거
-- `github.com/geul-org/stml` require + replace 제거
+- `github.com/park-jun-woo/ssac` require + replace 제거
+- `github.com/park-jun-woo/stml` require + replace 제거
 - `golang.org/x/net` 의존 추가 (STML용)
 - `go mod tidy`
 

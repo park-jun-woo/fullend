@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // collectModelsForDomain extracts model names used by funcs in a specific domain.

@@ -6,7 +6,7 @@ package gogin
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 // generateAuthIfNeeded generates auth package and middleware only when claims are configured.

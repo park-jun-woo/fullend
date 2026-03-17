@@ -7,7 +7,7 @@ import (
 
 	"github.com/jinzhu/inflection"
 
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // resolveInputParamType는 Inputs value에서 Go 타입을 추론한다.

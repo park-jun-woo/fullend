@@ -10,7 +10,7 @@ import (
 
 	"github.com/gigbridge/api/internal/model"
 	"github.com/gigbridge/api/internal/service"
-	"github.com/geul-org/fullend/pkg/authz"
+	"github.com/park-jun-woo/fullend/pkg/authz"
 	authsvc "github.com/gigbridge/api/internal/service/auth"
 	gigsvc "github.com/gigbridge/api/internal/service/gig"
 	proposalsvc "github.com/gigbridge/api/internal/service/proposal"

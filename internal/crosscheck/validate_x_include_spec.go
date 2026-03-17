@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // validateXIncludeSpec validates a single x-include spec entry.

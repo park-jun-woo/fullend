@@ -3,9 +3,9 @@
 package gen
 
 import (
-	"github.com/geul-org/fullend/internal/gen/gogin"
-	"github.com/geul-org/fullend/internal/genapi"
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/gen/gogin"
+	"github.com/park-jun-woo/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 func selectBackend(cfg *projectconfig.ProjectConfig) genapi.Backend {

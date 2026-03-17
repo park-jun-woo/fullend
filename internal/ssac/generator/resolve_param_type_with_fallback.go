@@ -5,7 +5,7 @@ package generator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func resolveParamTypeWithFallback(val, key, modelName string, st *validator.SymbolTable) string {

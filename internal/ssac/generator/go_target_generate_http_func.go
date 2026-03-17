@@ -3,8 +3,8 @@
 package generator
 
 import (
-	"github.com/geul-org/fullend/internal/ssac/parser"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // generateHTTPFunc는 HTTP 핸들러 함수를 생성한다.

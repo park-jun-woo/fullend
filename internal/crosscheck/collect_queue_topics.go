@@ -2,7 +2,7 @@
 //ff:what SSaC 함수에서 publish/subscribe 토픽을 수집
 package crosscheck
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func collectQueueTopics(funcs []ssacparser.ServiceFunc) (map[string]map[string]bool, map[string]ssacparser.ServiceFunc) {
 	publishTopics := map[string]map[string]bool{}

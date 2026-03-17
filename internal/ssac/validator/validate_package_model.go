@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validatePackageModel은 패키지 접두사 모델의 존재 및 파라미터 매칭을 검증한다.

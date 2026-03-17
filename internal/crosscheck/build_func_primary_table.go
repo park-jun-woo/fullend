@@ -3,7 +3,7 @@
 package crosscheck
 
 import (
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // buildFuncPrimaryTable maps function names to their primary DDL table.

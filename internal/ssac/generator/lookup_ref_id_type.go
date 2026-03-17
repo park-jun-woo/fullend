@@ -7,7 +7,7 @@ import (
 
 	"github.com/jinzhu/inflection"
 
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func lookupRefIDType(field string, st *validator.SymbolTable) string {

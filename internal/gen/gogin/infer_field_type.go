@@ -3,7 +3,7 @@
 
 package gogin
 
-import "github.com/geul-org/fullend/internal/statemachine"
+import "github.com/park-jun-woo/fullend/internal/statemachine"
 
 // inferFieldType determines if the status field is boolean or string-based.
 // Heuristic: if exactly 2 live states (excluding terminal states like "deleted")

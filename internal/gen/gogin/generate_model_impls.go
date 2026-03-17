@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // generateModelImpls generates model implementation files that use database/sql directly.

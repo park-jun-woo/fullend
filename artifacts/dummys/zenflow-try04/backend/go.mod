@@ -3,7 +3,7 @@ module github.com/example/zenflow
 go 1.25.0
 
 require (
-	github.com/geul-org/fullend v0.1.8
+	github.com/park-jun-woo/fullend v0.1.8
 	github.com/gin-gonic/gin v1.10.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/lib/pq v1.11.2

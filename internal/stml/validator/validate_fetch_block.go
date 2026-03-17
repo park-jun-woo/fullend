@@ -5,7 +5,7 @@ package validator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 func validateFetchBlock(f parser.FetchBlock, file string, st *SymbolTable, cs *CustomSymbol, frontendDir string) []ValidationError {

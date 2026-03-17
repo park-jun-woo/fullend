@@ -32,8 +32,8 @@ package middleware
 import (
     "strings"
     "github.com/gin-gonic/gin"
-    "github.com/geul-org/fullend/pkg/auth"
-    "github.com/geul-org/dummy-lesson/internal/model"
+    "github.com/park-jun-woo/fullend/pkg/auth"
+    "github.com/park-jun-woo/dummy-lesson/internal/model"
 )
 
 func BearerAuth(secret string) gin.HandlerFunc {
@@ -64,7 +64,7 @@ func BearerAuth(secret string) gin.HandlerFunc {
 ### 2. gluegen/domain.go — server.go import 변경
 
 `generateCentralServer`에서:
-- `"github.com/geul-org/fullend/pkg/middleware"` → `"{modulePath}/internal/middleware"` import 변경
+- `"github.com/park-jun-woo/fullend/pkg/middleware"` → `"{modulePath}/internal/middleware"` import 변경
 - `middleware.BearerAuth("secret")` 호출은 그대로 (함수명 동일)
 
 ### 3. gluegen/gluegen.go — Generate 흐름에 미들웨어 생성 추가

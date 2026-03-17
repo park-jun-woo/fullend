@@ -30,13 +30,13 @@ package genapi
 import (
     "github.com/getkin/kin-openapi/openapi3"
 
-    "github.com/geul-org/fullend/internal/funcspec"
-    "github.com/geul-org/fullend/internal/policy"
-    "github.com/geul-org/fullend/internal/projectconfig"
-    "github.com/geul-org/fullend/internal/statemachine"
-    ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
-    ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
-    stmlparser "github.com/geul-org/fullend/internal/stml/parser"
+    "github.com/park-jun-woo/fullend/internal/funcspec"
+    "github.com/park-jun-woo/fullend/internal/policy"
+    "github.com/park-jun-woo/fullend/internal/projectconfig"
+    "github.com/park-jun-woo/fullend/internal/statemachine"
+    ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
+    ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
+    stmlparser "github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 // ParsedSSOTs holds all SSOT parsing results.
@@ -150,11 +150,11 @@ internal/
 package gen
 
 import (
-    "github.com/geul-org/fullend/internal/genapi"
-    "github.com/geul-org/fullend/internal/gen/gogin"
-    "github.com/geul-org/fullend/internal/gen/react"
-    "github.com/geul-org/fullend/internal/gen/hurl"
-    "github.com/geul-org/fullend/internal/projectconfig"
+    "github.com/park-jun-woo/fullend/internal/genapi"
+    "github.com/park-jun-woo/fullend/internal/gen/gogin"
+    "github.com/park-jun-woo/fullend/internal/gen/react"
+    "github.com/park-jun-woo/fullend/internal/gen/hurl"
+    "github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 // Generate creates all artifacts from parsed SSOTs.
@@ -186,7 +186,7 @@ func selectBackend(cfg *projectconfig.ProjectConfig) genapi.Backend {
 ```go
 package gogin
 
-import "github.com/geul-org/fullend/internal/genapi"
+import "github.com/park-jun-woo/fullend/internal/genapi"
 
 // GoGin implements genapi.Backend for Go + Gin framework.
 type GoGin struct{}
@@ -217,7 +217,7 @@ func GenerateAuthzPackage(policies []*policy.Policy, artifactsDir string) error 
 ```go
 package orchestrator
 
-import "github.com/geul-org/fullend/internal/genapi"
+import "github.com/park-jun-woo/fullend/internal/genapi"
 
 // ParseAll returns *genapi.ParsedSSOTs (not orchestrator-local struct).
 func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *genapi.ParsedSSOTs {

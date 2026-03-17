@@ -5,7 +5,7 @@ package validator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 func checkBindField(b parser.FieldBind, opID, file string, api APISymbol, cs *CustomSymbol) *ValidationError {

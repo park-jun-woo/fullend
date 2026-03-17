@@ -2,7 +2,7 @@
 //ff:what ServiceFunc 배열에서 모델 사용 정보를 수집
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func collectModelUsages(funcs []parser.ServiceFunc) []modelUsage {
 	var usages []modelUsage

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func buildDomainInitBlock(serviceFuncs []ssacparser.ServiceFunc, domains []string, anyNeedsAuth bool) string {

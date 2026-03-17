@@ -5,8 +5,8 @@ package generator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func buildModelCall(d *templateData, seq parser.Sequence, useTx bool, st *validator.SymbolTable) {

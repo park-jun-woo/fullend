@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 
 	"github.com/ettle/strcase"
-	"github.com/geul-org/fullend/internal/ssac/parser"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // GenerateHandlerStruct는 도메인별 Handler struct를 생성한다.

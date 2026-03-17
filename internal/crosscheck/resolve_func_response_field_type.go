@@ -2,7 +2,7 @@
 //ff:what func spec Response 필드에서 필드 타입 조회
 package crosscheck
 
-import "github.com/geul-org/fullend/internal/funcspec"
+import "github.com/park-jun-woo/fullend/internal/funcspec"
 
 // resolveFuncResponseFieldType looks up a field type from func spec Response fields.
 func resolveFuncResponseFieldType(specs []funcspec.FuncSpec, respTypeName, field string) string {

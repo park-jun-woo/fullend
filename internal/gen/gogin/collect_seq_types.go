@@ -6,7 +6,7 @@ package gogin
 import (
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // collectSeqTypes extracts per-model method → sequence type mapping from service functions.

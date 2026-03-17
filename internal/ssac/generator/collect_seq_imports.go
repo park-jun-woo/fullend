@@ -2,7 +2,7 @@
 //ff:what 시퀀스에서 필요한 패키지 import을 수집
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func collectSeqImports(sf parser.ServiceFunc, seen map[string]bool) {
 	for _, seq := range sf.Sequences {
@@ -16,7 +16,7 @@ func collectSeqImports(sf parser.ServiceFunc, seen map[string]bool) {
 			seen["queue"] = true
 		}
 		if seq.Result != nil && seq.Result.Wrapper != "" && !hasDirectResponse(sf.Sequences) {
-			seen["github.com/geul-org/fullend/pkg/pagination"] = true
+			seen["github.com/park-jun-woo/fullend/pkg/pagination"] = true
 		}
 	}
 }

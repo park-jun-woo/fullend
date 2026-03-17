@@ -6,7 +6,7 @@ package orchestrator
 import (
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 func determineModulePath(specsDir, artifactsDir string, cfg *projectconfig.ProjectConfig) string {

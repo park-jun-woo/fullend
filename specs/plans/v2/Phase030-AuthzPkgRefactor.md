@@ -122,7 +122,7 @@ embed용 더미 rego 파일 제거. 런타임에 `OPA_POLICY_PATH`에서 로딩.
 
 artifacts의 service 코드가 `internal/authz` 대신 `fullend/pkg/authz` import하도록:
 - main.go의 `authz.Init(db)` → `authz.Init(db, ownerships)`
-- service 코드의 import: `github.com/gigbridge/api/internal/authz` → `github.com/geul-org/fullend/pkg/authz`
+- service 코드의 import: `github.com/gigbridge/api/internal/authz` → `github.com/park-jun-woo/fullend/pkg/authz`
 
 ### 5. SSaC 수정지시서 — Role 전달
 

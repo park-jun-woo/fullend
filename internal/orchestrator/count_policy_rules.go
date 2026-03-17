@@ -4,7 +4,7 @@
 package orchestrator
 
 import (
-	"github.com/geul-org/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/policy"
 )
 
 func countPolicyRules(policies []*policy.Policy) int {

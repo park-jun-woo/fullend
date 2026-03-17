@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"github.com/getkin/kin-openapi/openapi3"
 
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func checkXInclude(op *openapi3.Operation, st *ssacvalidator.SymbolTable, ctx string, primaryTable string) []CrossError {

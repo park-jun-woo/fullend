@@ -2,7 +2,7 @@
 //ff:what 필드 목록에서 이름으로 타입 조회
 package crosscheck
 
-import "github.com/geul-org/fullend/internal/funcspec"
+import "github.com/park-jun-woo/fullend/internal/funcspec"
 
 // findFieldType finds a field's type by name in a list of fields.
 func findFieldType(fields []funcspec.Field, name string) string {

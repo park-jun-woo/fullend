@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func validateScenarioHurl(testsDir string, specsRoot string) (reporter.StepResult, []string) {

@@ -8,7 +8,7 @@ import (
 
 	"github.com/ettle/strcase"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // generateSkeleton creates a skeleton code hint for a missing func.

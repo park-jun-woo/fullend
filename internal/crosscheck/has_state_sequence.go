@@ -2,7 +2,7 @@
 //ff:what SSaC 함수에 @state 시퀀스가 있는지 확인
 package crosscheck
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // hasStateSequence checks if a function has a @state sequence.
 func hasStateSequence(fn ssacparser.ServiceFunc) bool {

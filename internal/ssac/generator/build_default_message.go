@@ -2,7 +2,7 @@
 //ff:what 시퀀스의 메시지가 비어있으면 기본 메시지를 설정
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func buildDefaultMessage(d *templateData, seq parser.Sequence) {
 	if d.Message == "" {

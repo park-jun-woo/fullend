@@ -90,7 +90,7 @@ Uses Go syntax but excluded from Go build via `.ssac` extension.
 ```go
 package service
 
-import "github.com/geul-org/fullend/pkg/auth"
+import "github.com/park-jun-woo/fullend/pkg/auth"
 
 // @call auth.HashPasswordResponse hp = auth.HashPassword({Password: request.password})
 // @post User user = User.Create({Email: request.email, PasswordHash: hp.HashedPassword})

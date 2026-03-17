@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/geul-org/fullend/internal/genmodel"
+	"github.com/park-jun-woo/fullend/internal/genmodel"
 )
 
 // Version is set at build time via -ldflags.

@@ -3,7 +3,7 @@ package crosscheck
 import (
 	"testing"
 
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func TestCheckSensitiveColumns_NewPatterns(t *testing.T) {

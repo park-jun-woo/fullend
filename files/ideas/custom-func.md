@@ -36,7 +36,7 @@ package service
 
 import (
     "net/http"
-    auth "github.com/geul-org/fullend/pkg/auth"
+    auth "github.com/park-jun-woo/fullend/pkg/auth"
 )
 
 // @sequence call
@@ -155,13 +155,13 @@ func HashPassword(in HashPasswordInput) (HashPasswordOutput, error) {
 1. SSaC 스펙의 import에서 func 패키지 경로 확인
 2. 로컬 패키지인 경우:
    → `specs/<project>/func/auth/` → `artifacts/<project>/backend/internal/auth/`로 복사
-3. 외부 모듈인 경우 (`github.com/geul-org/fullend/pkg/auth`):
+3. 외부 모듈인 경우 (`github.com/park-jun-woo/fullend/pkg/auth`):
    → 복사 불필요. `go get`으로 의존성 해결
 
 ## fullend validate 흐름
 
 1. SSaC에서 `@func` 참조 + import 경로 수집
-2. import가 `github.com/geul-org/fullend/pkg/` → fullend 기본 제공, 검증 스킵
+2. import가 `github.com/park-jun-woo/fullend/pkg/` → fullend 기본 제공, 검증 스킵
 3. import가 로컬 경로 → `specs/<project>/func/<pkg>/`에 구현 파일 존재 확인
    - 없으면 **ERROR** + 구현 지침 프롬프트 출력:
      ```

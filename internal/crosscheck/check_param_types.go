@@ -5,8 +5,8 @@ package crosscheck
 import (
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func checkParamTypes(seq ssacparser.Sequence, st *ssacvalidator.SymbolTable, ctx string, seqIdx int) []CrossError {

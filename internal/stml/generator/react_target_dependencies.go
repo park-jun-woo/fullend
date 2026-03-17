@@ -2,7 +2,7 @@
 //ff:what 페이지 목록에서 필요한 npm 의존성 목록을 수집한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 func (r *ReactTarget) Dependencies(pages []parser.PageSpec) map[string]string {
 	deps := map[string]string{}

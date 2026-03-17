@@ -3,7 +3,7 @@
 package validator
 
 import (
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validateSubscribeRules는 subscribe/HTTP 트리거와 관련된 규칙을 검증한다.

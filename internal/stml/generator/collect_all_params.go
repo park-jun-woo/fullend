@@ -2,7 +2,7 @@
 //ff:what 페이지의 모든 ParamBind를 Fetch, Action, Children에서 수집한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 // collectAllParams gathers all ParamBinds from the page.
 func collectAllParams(page parser.PageSpec) []parser.ParamBind {

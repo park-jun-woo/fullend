@@ -3,7 +3,7 @@
 
 package gogin
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // domainNeedsJWTSecret checks if any service function in the domain calls auth.IssueToken.
 func domainNeedsJWTSecret(serviceFuncs []ssacparser.ServiceFunc, domain string) bool {

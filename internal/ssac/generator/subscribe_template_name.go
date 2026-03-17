@@ -2,7 +2,7 @@
 //ff:what subscribe 함수 내 시퀀스의 템플릿 이름을 반환
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // subscribeTemplateName은 subscribe 함수 내 시퀀스의 템플릿 이름을 반환한다.
 func subscribeTemplateName(seq parser.Sequence) string {

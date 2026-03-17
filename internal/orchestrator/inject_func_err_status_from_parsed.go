@@ -6,9 +6,9 @@ package orchestrator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/funcspec"
-	"github.com/geul-org/fullend/internal/genapi"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
+	"github.com/park-jun-woo/fullend/internal/genapi"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // injectFuncErrStatusFromParsed uses pre-parsed func specs to inject @error annotations.

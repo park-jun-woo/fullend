@@ -38,7 +38,7 @@ func scanFuncImports(specsDir, modulePath string) (map[string]string, error) {
 			importPath := line[q1+1 : q2]
 
 			// Skip fullend built-in packages.
-			if strings.HasPrefix(importPath, "github.com/geul-org/fullend/") {
+			if strings.HasPrefix(importPath, "github.com/park-jun-woo/fullend/") {
 				continue
 			}
 

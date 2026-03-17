@@ -2,7 +2,7 @@
 //ff:what 시퀀스 목록에서 request 소스 필드명을 수집한다
 package contract
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // collectReqFields returns request field names from all sequences.
 func collectReqFields(seqs []ssacparser.Sequence) []string {

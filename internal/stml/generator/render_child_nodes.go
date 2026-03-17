@@ -2,7 +2,7 @@
 //ff:what ChildNode 슬라이스를 Kind별로 분기하여 DOM 순서대로 JSX를 렌더링한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 // renderChildNodes renders ChildNode slice in DOM order for fetch context.
 func renderChildNodes(nodes []parser.ChildNode, dataVar, itemVar string, indent int) []string {

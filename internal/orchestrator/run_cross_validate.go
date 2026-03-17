@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/crosscheck"
-	"github.com/geul-org/fullend/internal/genapi"
-	"github.com/geul-org/fullend/internal/projectconfig"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/crosscheck"
+	"github.com/park-jun-woo/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func runCrossValidate(root string, parsed *genapi.ParsedSSOTs) reporter.StepResult {

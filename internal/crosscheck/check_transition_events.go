@@ -3,7 +3,7 @@
 package crosscheck
 
 import (
-	"github.com/geul-org/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
 // checkTransitionEvents validates that transition events have matching SSaC functions.

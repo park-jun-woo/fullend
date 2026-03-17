@@ -2,7 +2,7 @@
 //ff:what Returns operationIDs that have @state annotations in SSaC.
 package hurl
 
-import ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+import ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // buildStateOpsSet returns operationIDs that have @state annotations in SSaC.
 func buildStateOpsSet(serviceFuncs []ssacparser.ServiceFunc) map[string]bool {

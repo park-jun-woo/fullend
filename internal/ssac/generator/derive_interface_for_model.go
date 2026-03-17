@@ -5,7 +5,7 @@ package generator
 import (
 	"sort"
 
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func deriveInterfaceForModel(modelName string, usages []modelUsage, methodMap map[methodKey]modelUsage, st *validator.SymbolTable) *derivedInterface {

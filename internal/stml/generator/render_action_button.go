@@ -5,7 +5,7 @@ package generator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/internal/stml/parser"
 )
 
 func renderActionButton(a parser.ActionBlock, indent int) string {

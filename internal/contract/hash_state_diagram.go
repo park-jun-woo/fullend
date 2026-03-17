@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
 // HashStateDiagram computes a contract hash for a state machine.

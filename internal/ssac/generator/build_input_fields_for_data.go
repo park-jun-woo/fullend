@@ -2,7 +2,7 @@
 //ff:what state/auth/call 시퀀스의 Inputs를 Go struct 필드로 변환
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func buildInputFieldsForData(d *templateData, seq parser.Sequence) {
 	if seq.Type != parser.SeqState && seq.Type != parser.SeqAuth && seq.Type != parser.SeqCall {

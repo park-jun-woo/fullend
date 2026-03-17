@@ -46,8 +46,8 @@ Phase 4 완료
 
 | 패키지 | 호출 |
 |---|---|
-| `github.com/geul-org/ssac/generator` | `Generate()`, `GenerateModelInterfaces()` |
-| `github.com/geul-org/stml/generator` | `Generate()` |
+| `github.com/park-jun-woo/ssac/generator` | `Generate()`, `GenerateModelInterfaces()` |
+| `github.com/park-jun-woo/stml/generator` | `Generate()` |
 | `os/exec` | `sqlc generate`, `terraform fmt` |
 
 ## 검증 방법

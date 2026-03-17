@@ -3,7 +3,7 @@
 package crosscheck
 
 import (
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // sensitivePatterns are column name substrings that suggest sensitive data.

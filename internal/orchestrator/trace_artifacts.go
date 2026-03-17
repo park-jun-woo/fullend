@@ -8,8 +8,8 @@ import (
 
 	"github.com/jinzhu/inflection"
 
-	"github.com/geul-org/fullend/internal/contract"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/contract"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // traceArtifacts finds generated code artifacts connected to the operationId.

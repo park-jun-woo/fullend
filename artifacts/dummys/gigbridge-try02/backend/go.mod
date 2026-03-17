@@ -5,7 +5,7 @@ go 1.25.0
 require github.com/gin-gonic/gin v1.10.1
 
 require (
-	github.com/geul-org/fullend v0.0.0
+	github.com/park-jun-woo/fullend v0.0.0
 	github.com/lib/pq v1.10.9
 	github.com/oapi-codegen/runtime v1.2.0
 )
@@ -68,6 +68,6 @@ require (
 )
 
 replace (
-	github.com/geul-org/fullend => /home/parkjunwoo/.clari/repos/fullend
-	github.com/geul-org/ssac => /home/parkjunwoo/.clari/repos/ssac
+	github.com/park-jun-woo/fullend => /home/parkjunwoo/.clari/repos/fullend
+	github.com/park-jun-woo/ssac => /home/parkjunwoo/.clari/repos/ssac
 )

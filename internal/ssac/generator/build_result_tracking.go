@@ -2,7 +2,7 @@
 //ff:what result 변수 재선언 여부를 추적하여 ReAssign 플래그 설정
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func buildResultTracking(d *templateData, seq parser.Sequence, declaredVars map[string]bool) {
 	if seq.Result == nil {

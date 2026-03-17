@@ -5,7 +5,7 @@ package validator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // validateSeqRequiredFields는 단일 시퀀스의 타입별 필수 필드 누락을 검증한다.

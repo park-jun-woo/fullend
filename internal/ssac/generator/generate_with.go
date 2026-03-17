@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // GenerateWith는 지정된 Target으로 코드를 생성한다.

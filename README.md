@@ -20,7 +20,7 @@ specs/
 ## Install
 
 ```bash
-go install github.com/geul-org/fullend/cmd/fullend@latest
+go install github.com/park-jun-woo/fullend/cmd/fullend@latest
 ```
 
 ## Commands
@@ -204,7 +204,7 @@ User-written tests (placed in `specs/<project>/tests/`):
 
 ## Architecture
 
-SSaC (parser/validator/generator) and STML (parser/validator/generator) are integrated into fullend as `internal/ssac/` and `internal/stml/`. The original [SSaC](https://github.com/geul-org/ssac) and [STML](https://github.com/geul-org/stml) repos are simple file-copy mirrors from fullend.
+SSaC (parser/validator/generator) and STML (parser/validator/generator) are integrated into fullend as `internal/ssac/` and `internal/stml/`. The original [SSaC](https://github.com/park-jun-woo/ssac) and [STML](https://github.com/park-jun-woo/stml) repos are simple file-copy mirrors from fullend.
 
 All SSOTs are parsed once per CLI invocation via `ParseAll()` and shared across validate, gen, status, and chain pipelines.
 

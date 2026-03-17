@@ -2,7 +2,7 @@
 //ff:what OperationID 기준으로 중복 ActionBlock을 제거한다
 package generator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 // deduplicateActions removes duplicate actions by OperationID.
 func deduplicateActions(actions []parser.ActionBlock) []parser.ActionBlock {

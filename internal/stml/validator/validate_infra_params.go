@@ -2,7 +2,7 @@
 //ff:what data-paginate·sort·filter 인프라 파라미터 검증
 package validator
 
-import "github.com/geul-org/fullend/internal/stml/parser"
+import "github.com/park-jun-woo/fullend/internal/stml/parser"
 
 func validateInfraParams(f parser.FetchBlock, file string, api APISymbol) []ValidationError {
 	var errs []ValidationError

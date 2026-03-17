@@ -6,9 +6,9 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/gen"
-	"github.com/geul-org/fullend/internal/genapi"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/gen"
+	"github.com/park-jun-woo/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func genGlue(specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT, parsed *genapi.ParsedSSOTs, stmlDeps map[string]string, stmlPages []string, stmlPageOps map[string]string) reporter.StepResult {

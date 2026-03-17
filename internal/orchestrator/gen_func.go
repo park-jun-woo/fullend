@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func genFunc(funcDir, specsDir, artifactsDir, modulePath string) reporter.StepResult {

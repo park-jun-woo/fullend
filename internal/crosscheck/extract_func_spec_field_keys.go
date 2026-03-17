@@ -2,7 +2,7 @@
 //ff:what func spec 응답 필드에서 JSON 키 목록 추출
 package crosscheck
 
-import "github.com/geul-org/fullend/internal/funcspec"
+import "github.com/park-jun-woo/fullend/internal/funcspec"
 
 // extractFuncSpecFieldKeys extracts JSON field keys from a func spec's response fields.
 func extractFuncSpecFieldKeys(fs funcspec.FuncSpec) []string {

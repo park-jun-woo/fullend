@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/policy"
 )
 
 // GenerateAuthzPackage copies .rego files to the artifacts directory for runtime loading.

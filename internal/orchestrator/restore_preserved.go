@@ -6,8 +6,8 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/contract"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 // restorePreserved restores preserved function bodies and returns a step result.

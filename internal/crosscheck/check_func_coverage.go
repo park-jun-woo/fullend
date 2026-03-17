@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/funcspec"
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // CheckFuncCoverage warns about project func specs not referenced by any SSaC @call.

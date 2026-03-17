@@ -5,7 +5,7 @@ package generator
 import (
 	"strings"
 
-	"github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // lookupCallErrStatus는 SymbolTable에서 @call 대상 함수의 @error 어노테이션 값을 조회한다.

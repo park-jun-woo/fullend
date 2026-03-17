@@ -7,14 +7,14 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/geul-org/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/internal/contract"
 )
 
 // generateReexport creates internal/auth/reexport.go that re-exports pkg/auth utilities.
 func generateReexport(authDir string, claimsHash string) error {
 	src := `package auth
 
-import pkgauth "github.com/geul-org/fullend/pkg/auth"
+import pkgauth "github.com/park-jun-woo/fullend/pkg/auth"
 
 // Re-export pkg/auth utilities for unified import.
 var HashPassword = pkgauth.HashPassword

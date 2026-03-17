@@ -3,7 +3,7 @@
 
 package gogin
 
-import "github.com/geul-org/fullend/internal/statemachine"
+import "github.com/park-jun-woo/fullend/internal/statemachine"
 
 // inferBoolStates returns (trueState, falseState) for boolean diagrams.
 func inferBoolStates(d *statemachine.StateDiagram) (string, string) {

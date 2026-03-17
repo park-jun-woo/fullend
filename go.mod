@@ -1,4 +1,4 @@
-module github.com/geul-org/fullend
+module github.com/park-jun-woo/fullend
 
 go 1.25.0
 

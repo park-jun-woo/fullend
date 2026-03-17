@@ -2,7 +2,7 @@
 //ff:what Rego 정책에서 role 값을 수집
 package crosscheck
 
-import "github.com/geul-org/fullend/internal/policy"
+import "github.com/park-jun-woo/fullend/internal/policy"
 
 func collectRegoRoles(policies []*policy.Policy) map[string]string {
 	regoRoles := make(map[string]string)

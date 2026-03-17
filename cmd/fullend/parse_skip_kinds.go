@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/orchestrator"
+	"github.com/park-jun-woo/fullend/internal/orchestrator"
 )
 
 // parseSkipKinds parses a comma-separated string of SSOT kinds into a map.

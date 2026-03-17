@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // LoadPackageInterfaces는 서비스 파일의 import 경로에서 패키지 접두사 모델의 Go interface를 파싱한다.

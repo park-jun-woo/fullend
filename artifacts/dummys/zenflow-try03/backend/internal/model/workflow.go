@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/geul-org/fullend/pkg/pagination"
+	"github.com/park-jun-woo/fullend/pkg/pagination"
 )
 
 type workflowModelImpl struct {

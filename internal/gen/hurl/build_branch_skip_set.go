@@ -2,7 +2,7 @@
 //ff:what Finds branching state transitions and marks all but the first as skippable in smoke tests.
 package hurl
 
-import "github.com/geul-org/fullend/internal/statemachine"
+import "github.com/park-jun-woo/fullend/internal/statemachine"
 
 // buildBranchSkipSet finds state transitions that share a 'from' state (branching)
 // and marks all but the first (by transitionOrder) as skippable in smoke tests.

@@ -6,7 +6,7 @@ package gogin
 import (
 	"sort"
 
-	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
+	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // uniqueDomains returns sorted unique non-empty domain names.

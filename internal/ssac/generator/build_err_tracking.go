@@ -2,7 +2,7 @@
 //ff:what 시퀀스 타입별 err 변수 선언 추적 및 FirstErr 플래그 설정
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 func buildErrTracking(d *templateData, seq parser.Sequence, errDeclared *bool) {
 	d.ErrDeclared = *errDeclared

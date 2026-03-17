@@ -2,7 +2,7 @@
 //ff:what @call func의 본체 구현 여부 검증
 package crosscheck
 
-import "github.com/geul-org/fullend/internal/funcspec"
+import "github.com/park-jun-woo/fullend/internal/funcspec"
 
 // validateCallBody checks that a func spec has a body implementation.
 func validateCallBody(ctx string, spec *funcspec.FuncSpec) []CrossError {

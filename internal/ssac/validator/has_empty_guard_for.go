@@ -2,7 +2,7 @@
 //ff:what 시퀀스 슬라이스에서 지정한 변수에 대한 @empty 가드가 있는지 확인한다
 package validator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 // hasEmptyGuardFor는 시퀀스 슬라이스에서 지정한 변수에 대한 @empty 가드가 있는지 확인한다.
 func hasEmptyGuardFor(seqs []parser.Sequence, varName string) bool {

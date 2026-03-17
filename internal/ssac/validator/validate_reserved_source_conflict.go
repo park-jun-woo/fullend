@@ -6,7 +6,7 @@ package validator
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // reservedSources는 사용자가 result 변수명으로 사용할 수 없는 예약 소스다.

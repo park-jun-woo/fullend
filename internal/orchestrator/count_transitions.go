@@ -3,7 +3,7 @@
 
 package orchestrator
 
-import "github.com/geul-org/fullend/internal/statemachine"
+import "github.com/park-jun-woo/fullend/internal/statemachine"
 
 // countTransitions counts total transitions across all state diagrams.
 func countTransitions(diagrams []*statemachine.StateDiagram) int {

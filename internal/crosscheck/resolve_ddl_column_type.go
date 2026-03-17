@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"strings"
 
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // resolveDDLColumnType looks up a column's Go type from the SymbolTable.

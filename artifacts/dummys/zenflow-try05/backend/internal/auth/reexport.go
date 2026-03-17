@@ -1,7 +1,7 @@
 //fullend:gen ssot=fullend.yaml contract=445e7aa
 package auth
 
-import pkgauth "github.com/geul-org/fullend/pkg/auth"
+import pkgauth "github.com/park-jun-woo/fullend/pkg/auth"
 
 // Re-export pkg/auth utilities for unified import.
 var HashPassword = pkgauth.HashPassword

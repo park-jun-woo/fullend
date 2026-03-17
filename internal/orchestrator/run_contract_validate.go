@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/contract"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func runContractValidate(specsDir string) reporter.StepResult {

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/funcspec"
+	"github.com/park-jun-woo/fullend/internal/funcspec"
 )
 
 // findFuncSpecLink searches specs for a matching func spec and returns a ChainLink.

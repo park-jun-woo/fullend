@@ -4,8 +4,8 @@
 package orchestrator
 
 import (
-	ssacgenerator "github.com/geul-org/fullend/internal/ssac/generator"
-	stmlgenerator "github.com/geul-org/fullend/internal/stml/generator"
+	ssacgenerator "github.com/park-jun-woo/fullend/internal/ssac/generator"
+	stmlgenerator "github.com/park-jun-woo/fullend/internal/stml/generator"
 )
 
 // TargetProfile defines the backend + frontend code generation targets.

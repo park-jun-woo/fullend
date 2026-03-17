@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/geul-org/fullend/internal/policy"
-	"github.com/geul-org/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
 )
 
 func TestCheckClaimsRego_AllMatch(t *testing.T) {

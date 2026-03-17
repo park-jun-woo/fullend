@@ -7,7 +7,7 @@ import (
 
 	"github.com/jinzhu/inflection"
 
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // resolveTableName finds the DDL table for a resource name.

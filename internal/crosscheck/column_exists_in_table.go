@@ -2,7 +2,7 @@
 //ff:what 특정 DDL 테이블에 컬럼이 존재하는지 확인
 package crosscheck
 
-import ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+import ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 
 // columnExistsInTable checks if a column exists in a specific DDL table.
 func columnExistsInTable(st *ssacvalidator.SymbolTable, tableName, colName string) bool {

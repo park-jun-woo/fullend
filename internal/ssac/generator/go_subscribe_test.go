@@ -3,7 +3,7 @@ package generator
 import (
 	"testing"
 
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 func TestGenerateSubscribeFunc(t *testing.T) {

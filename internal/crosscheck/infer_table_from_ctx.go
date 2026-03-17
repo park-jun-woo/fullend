@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"github.com/getkin/kin-openapi/openapi3"
 
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 // inferTableFromCtx guesses the primary table name from the operation's path.

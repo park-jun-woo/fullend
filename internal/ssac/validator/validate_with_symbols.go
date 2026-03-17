@@ -3,7 +3,7 @@
 package validator
 
 import (
-	"github.com/geul-org/fullend/internal/ssac/parser"
+	"github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
 // ValidateWithSymbols는 내부 검증 + 외부 SSOT 교차 검증을 수행한다.

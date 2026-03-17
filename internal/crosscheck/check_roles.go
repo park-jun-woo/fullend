@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/geul-org/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/policy"
 )
 
 // CheckRoles validates that OPA Rego input.role values match fullend.yaml auth.roles.

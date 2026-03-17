@@ -3,7 +3,7 @@
 
 package orchestrator
 
-import "github.com/geul-org/fullend/internal/funcspec"
+import "github.com/park-jun-woo/fullend/internal/funcspec"
 
 // countFuncStubs counts func specs without a body (TODO stubs).
 func countFuncStubs(specs []funcspec.FuncSpec) int {

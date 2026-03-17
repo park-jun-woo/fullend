@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/policy"
 )
 
 func collectPolicyRoles(p *policy.Policy, regoRoles map[string]string) {

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/policy"
 )
 
 // buildOwnershipsLiteral generates Go code for []authz.OwnershipMapping literal.

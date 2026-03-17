@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"fmt"
 
-	"github.com/geul-org/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/internal/policy"
 )
 
 func checkOwnershipAnnotations(ownerResources map[string]bool, allOwnerships []policy.OwnershipMapping) []CrossError {

@@ -48,10 +48,10 @@ ssac/stml CLI와 동일한 규칙.
 | 패키지 | 호출 함수 |
 |---|---|
 | `github.com/getkin/kin-openapi/openapi3` | `openapi3.NewLoader().LoadFromFile()` |
-| `github.com/geul-org/ssac/parser` | `ParseDir()` |
-| `github.com/geul-org/ssac/validator` | `LoadSymbolTable()`, `ValidateWithSymbols()` |
-| `github.com/geul-org/stml/parser` | `ParseDir()` |
-| `github.com/geul-org/stml/validator` | `Validate()` |
+| `github.com/park-jun-woo/ssac/parser` | `ParseDir()` |
+| `github.com/park-jun-woo/ssac/validator` | `LoadSymbolTable()`, `ValidateWithSymbols()` |
+| `github.com/park-jun-woo/stml/parser` | `ParseDir()` |
+| `github.com/park-jun-woo/stml/validator` | `Validate()` |
 
 ## 검증 방법
 

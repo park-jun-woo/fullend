@@ -2,7 +2,7 @@
 //ff:what 템플릿 실행에 필요한 시퀀스별 데이터 구조체
 package generator
 
-import "github.com/geul-org/fullend/internal/ssac/parser"
+import "github.com/park-jun-woo/fullend/internal/ssac/parser"
 
 type templateData struct {
 	// 공통

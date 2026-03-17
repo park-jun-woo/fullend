@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/geul-org/fullend/internal/projectconfig"
-	"github.com/geul-org/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/internal/projectconfig"
+	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 func validateConfig(path string, cfg *projectconfig.ProjectConfig) reporter.StepResult {

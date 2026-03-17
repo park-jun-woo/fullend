@@ -3,8 +3,8 @@
 package crosscheck
 
 import (
-	"github.com/geul-org/fullend/internal/policy"
-	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/internal/policy"
+	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 )
 
 func checkOwnershipDDL(allOwnerships []policy.OwnershipMapping, st *ssacvalidator.SymbolTable) []CrossError {
