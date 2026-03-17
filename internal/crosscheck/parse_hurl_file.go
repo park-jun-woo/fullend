@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	reHurlRequest  = regexp.MustCompile(`^(GET|POST|PUT|DELETE|PATCH)\s+\{\{host\}\}(.+)`)
+	reHurlRequest  = regexp.MustCompile(`^(GET|POST|PUT|DELETE|PATCH)\s+(?:\{\{host\}\}|https?://[^/]*)(/.+)`)
 	reHurlResponse = regexp.MustCompile(`^HTTP\s+(\d+)`)
 )
 
