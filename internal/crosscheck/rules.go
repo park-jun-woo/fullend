@@ -66,6 +66,15 @@ var rules = []Rule{
 		},
 	},
 	{
+		Name: "SSaC → JWT Claims", Source: "SSaC", Target: "Config",
+		Requires: func(in *CrossValidateInput) bool {
+			return in.ServiceFuncs != nil && in.Claims != nil
+		},
+		Check: func(in *CrossValidateInput) []CrossError {
+			return CheckJWTBuiltinInputs(in.ServiceFuncs, in.Claims)
+		},
+	},
+	{
 		Name: "Config → OpenAPI", Source: "Config", Target: "OpenAPI",
 		Requires: func(in *CrossValidateInput) bool {
 			return in.OpenAPIDoc != nil
@@ -144,6 +153,15 @@ var rules = []Rule{
 		},
 		Check: func(in *CrossValidateInput) []CrossError {
 			return CheckRoles(in.Policies, in.Roles)
+		},
+	},
+	{
+		Name: "Policy → DDL (roles)", Source: "Policy", Target: "DDL",
+		Requires: func(in *CrossValidateInput) bool {
+			return len(in.Policies) > 0 && in.SymbolTable != nil
+		},
+		Check: func(in *CrossValidateInput) []CrossError {
+			return CheckRegoRoleDDL(in.Policies, in.SymbolTable)
 		},
 	},
 	{

@@ -82,9 +82,9 @@ func parseDDLTables(content string, tables map[string]DDLTable) {
 		t.ColumnOrder = append(t.ColumnOrder, colName)
 		applyInlineConstraints(&t, upper, colName, parts)
 		applyVarcharLen(&t, colName, colType)
+		tables[currentTable] = t
 		if strings.Contains(upper, "CHECK") {
 			applyCheckEnum(line, colName, currentTable, tables)
 		}
-		tables[currentTable] = t
 	}
 }

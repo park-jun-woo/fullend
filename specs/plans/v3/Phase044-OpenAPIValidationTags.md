@@ -1,4 +1,4 @@
-# Phase044: OpenAPI 기반 입력 검증 태그 코드젠 + validate 제약 누락 검출
+# Phase044: OpenAPI 기반 입력 검증 태그 코드젠 + validate 제약 누락 검출 ✅ 완료
 
 ## 목표
 

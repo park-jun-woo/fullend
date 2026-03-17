@@ -73,7 +73,7 @@ func TestRunRules_SkipAll(t *testing.T) {
 }
 
 func TestRules_Count(t *testing.T) {
-	if got := len(Rules()); got != 17 {
-		t.Errorf("expected 17 rules, got %d", got)
+	if got := len(Rules()); got != 19 {
+		t.Errorf("expected 19 rules, got %d", got)
 	}
 }
