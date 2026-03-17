@@ -37,7 +37,7 @@ func parseState(rest string) (*Sequence, error) {
 		Message:    msg,
 	}
 	if remainder != "" {
-		if code, err := strconv.Atoi(remainder); err == nil && code >= 100 && code <= 599 {
+		if code, err := strconv.Atoi(remainder); err == nil && code > 0 {
 			seq.ErrStatus = code
 		}
 	}

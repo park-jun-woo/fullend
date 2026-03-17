@@ -46,7 +46,7 @@ func parseCall(rest string) (*Sequence, error) {
 
 	// trailing HTTP status code (e.g. "401")
 	if remainder != "" {
-		if code, err := strconv.Atoi(remainder); err == nil && code >= 100 && code <= 599 {
+		if code, err := strconv.Atoi(remainder); err == nil && code > 0 {
 			seq.ErrStatus = code
 		}
 	}

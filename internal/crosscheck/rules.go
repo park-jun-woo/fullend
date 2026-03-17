@@ -20,6 +20,15 @@ var rules = []Rule{
 		},
 	},
 	{
+		Name: "SSaC input key case", Source: "SSaC", Target: "DDL",
+		Requires: func(in *CrossValidateInput) bool {
+			return in.ServiceFuncs != nil && in.SymbolTable != nil
+		},
+		Check: func(in *CrossValidateInput) []CrossError {
+			return CheckInputKeyCase(in.ServiceFuncs, in.SymbolTable)
+		},
+	},
+	{
 		Name: "SSaC ↔ OpenAPI", Source: "SSaC", Target: "OpenAPI",
 		Requires: func(in *CrossValidateInput) bool {
 			return in.ServiceFuncs != nil && in.SymbolTable != nil

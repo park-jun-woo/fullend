@@ -14,5 +14,6 @@ func validateFunc(sf parser.ServiceFunc) []ValidationError {
 	errs = append(errs, validateReservedSourceConflict(sf)...)
 	errs = append(errs, validateSubscribeRules(sf)...)
 	errs = append(errs, validateFKReferenceGuard(sf)...)
+	errs = append(errs, validateErrStatus(sf)...)
 	return errs
 }
