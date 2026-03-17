@@ -29,14 +29,14 @@ func checkFuncGuardStates(fn ssacparser.ServiceFunc, diagramByID map[string]*sta
 		}
 
 		d := diagramByID[diagramID]
-		validStates := d.ValidFromStates(fn.Name)
+		validStates := d.ValidFromStates(seq.Transition)
 		if len(validStates) == 0 {
 			errs = append(errs, CrossError{
 				Rule:       "States ↔ SSaC",
 				Context:    fn.Name,
-				Message:    fmt.Sprintf("function %q is not a valid transition event in diagram %q", fn.Name, diagramID),
+				Message:    fmt.Sprintf("transition %q is not a valid event in diagram %q", seq.Transition, diagramID),
 				Level:      "ERROR",
-				Suggestion: fmt.Sprintf("Add transition to states/%s.md: someState --> targetState: %s", diagramID, fn.Name),
+				Suggestion: fmt.Sprintf("Add transition to states/%s.md: someState --> targetState: %s", diagramID, seq.Transition),
 			})
 		}
 	}

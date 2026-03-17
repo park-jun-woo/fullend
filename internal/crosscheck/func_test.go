@@ -540,6 +540,63 @@ func TestCheckFuncs_PackageModelSkipDDL(t *testing.T) {
 	}
 }
 
+func TestCheckFuncs_LowercaseFuncName(t *testing.T) {
+	specs := []funcspec.FuncSpec{{
+		Package: "auth",
+		Name:    "issueToken",
+		RequestFields: []funcspec.Field{
+			{Name: "Email", Type: "string"},
+		},
+		HasBody: true,
+	}}
+
+	sfs := []ssacparser.ServiceFunc{{
+		Name: "Login",
+		Sequences: []ssacparser.Sequence{{
+			Type:  "call",
+			Model: "auth.issueToken",
+			Inputs: map[string]string{
+				"Email": "request.Email",
+			},
+		}},
+	}}
+
+	errs := CheckFuncs(sfs, specs, nil, nil, nil)
+	found := false
+	for _, e := range errs {
+		if e.Level == "ERROR" && contains(e.Message, "lowercase") {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("expected ERROR for lowercase func name, got: %+v", errs)
+	}
+}
+
+func TestCheckFuncs_LowercaseNoPackage(t *testing.T) {
+	sfs := []ssacparser.ServiceFunc{{
+		Name: "Handler",
+		Sequences: []ssacparser.Sequence{{
+			Type:  "call",
+			Model: "someFunc",
+			Inputs: map[string]string{
+				"ID": "request.ID",
+			},
+		}},
+	}}
+
+	errs := CheckFuncs(sfs, nil, nil, nil, nil)
+	found := false
+	for _, e := range errs {
+		if e.Level == "ERROR" && contains(e.Message, "lowercase") {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("expected ERROR for lowercase func name without package, got: %+v", errs)
+	}
+}
+
 func contains(s, substr string) bool {
 	return len(s) >= len(substr) && searchString(s, substr)
 }

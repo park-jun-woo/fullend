@@ -5,6 +5,8 @@ package crosscheck
 import (
 	"fmt"
 
+	"github.com/jinzhu/inflection"
+
 	ssacparser "github.com/geul-org/fullend/internal/ssac/parser"
 	ssacvalidator "github.com/geul-org/fullend/internal/ssac/validator"
 )
@@ -17,6 +19,17 @@ func checkResultType(seq ssacparser.Sequence, st *ssacvalidator.SymbolTable, ctx
 	// Skip primitive Go types.
 	if primitiveTypes[typeName] {
 		return errs
+	}
+
+	// Result type must be singular (e.g. "Gig" not "Gigs").
+	if inflection.Singular(typeName) != typeName {
+		errs = append(errs, CrossError{
+			Rule:       "SSaC @result ↔ DDL",
+			Context:    ctx,
+			Message:    fmt.Sprintf("seq[%d] @result type %q should be singular (expected %q)", seqIdx, seq.Result.Type, inflection.Singular(typeName)),
+			Level:      "WARNING",
+			Suggestion: fmt.Sprintf("@result type을 단수형 %q으로 변경", inflection.Singular(typeName)),
+		})
 	}
 
 	// Skip @dto types (no DDL table).

@@ -7,7 +7,7 @@ import (
 	"go/token"
 )
 
-// isStubBody checks if function body only contains "// TODO: implement" and a return.
+// isStubBody checks if function body only contains a return or panic("TODO").
 func isStubBody(fset *token.FileSet, body *ast.BlockStmt) bool {
 	if len(body.List) == 0 {
 		return true
@@ -16,6 +16,18 @@ func isStubBody(fset *token.FileSet, body *ast.BlockStmt) bool {
 		return false
 	}
 	// Single statement: check if it's a return.
-	_, isReturn := body.List[0].(*ast.ReturnStmt)
-	return isReturn
+	if _, isReturn := body.List[0].(*ast.ReturnStmt); isReturn {
+		return true
+	}
+	// Single statement: check if it's a panic(...) call.
+	exprStmt, ok := body.List[0].(*ast.ExprStmt)
+	if !ok {
+		return false
+	}
+	callExpr, ok := exprStmt.X.(*ast.CallExpr)
+	if !ok {
+		return false
+	}
+	ident, ok := callExpr.Fun.(*ast.Ident)
+	return ok && ident.Name == "panic"
 }

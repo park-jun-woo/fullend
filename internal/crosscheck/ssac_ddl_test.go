@@ -66,6 +66,37 @@ func TestCheckSSaCDDL_DBModelChecked(t *testing.T) {
 	}
 }
 
+func TestCheckSSaCDDL_PluralResultType(t *testing.T) {
+	st := &ssacvalidator.SymbolTable{
+		DDLTables: map[string]ssacvalidator.DDLTable{
+			"gigs": {Columns: map[string]string{"id": "int64"}},
+		},
+	}
+
+	// Plural result type "Gigs" should trigger singular WARNING.
+	funcs := []ssacparser.ServiceFunc{{
+		Name:     "GetGig",
+		FileName: "service.go",
+		Sequences: []ssacparser.Sequence{{
+			Type:   "get",
+			Model:  "Gig.FindByID",
+			Inputs: map[string]string{"ID": "request.ID"},
+			Result: &ssacparser.Result{Var: "gig", Type: "Gigs"},
+		}},
+	}}
+
+	errs := CheckSSaCDDL(funcs, st, nil)
+	found := false
+	for _, e := range errs {
+		if e.Level == "WARNING" && contains(e.Message, "singular") {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("expected singular WARNING for plural type Gigs, got: %+v", errs)
+	}
+}
+
 func TestCheckSSaCDDL_MixedPackageAndDB(t *testing.T) {
 	st := &ssacvalidator.SymbolTable{
 		DDLTables: map[string]ssacvalidator.DDLTable{
