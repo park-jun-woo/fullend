@@ -19,7 +19,8 @@ func (h *Handler) OnWorkflowExecuted(ctx context.Context, message WorkflowExecut
 		return fmt.Errorf("Webhook 조회 실패: %w", err)
 	}
 
-	if _, err = webhook.Deliver(webhook.DeliverRequest{OrgID: message.OrgID, Status: message.Status, WorkflowID: message.WorkflowID}); err != nil {
+	_, err = webhook.Deliver(webhook.DeliverRequest{OrgID: message.OrgID, Status: message.Status, WorkflowID: message.WorkflowID})
+	if err != nil {
 		return fmt.Errorf("호출 실패: %w", err)
 	}
 

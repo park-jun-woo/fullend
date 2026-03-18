@@ -7,7 +7,7 @@ import "github.com/example/zenflow/internal/billing"
 // @auth "ActivateWorkflow" "workflow" {ResourceID: wf.ID} "Not authorized" 403
 // @get Organization org = Organization.FindByID({ID: wf.OrgID})
 // @empty org "Organization not found" 404
-// @call billing.CheckCredits({OrgID: org.ID, Balance: org.CreditsBalance})
+// @call billing.CheckCreditsResponse credCheck = billing.CheckCredits({OrgID: org.ID, Balance: org.CreditsBalance})
 // @state workflow {status: wf.Status} "ActivateWorkflow" "Cannot activate workflow" 409
 // @put Workflow.UpdateStatus({ID: wf.ID, Status: "active"})
 // @get Workflow updated = Workflow.FindByID({ID: wf.ID})

@@ -8,5 +8,7 @@ package service
 // @post Workflow newWf = Workflow.Create({OrgID: currentUser.OrgID, Title: source.Title, TriggerEvent: source.TriggerEvent, Status: "draft"})
 // @put Action.CopyToWorkflow({WorkflowID: newWf.ID, SourceWorkflowID: source.ID})
 // @put Template.IncrementCloneCount({ID: tmpl.ID})
-// @response { workflow: newWf, template_id: tmpl.ID }
+// @get Template updatedTmpl = Template.FindByID({ID: tmpl.ID})
+// @empty updatedTmpl "Template not found" 404
+// @response { workflow: newWf, template_id: updatedTmpl.ID }
 func CloneTemplate() {}

@@ -55,7 +55,8 @@ func (h *Handler) ActivateWorkflow(c *gin.Context) {
 		return
 	}
 
-	if _, err = billing.CheckCredits(billing.CheckCreditsRequest{Balance: org.CreditsBalance, OrgID: org.ID}); err != nil {
+	_, err = billing.CheckCredits(billing.CheckCreditsRequest{Balance: org.CreditsBalance, OrgID: org.ID})
+	if err != nil {
 		c.JSON(http.StatusPaymentRequired, gin.H{"error": "호출 실패"})
 		return
 	}

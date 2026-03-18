@@ -15,6 +15,7 @@ import (
 	authsvc "github.com/example/zenflow/internal/service/auth"
 	logsvc "github.com/example/zenflow/internal/service/log"
 	organizationsvc "github.com/example/zenflow/internal/service/organization"
+	schedulesvc "github.com/example/zenflow/internal/service/schedule"
 	templatesvc "github.com/example/zenflow/internal/service/template"
 	webhooksvc "github.com/example/zenflow/internal/service/webhook"
 	workflowsvc "github.com/example/zenflow/internal/service/workflow"
@@ -22,6 +23,8 @@ import (
 	"encoding/json"
 	"github.com/park-jun-woo/fullend/pkg/queue"
 	"fmt"
+	"github.com/park-jun-woo/fullend/pkg/session"
+	"github.com/park-jun-woo/fullend/pkg/file"
 )
 
 func main() {
@@ -58,6 +61,12 @@ func main() {
 	}
 	defer queue.Close()
 
+	sm, err := session.NewPostgresSession(context.Background(), conn)
+	if err != nil {
+		log.Fatalf("session init failed: %v", err)
+	}
+	session.Init(sm)
+	file.Init(file.NewLocalFile("./uploads"))
 	server := &service.Server{
 		Action: &actionsvc.Handler{
 			DB: conn,
@@ -77,6 +86,9 @@ func main() {
 		Organization: &organizationsvc.Handler{
 			DB: conn,
 			OrganizationModel: model.NewOrganizationModel(conn),
+		},
+		Schedule: &schedulesvc.Handler{
+			WorkflowModel: model.NewWorkflowModel(conn),
 		},
 		Template: &templatesvc.Handler{
 			DB: conn,

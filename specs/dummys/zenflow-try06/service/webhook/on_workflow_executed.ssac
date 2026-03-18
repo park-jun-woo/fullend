@@ -10,5 +10,5 @@ type WorkflowExecutedMessage struct {
 
 // @subscribe "workflow.executed"
 // @get []Webhook hooks = Webhook.ListByOrgIDAndEventType({OrgID: message.OrgID, EventType: "workflow.executed"})
-// @call webhook.Deliver({OrgID: message.OrgID, WorkflowID: message.WorkflowID, Status: message.Status})
+// @call webhook.DeliverResponse delivery = webhook.Deliver({OrgID: message.OrgID, WorkflowID: message.WorkflowID, Status: message.Status})
 func OnWorkflowExecuted(message WorkflowExecutedMessage) {}

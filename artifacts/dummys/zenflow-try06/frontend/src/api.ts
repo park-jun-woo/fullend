@@ -115,6 +115,23 @@ async function createWorkflowVersion(params?: Record<string, any>) {
   return res.json()
 }
 
+async function deleteSchedule(params?: Record<string, any>) {
+  const id = params?.id
+  const exclude = new Set(['id'])
+  const body: Record<string, any> = {}
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      if (!exclude.has(k)) body[k] = v
+    }
+  }
+  const res = await fetch(`${BASE}/workflows/${id}/schedule`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  return res.json()
+}
+
 async function deleteWebhook(params?: Record<string, any>) {
   const id = params?.id
   const exclude = new Set(['id'])
@@ -177,6 +194,20 @@ async function getExecutionReport(params?: Record<string, any>) {
   }
   const qs = query.toString()
   const res = await fetch(`${BASE}/execution-logs/${id}/report${qs ? '?' + qs : ''}`)
+  return res.json()
+}
+
+async function getSchedule(params?: Record<string, any>) {
+  const id = params?.id
+  const query = new URLSearchParams()
+  if (params) {
+    const exclude = new Set(['id'])
+    for (const [k, v] of Object.entries(params)) {
+      if (v != null && !exclude.has(k)) query.set(k, String(v))
+    }
+  }
+  const qs = query.toString()
+  const res = await fetch(`${BASE}/workflows/${id}/schedule${qs ? '?' + qs : ''}`)
   return res.json()
 }
 
@@ -319,6 +350,23 @@ async function register(params?: Record<string, any>) {
   return res.json()
 }
 
+async function setSchedule(params?: Record<string, any>) {
+  const id = params?.id
+  const exclude = new Set(['id'])
+  const body: Record<string, any> = {}
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      if (!exclude.has(k)) body[k] = v
+    }
+  }
+  const res = await fetch(`${BASE}/workflows/${id}/schedule`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  return res.json()
+}
+
 export const api = {
   ActivateWorkflow: activateWorkflow,
   AddAction: addAction,
@@ -328,10 +376,12 @@ export const api = {
   CreateWebhook: createWebhook,
   CreateWorkflow: createWorkflow,
   CreateWorkflowVersion: createWorkflowVersion,
+  DeleteSchedule: deleteSchedule,
   DeleteWebhook: deleteWebhook,
   ExecuteWithReport: executeWithReport,
   ExecuteWorkflow: executeWorkflow,
   GetExecutionReport: getExecutionReport,
+  GetSchedule: getSchedule,
   GetTemplate: getTemplate,
   GetWorkflow: getWorkflow,
   ListExecutionLogs: listExecutionLogs,
@@ -342,5 +392,6 @@ export const api = {
   Login: login,
   PauseWorkflow: pauseWorkflow,
   PublishTemplate: publishTemplate,
-  Register: register
+  Register: register,
+  SetSchedule: setSchedule
 }

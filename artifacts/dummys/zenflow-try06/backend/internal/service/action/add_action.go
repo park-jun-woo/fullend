@@ -20,17 +20,17 @@ func (h *Handler) AddAction(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(*model.CurrentUser)
 
 	var req struct {
+		PayloadTemplate string `json:"payload_template" binding:"required"`
 		SequenceOrder   int64  `json:"sequence_order" binding:"required"`
 		ActionType      string `json:"action_type" binding:"required,max=100"`
-		PayloadTemplate string `json:"payload_template" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	payloadTemplate := req.PayloadTemplate
 	sequenceOrder := req.SequenceOrder
 	actionType := req.ActionType
-	payloadTemplate := req.PayloadTemplate
 
 	tx, err := h.DB.BeginTx(c.Request.Context(), nil)
 	if err != nil {

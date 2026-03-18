@@ -19,12 +19,14 @@ allow if {
 allow if {
     input.action == "ListWorkflows"
     input.resource == "workflow"
+    input.claims.user_id > 0
 }
 
 # GetWorkflow - any authenticated user (org isolation via query)
 allow if {
     input.action == "GetWorkflow"
     input.resource == "workflow"
+    input.claims.email != ""
 }
 
 # ActivateWorkflow - admin + org match
@@ -32,6 +34,7 @@ allow if {
     input.action == "ActivateWorkflow"
     input.resource == "workflow"
     input.claims.role == "admin"
+    input.claims.org_id == input.resource_owner.org_id
 }
 
 # PauseWorkflow - admin + org match
@@ -39,6 +42,7 @@ allow if {
     input.action == "PauseWorkflow"
     input.resource == "workflow"
     input.claims.role == "admin"
+    input.claims.org_id == input.resource_owner.org_id
 }
 
 # ArchiveWorkflow - admin + org match
@@ -46,6 +50,7 @@ allow if {
     input.action == "ArchiveWorkflow"
     input.resource == "workflow"
     input.claims.role == "admin"
+    input.claims.org_id == input.resource_owner.org_id
 }
 
 # ExecuteWorkflow - any authenticated member (org isolation via query)

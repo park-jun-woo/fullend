@@ -70,7 +70,8 @@ func (h *Handler) ExecuteWithReport(c *gin.Context) {
 		return
 	}
 
-	if _, err = billing.CheckCredits(billing.CheckCreditsRequest{Balance: org.CreditsBalance, OrgID: org.ID}); err != nil {
+	_, err = billing.CheckCredits(billing.CheckCreditsRequest{Balance: org.CreditsBalance, OrgID: org.ID})
+	if err != nil {
 		c.JSON(http.StatusPaymentRequired, gin.H{"error": "호출 실패"})
 		return
 	}
@@ -115,7 +116,8 @@ func (h *Handler) ExecuteWithReport(c *gin.Context) {
 		return
 	}
 
-	if _, err = webhook.Deliver(webhook.DeliverRequest{OrgID: wf.OrgID, Status: "completed", WorkflowID: wf.ID}); err != nil {
+	_, err = webhook.Deliver(webhook.DeliverRequest{OrgID: wf.OrgID, Status: "completed", WorkflowID: wf.ID})
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "호출 실패"})
 		return
 	}

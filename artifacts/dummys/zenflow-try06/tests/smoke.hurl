@@ -153,6 +153,19 @@ HTTP 201
 [Asserts]
 jsonpath "$.workflow" exists
 
+# SetSchedule
+POST {{host}}/workflows/{{workflow_id}}/schedule
+Authorization: Bearer {{token}}
+Content-Type: application/json
+{
+  "cron": "test_string"
+}
+
+HTTP 200
+[Asserts]
+jsonpath "$.cron" exists
+jsonpath "$.next_run" exists
+
 # PauseWorkflow
 POST {{host}}/workflows/{{workflow_id}}/pause
 Authorization: Bearer {{token}}
@@ -224,6 +237,15 @@ Authorization: Bearer {{token}}
 HTTP 200
 [Asserts]
 jsonpath "$.logs" isCollection
+
+# GetSchedule
+GET {{host}}/workflows/{{workflow_id}}/schedule
+Authorization: Bearer {{token}}
+
+HTTP 200
+[Asserts]
+jsonpath "$.cron" exists
+jsonpath "$.next_run" exists
 
 # ListWorkflowVersions
 GET {{host}}/workflows/{{workflow_id}}/versions

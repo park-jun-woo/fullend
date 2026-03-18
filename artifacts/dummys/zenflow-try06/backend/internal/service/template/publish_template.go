@@ -13,18 +13,18 @@ func (h *Handler) PublishTemplate(c *gin.Context) {
 
 	var req struct {
 		SourceWorkflowID int64  `json:"source_workflow_id" binding:"required"`
+		Category         string `json:"category" binding:"required,max=100"`
 		Title            string `json:"title" binding:"required,max=255"`
 		Description      string `json:"description" binding:"required"`
-		Category         string `json:"category" binding:"required,max=100"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	sourceWorkflowID := req.SourceWorkflowID
+	category := req.Category
 	title := req.Title
 	description := req.Description
-	category := req.Category
 
 	tx, err := h.DB.BeginTx(c.Request.Context(), nil)
 	if err != nil {

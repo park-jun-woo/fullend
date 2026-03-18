@@ -137,6 +137,11 @@ type AddActionJSONBody struct {
 	SequenceOrder   int64  `json:"sequence_order"`
 }
 
+// SetScheduleJSONBody defines parameters for SetSchedule.
+type SetScheduleJSONBody struct {
+	Cron string `json:"cron"`
+}
+
 // CreateOrganizationJSONRequestBody defines body for CreateOrganization for application/json ContentType.
 type CreateOrganizationJSONRequestBody CreateOrganizationJSONBody
 
@@ -157,3 +162,6 @@ type CreateWorkflowJSONRequestBody CreateWorkflowJSONBody
 
 // AddActionJSONRequestBody defines body for AddAction for application/json ContentType.
 type AddActionJSONRequestBody AddActionJSONBody
+
+// SetScheduleJSONRequestBody defines body for SetSchedule for application/json ContentType.
+type SetScheduleJSONRequestBody SetScheduleJSONBody

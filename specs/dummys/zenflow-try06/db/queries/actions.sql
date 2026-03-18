@@ -8,4 +8,4 @@ SELECT * FROM actions WHERE workflow_id = $1 ORDER BY sequence_order ASC;
 
 -- name: ActionCopyToWorkflow :exec
 INSERT INTO actions (workflow_id, action_type, payload_template, sequence_order)
-SELECT $1, action_type, payload_template, sequence_order FROM actions WHERE workflow_id = $2;
+SELECT $1, action_type, payload_template, sequence_order FROM actions AS src WHERE src.workflow_id = $2;

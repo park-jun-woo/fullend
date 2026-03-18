@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-//fullend:gen ssot=service/template/clone_template.ssac contract=7b8f4c9
+//fullend:gen ssot=service/template/clone_template.ssac contract=f8cb60f
 func (h *Handler) CloneTemplate(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
@@ -71,13 +71,24 @@ func (h *Handler) CloneTemplate(c *gin.Context) {
 		return
 	}
 
+	updatedTmpl, err := h.TemplateModel.WithTx(tx).FindByID(tmpl.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Template 조회 실패"})
+		return
+	}
+
+	if updatedTmpl == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Template not found"})
+		return
+	}
+
 	if err = tx.Commit(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "commit failed"})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"template_id": tmpl.ID,
+		"template_id": updatedTmpl.ID,
 		"workflow":    newWf,
 	})
 

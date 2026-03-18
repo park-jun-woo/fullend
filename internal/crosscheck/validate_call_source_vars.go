@@ -15,7 +15,7 @@ func validateCallSourceVars(ctx string, seq ssacparser.Sequence, definedVars map
 	for _, value := range seq.Inputs {
 		parts := strings.SplitN(value, ".", 2)
 		source := parts[0]
-		if source == "request" || source == "currentUser" {
+		if source == "request" || source == "currentUser" || source == "query" || source == "message" {
 			continue
 		}
 		if strings.HasPrefix(value, "\"") {

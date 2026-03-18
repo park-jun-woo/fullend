@@ -42,7 +42,7 @@ func (m *actionModelImpl) WithTx(tx *sql.Tx) ActionModel {
 //fullend:gen ssot=db/actions.sql contract=e0afc28
 func (m *actionModelImpl) CopyToWorkflow(workflowID int64, sourceWorkflowID int64) error {
 	_, err := m.conn().ExecContext(context.Background(),
-		"INSERT INTO actions (workflow_id, action_type, payload_template, sequence_order)\nSELECT $1, action_type, payload_template, sequence_order FROM actions WHERE workflow_id = $2;",
+		"INSERT INTO actions (workflow_id, action_type, payload_template, sequence_order)\nSELECT $1, action_type, payload_template, sequence_order FROM actions AS src WHERE src.workflow_id = $2;",
 		workflowID, sourceWorkflowID)
 	return err
 }

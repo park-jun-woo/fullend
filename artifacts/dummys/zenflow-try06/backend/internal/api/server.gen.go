@@ -82,6 +82,15 @@ type ServerInterface interface {
 	// (POST /workflows/{id}/pause)
 	PauseWorkflow(w http.ResponseWriter, r *http.Request, id int64)
 
+	// (DELETE /workflows/{id}/schedule)
+	DeleteSchedule(w http.ResponseWriter, r *http.Request, id int64)
+
+	// (GET /workflows/{id}/schedule)
+	GetSchedule(w http.ResponseWriter, r *http.Request, id int64)
+
+	// (POST /workflows/{id}/schedule)
+	SetSchedule(w http.ResponseWriter, r *http.Request, id int64)
+
 	// (GET /workflows/{id}/versions)
 	ListWorkflowVersions(w http.ResponseWriter, r *http.Request, id int64)
 }
@@ -648,6 +657,99 @@ func (siw *ServerInterfaceWrapper) PauseWorkflow(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r)
 }
 
+// DeleteSchedule operation middleware
+func (siw *ServerInterfaceWrapper) DeleteSchedule(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "integer", Format: "int64"})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteSchedule(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetSchedule operation middleware
+func (siw *ServerInterfaceWrapper) GetSchedule(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "integer", Format: "int64"})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetSchedule(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SetSchedule operation middleware
+func (siw *ServerInterfaceWrapper) SetSchedule(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id int64
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "integer", Format: "int64"})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SetSchedule(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListWorkflowVersions operation middleware
 func (siw *ServerInterfaceWrapper) ListWorkflowVersions(w http.ResponseWriter, r *http.Request) {
 
@@ -821,6 +923,9 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("GET "+options.BaseURL+"/workflows/{id}/logs", wrapper.ListExecutionLogs)
 	m.HandleFunc("POST "+options.BaseURL+"/workflows/{id}/new-version", wrapper.CreateWorkflowVersion)
 	m.HandleFunc("POST "+options.BaseURL+"/workflows/{id}/pause", wrapper.PauseWorkflow)
+	m.HandleFunc("DELETE "+options.BaseURL+"/workflows/{id}/schedule", wrapper.DeleteSchedule)
+	m.HandleFunc("GET "+options.BaseURL+"/workflows/{id}/schedule", wrapper.GetSchedule)
+	m.HandleFunc("POST "+options.BaseURL+"/workflows/{id}/schedule", wrapper.SetSchedule)
 	m.HandleFunc("GET "+options.BaseURL+"/workflows/{id}/versions", wrapper.ListWorkflowVersions)
 
 	return m
