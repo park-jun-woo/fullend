@@ -25,6 +25,9 @@ artifacts/*/backend/server
 # whyso cache
 .whyso/
 
+# Project files (기획서, 참고 문서)
+files/
+
 # Claude Code
 .claude/
 CLAUDE.md
