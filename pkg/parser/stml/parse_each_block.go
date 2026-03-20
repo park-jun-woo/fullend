@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what data-each 요소에서 EachBlock 구성
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

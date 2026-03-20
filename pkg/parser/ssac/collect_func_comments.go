@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what 함수 위치 이전의 주석을 수집
-package parser
+package ssac
 
 import (
 	"go/ast"

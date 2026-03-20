@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what DOM 트리를 순회하며 최상위 블록(fetch·action·static) 수집
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

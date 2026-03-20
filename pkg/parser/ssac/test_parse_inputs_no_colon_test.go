@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 콜론 없는 입력 형식 에러 검증 — {query} 형태 거부
 
-package parser
+package ssac
 
 import (
 	"os"

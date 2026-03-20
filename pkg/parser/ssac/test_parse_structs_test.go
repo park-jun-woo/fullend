@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 파일 내 struct 선언 파싱 검증 — Name, Fields 확인
 
-package parser
+package ssac
 
 import "testing"
 

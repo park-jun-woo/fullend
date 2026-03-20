@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what TestPhase5_InfraParams — data-paginate, data-sort, data-filter extraction
 
-package parser
+package stml
 
 import (
 	"strings"

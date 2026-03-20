@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=util control=iteration dimension=1
 //ff:what 쉼표 구분 문자열을 분리하고 공백 제거
-package parser
+package stml
 
 import "strings"
 

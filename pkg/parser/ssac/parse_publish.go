@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence topic=publish
 //ff:what @publish 이벤트 발행 시퀀스 파싱
-package parser
+package ssac
 
 import "strings"
 

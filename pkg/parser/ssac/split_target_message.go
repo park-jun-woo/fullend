@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=util control=sequence
 //ff:what "target \"message\"" 문자열을 target과 message로 분리
-package parser
+package ssac
 
 import "strings"
 

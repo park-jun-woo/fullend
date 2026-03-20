@@ -9,6 +9,7 @@ import (
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 	"github.com/park-jun-woo/fullend/pkg/parser/rego"
+	"github.com/park-jun-woo/fullend/pkg/parser/scenario"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
 	"github.com/park-jun-woo/fullend/pkg/parser/stml"
@@ -82,8 +83,24 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Ful
 		}
 	}
 
+	if d, ok := has[KindScenario]; ok && !skip[KindScenario] {
+		fs.HurlFiles = collectHurlFiles(d.Path)
+		for _, hf := range fs.HurlFiles {
+			entries, _ := scenario.ParseFile(hf)
+			fs.HurlEntries = append(fs.HurlEntries, entries...)
+		}
+	}
+
 	if d, ok := has[KindModel]; ok {
 		fs.ModelDir = d.Path
+	}
+
+	// fullend built-in pkg/ specs.
+	if pkgRoot := findFullendPkgRoot(); pkgRoot != "" {
+		specs, diags := funcspec.ParseDir(pkgRoot)
+		if len(diags) == 0 {
+			fs.FullendPkgSpecs = specs
+		}
 	}
 
 	return fs

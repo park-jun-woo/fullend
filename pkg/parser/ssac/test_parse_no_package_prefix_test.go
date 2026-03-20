@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 패키지 접두사 없는 모델 — Package 빈 문자열 확인
 
-package parser
+package ssac
 
 import "testing"
 

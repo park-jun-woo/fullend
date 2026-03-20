@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what 정적 action 래퍼 내 data-field 요소 처리
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

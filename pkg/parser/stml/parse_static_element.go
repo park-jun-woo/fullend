@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what 바인딩이 없는 정적 HTML 요소를 재귀적으로 파싱
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

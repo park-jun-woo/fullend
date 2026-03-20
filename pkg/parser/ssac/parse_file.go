@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what 단일 .ssac 파일을 파싱하여 []ServiceFunc 반환
-package parser
+package ssac
 
 import (
 	"go/ast"

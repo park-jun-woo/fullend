@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what "pkg.Func({Key: val, ...}) remainder" 형식 파싱
-package parser
+package ssac
 
 import "strings"
 

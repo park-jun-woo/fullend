@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 디렉토리 내 모든 .ssac 파일을 재귀 탐색하여 []ServiceFunc 반환
-package parser
+package ssac
 
 import (
 	"io/fs"

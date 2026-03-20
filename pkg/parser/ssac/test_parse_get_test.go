@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @get 단일 인자 파싱 검증 — Model, Result, Inputs 확인
 
-package parser
+package ssac
 
 import "testing"
 

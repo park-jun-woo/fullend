@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @state 다중 Inputs 파싱 검증 — status + createdAt 두 개 입력
 
-package parser
+package ssac
 
 import "testing"
 

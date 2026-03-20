@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what TestParseLoginPage — login page with single action and two fields
 
-package parser
+package stml
 
 import (
 	"strings"

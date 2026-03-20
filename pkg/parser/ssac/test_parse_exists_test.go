@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @exists 파싱 검증 — Target, Message 확인
 
-package parser
+package ssac
 
 import "testing"
 

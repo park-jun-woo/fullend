@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what @response 한 줄 구조체 파싱 검증 — { user: user } 형식
 
-package parser
+package ssac
 
 import "testing"
 

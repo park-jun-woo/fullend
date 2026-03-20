@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what 단일 AST 선언에서 struct 목록을 추출
-package parser
+package ssac
 
 import "go/ast"
 

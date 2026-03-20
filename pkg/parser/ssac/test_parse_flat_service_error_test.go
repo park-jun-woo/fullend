@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 플랫 service/ 디렉토리에 .ssac 파일 배치 시 에러 검증
 
-package parser
+package ssac
 
 import (
 	"os"

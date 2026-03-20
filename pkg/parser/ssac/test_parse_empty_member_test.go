@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @empty 멤버 접근 Target 파싱 검증 — course.InstructorID 형식
 
-package parser
+package ssac
 
 import "testing"
 

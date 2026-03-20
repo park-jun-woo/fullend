@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what TestPhase5_SortDefaultDirection — data-sort without direction defaults to asc
 
-package parser
+package stml
 
 import (
 	"strings"

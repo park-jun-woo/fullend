@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @get 다중 인자 파싱 검증 — 슬라이스 결과 타입 + 복수 Inputs
 
-package parser
+package ssac
 
 import "testing"
 

@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @post 파싱 검증 — SeqPost 타입, Result, Inputs 확인
 
-package parser
+package ssac
 
 import "testing"
 

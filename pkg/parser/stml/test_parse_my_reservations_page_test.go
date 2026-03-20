@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what TestParseMyReservationsPage — page with fetch/each/state blocks and one action
 
-package parser
+package stml
 
 import (
 	"strings"

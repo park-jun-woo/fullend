@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what TestParseReservationDetailPage — detail page with fetch params, binds, and conditional state
 
-package parser
+package stml
 
 import (
 	"strings"

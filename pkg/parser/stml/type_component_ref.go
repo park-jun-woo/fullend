@@ -1,6 +1,6 @@
 //ff:type feature=stml-parse type=model
 //ff:what data-component 속성을 나타내는 구조체
-package parser
+package stml
 
 // ComponentRef represents a data-component attribute.
 type ComponentRef struct {

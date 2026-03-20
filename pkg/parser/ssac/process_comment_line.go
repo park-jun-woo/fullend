@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 주석 한 줄을 상태에 따라 처리
-package parser
+package ssac
 
 import "strings"
 

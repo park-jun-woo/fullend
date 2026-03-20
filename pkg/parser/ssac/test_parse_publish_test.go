@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @publish 파싱 검증 — Topic, Inputs, Options nil 확인
 
-package parser
+package ssac
 
 import "testing"
 

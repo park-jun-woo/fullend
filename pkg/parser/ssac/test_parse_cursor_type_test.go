@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what Cursor[T] 래퍼 타입 파싱 검증
 
-package parser
+package ssac
 
 import "testing"
 

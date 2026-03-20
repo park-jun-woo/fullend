@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what 주석 리스트에서 v2 시퀀스를 추출
-package parser
+package ssac
 
 import (
 	"go/ast"

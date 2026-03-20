@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what each 항목 템플릿의 자식을 순회
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

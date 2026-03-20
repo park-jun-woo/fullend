@@ -1,6 +1,6 @@
 //ff:type feature=stml-parse type=model
 //ff:what data-fetch 요소와 하위 바인딩을 나타내는 구조체
-package parser
+package stml
 
 // FetchBlock represents a data-fetch element and its descendant bindings.
 type FetchBlock struct {

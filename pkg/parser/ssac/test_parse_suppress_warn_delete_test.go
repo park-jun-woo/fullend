@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @delete! SuppressWarn 파싱 검증
 
-package parser
+package ssac
 
 import "testing"
 

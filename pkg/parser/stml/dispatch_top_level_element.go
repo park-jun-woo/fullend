@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=selection
 //ff:what 최상위 요소를 fetch·action·static으로 분기 처리
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

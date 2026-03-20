@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what 정적 action 래퍼 내 data-component 요소를 재귀 처리
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

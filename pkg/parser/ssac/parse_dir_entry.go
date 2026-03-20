@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what 단일 디렉토리 엔트리의 .ssac 파일을 파싱하여 도메인 할당
-package parser
+package ssac
 
 import (
 	"path/filepath"

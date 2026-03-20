@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what TestPhase4_StateText — state element tag, className, and inner text extraction
 
-package parser
+package stml
 
 import (
 	"strings"

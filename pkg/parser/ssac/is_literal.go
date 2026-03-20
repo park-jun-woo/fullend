@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=util control=iteration dimension=1
 //ff:what 문자열이 Go 리터럴 값인지 확인
-package parser
+package ssac
 
 // IsLiteral checks if a string is a Go literal value (not a variable reference).
 // Recognizes: numeric (42, -1, 3.14), boolean (true, false), nil.

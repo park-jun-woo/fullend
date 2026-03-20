@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what @response! SuppressWarn 파싱 검증
 
-package parser
+package ssac
 
 import "testing"
 

@@ -1,6 +1,6 @@
 //ff:type feature=stml-parse type=model
 //ff:what data-action 요소와 하위 필드를 나타내는 구조체
-package parser
+package stml
 
 // ActionBlock represents a data-action element and its descendant fields.
 type ActionBlock struct {

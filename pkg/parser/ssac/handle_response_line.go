@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence topic=response
 //ff:what @response 블록 내부 줄을 처리하여 블록 종료 여부 반환
-package parser
+package ssac
 
 // handleResponseLine은 @response 블록 내부 줄을 처리한다.
 // 블록이 종료되면 (true, 완성된 Sequence)를 반환한다.

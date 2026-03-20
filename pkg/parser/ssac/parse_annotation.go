@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=selection
 //ff:what @get/@post/@put/@delete 등 어노테이션 종류별 분기
-package parser
+package ssac
 
 import "strings"
 

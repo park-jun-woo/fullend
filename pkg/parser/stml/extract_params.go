@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what 요소에서 data-param-* 속성을 추출
-package parser
+package stml
 
 import (
 	"strings"

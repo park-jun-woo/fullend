@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=util control=sequence
 //ff:what "first" "second" 형식의 두 개 인용문 파싱
-package parser
+package ssac
 
 import "strings"
 

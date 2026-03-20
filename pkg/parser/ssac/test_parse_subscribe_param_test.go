@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @subscribe Param 파싱 검증 — TypeName, VarName 확인
 
-package parser
+package ssac
 
 import "testing"
 

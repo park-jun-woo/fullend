@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what TestPhase5_NoInfraParams — fetch without paginate/sort/filter yields zero defaults
 
-package parser
+package stml
 
 import (
 	"strings"

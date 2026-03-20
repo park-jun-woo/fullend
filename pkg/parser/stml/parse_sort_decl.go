@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what "column:direction" 문자열을 SortDecl로 파싱
-package parser
+package stml
 
 import "strings"
 

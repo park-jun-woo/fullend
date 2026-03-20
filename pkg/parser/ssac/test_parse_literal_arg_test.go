@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 리터럴 문자열 인자 파싱 검증 — 따옴표 포함 값 확인
 
-package parser
+package ssac
 
 import "testing"
 

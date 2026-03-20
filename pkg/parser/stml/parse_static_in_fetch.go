@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what fetch 블록 내 정적 요소를 파싱하고 하위 data-* 요소를 부모 fb에 수집
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

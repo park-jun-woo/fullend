@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what import 단일 경로 파싱 검증
 
-package parser
+package ssac
 
 import "testing"
 

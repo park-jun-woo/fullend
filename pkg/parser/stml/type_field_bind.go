@@ -1,6 +1,6 @@
 //ff:type feature=stml-parse type=model
 //ff:what data-bind 또는 data-field 속성을 나타내는 구조체
-package parser
+package stml
 
 // FieldBind represents a data-bind or data-field attribute.
 type FieldBind struct {

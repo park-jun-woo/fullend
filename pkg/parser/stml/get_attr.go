@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=util control=iteration dimension=1
 //ff:what HTML 요소에서 지정한 속성 값을 반환
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

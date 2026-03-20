@@ -1,6 +1,6 @@
 //ff:type feature=ssac-parse type=model
 //ff:what 함수 호출 인자 타입
-package parser
+package ssac
 
 // Arg는 함수 호출 인자다.
 type Arg struct {

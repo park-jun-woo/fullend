@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=util control=sequence
 //ff:what 요소에 data-field 또는 data-component+data-field 속성이 있는지 확인
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

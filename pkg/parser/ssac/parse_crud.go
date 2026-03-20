@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @get/@post/@put/@delete CRUD 시퀀스 파싱
-package parser
+package ssac
 
 import "strings"
 

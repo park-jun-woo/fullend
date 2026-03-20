@@ -1,6 +1,6 @@
 //ff:type feature=stml-parse type=model
 //ff:what STML 페이지 파싱 결과를 나타내는 구조체
-package parser
+package stml
 
 // PageSpec represents a single STML page parsed from an HTML file.
 type PageSpec struct {

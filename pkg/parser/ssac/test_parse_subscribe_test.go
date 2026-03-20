@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @subscribe 파싱 검증 — Topic, MessageType, 시퀀스 필터링 확인
 
-package parser
+package ssac
 
 import "testing"
 

@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @response 다중 필드 파싱 검증 — Fields 맵에 변수·멤버·리터럴 포함
 
-package parser
+package ssac
 
 import "testing"
 

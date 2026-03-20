@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what AST 함수 선언에서 ServiceFunc를 추출
-package parser
+package ssac
 
 import (
 	"go/ast"

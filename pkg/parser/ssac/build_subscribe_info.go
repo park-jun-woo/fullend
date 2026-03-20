@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what SubscribeInfo를 생성
-package parser
+package ssac
 
 // buildSubscribeInfo는 SubscribeInfo를 생성한다.
 func buildSubscribeInfo(topic string, param *ParamInfo) *SubscribeInfo {

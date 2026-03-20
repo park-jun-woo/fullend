@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=selection
 //ff:what each 항목 내 정적 래퍼의 자식을 분기 처리
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

@@ -1,6 +1,6 @@
 //ff:type feature=stml-parse type=model
 //ff:what data-each 요소와 반복 항목 바인딩을 나타내는 구조체
-package parser
+package stml
 
 // EachBlock represents a data-each element and its descendant bindings.
 type EachBlock struct {

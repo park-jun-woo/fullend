@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=util control=sequence
 //ff:what 텍스트 노드에서 비어있지 않은 텍스트를 추출
-package parser
+package stml
 
 import (
 	"strings"

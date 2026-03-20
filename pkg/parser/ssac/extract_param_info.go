@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what AST 함수 선언에서 파라미터 정보를 추출
-package parser
+package ssac
 
 import "go/ast"
 

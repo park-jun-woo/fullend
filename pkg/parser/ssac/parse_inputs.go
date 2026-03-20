@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what {key: value, ...} 형식 입력을 파싱하여 맵 반환
-package parser
+package ssac
 
 import (
 	"fmt"

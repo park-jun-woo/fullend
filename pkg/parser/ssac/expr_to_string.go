@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=util control=selection
 //ff:what AST 표현식을 문자열로 변환
-package parser
+package ssac
 
 import "go/ast"
 

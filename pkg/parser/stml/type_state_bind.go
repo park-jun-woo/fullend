@@ -1,6 +1,6 @@
 //ff:type feature=stml-parse type=model
 //ff:what data-state 속성을 나타내는 구조체
-package parser
+package stml
 
 // StateBind represents a data-state attribute.
 type StateBind struct {

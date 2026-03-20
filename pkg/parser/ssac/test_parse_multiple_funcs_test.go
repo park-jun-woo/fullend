@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 단일 파일 내 복수 함수 파싱 검증
 
-package parser
+package ssac
 
 import "testing"
 

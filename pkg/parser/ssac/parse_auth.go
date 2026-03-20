@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence topic=currentuser
 //ff:what @auth 권한 검사 시퀀스 파싱
-package parser
+package ssac
 
 import (
 	"strconv"

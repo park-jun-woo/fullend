@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what TestParseRoomEditPage — edit page with two actions (update + delete) and route params
 
-package parser
+package stml
 
 import (
 	"strings"

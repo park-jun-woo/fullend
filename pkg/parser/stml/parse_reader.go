@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what io.Reader에서 HTML을 파싱하여 PageSpec 반환
-package parser
+package stml
 
 import (
 	"io"

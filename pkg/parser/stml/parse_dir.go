@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what 디렉토리 내 모든 .html 파일을 파싱하여 PageSpec 목록 반환
-package parser
+package stml
 
 import (
 	"fmt"

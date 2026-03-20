@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @empty ErrStatus 파싱 검증 — 커스텀 HTTP 상태 코드 402
 
-package parser
+package ssac
 
 import "testing"
 

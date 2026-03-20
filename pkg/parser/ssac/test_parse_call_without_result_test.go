@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @call 결과 없음 파싱 검증 — Result nil, Inputs 확인
 
-package parser
+package ssac
 
 import "testing"
 

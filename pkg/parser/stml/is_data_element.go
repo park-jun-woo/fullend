@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=util control=sequence
 //ff:what 요소가 data-fetch 또는 data-action 속성을 가진 ElementNode인지 판별
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

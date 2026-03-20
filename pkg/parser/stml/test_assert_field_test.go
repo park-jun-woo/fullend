@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what assertField — test helper to verify FieldBind name, tag, and type
 
-package parser
+package stml
 
 import (
 	"testing"

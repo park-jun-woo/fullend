@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what SuppressWarn 기본값 false 확인
 
-package parser
+package ssac
 
 import "testing"
 

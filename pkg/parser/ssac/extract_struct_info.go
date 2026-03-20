@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what AST TypeSpec에서 StructInfo를 추출
-package parser
+package ssac
 
 import "go/ast"
 

@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=util control=iteration dimension=1
 //ff:what 요소의 첫 번째 비어있지 않은 직접 텍스트 자식 추출
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

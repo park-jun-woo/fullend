@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @call 결과 있음 파싱 검증 — Result.Type, Result.Var, Inputs 확인
 
-package parser
+package ssac
 
 import "testing"
 

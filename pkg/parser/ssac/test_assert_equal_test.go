@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what assertEqual 헬퍼 — 문자열 값 비교 실패 시 테스트 에러 출력
 
-package parser
+package ssac
 
 import "testing"
 

@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what @response 직접 변수 반환 파싱 검증 — Target 설정, Fields 비어있음
 
-package parser
+package ssac
 
 import "testing"
 

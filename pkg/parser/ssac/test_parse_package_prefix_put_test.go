@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @put 패키지 접두사 모델 파싱 검증 — cache.Cache.Set
 
-package parser
+package ssac
 
 import "testing"
 

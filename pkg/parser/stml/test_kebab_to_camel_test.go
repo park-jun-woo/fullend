@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what TestKebabToCamel — kebab-case to camelCase conversion table test
 
-package parser
+package stml
 
 import (
 	"testing"

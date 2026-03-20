@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=util control=sequence
 //ff:what 단일 인자를 파싱하여 Arg 반환
-package parser
+package ssac
 
 import "strings"
 

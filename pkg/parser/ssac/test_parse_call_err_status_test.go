@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @call ErrStatus 파싱 검증 — 결과 없이 에러 상태 코드만 지정
 
-package parser
+package ssac
 
 import "testing"
 

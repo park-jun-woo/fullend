@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=util control=sequence
 //ff:what 문자열 앞의 "quoted" 값을 추출하고 나머지 반환
-package parser
+package ssac
 
 import "strings"
 

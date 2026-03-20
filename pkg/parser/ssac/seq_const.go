@@ -1,6 +1,6 @@
 //ff:type feature=ssac-parse type=model
 //ff:what 시퀀스 타입 상수 및 유효성 맵
-package parser
+package ssac
 
 // sequence 타입 상수
 const (

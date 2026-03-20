@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what @response 한 줄 복수 필드 파싱 검증 — { user: user, name: user.Name }
 
-package parser
+package ssac
 
 import "testing"
 

@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=util control=sequence
 //ff:what "session.Session.Get" → ("session", "Session.Get") 패키지 접두사 분리
-package parser
+package ssac
 
 import "strings"
 

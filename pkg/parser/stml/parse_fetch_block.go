@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what data-fetch 요소에서 FetchBlock 구성
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

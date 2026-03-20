@@ -1,6 +1,6 @@
 //ff:type feature=ssac-parse type=model
 //ff:what 하나의 시퀀스 라인 타입
-package parser
+package ssac
 
 // Sequence는 하나의 시퀀스 라인이다.
 type Sequence struct {

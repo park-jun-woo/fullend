@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what Page[T] 래퍼 타입 파싱 검증 — Result.Wrapper, Result.Type 확인
 
-package parser
+package ssac
 
 import "testing"
 

@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what action 블록 내 정적 요소를 파싱하고 하위 필드·컴포넌트 수집
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence topic=response
 //ff:what @response 줄을 파싱하여 Sequence 또는 멀티라인 시작 반환
-package parser
+package ssac
 
 import "strings"
 

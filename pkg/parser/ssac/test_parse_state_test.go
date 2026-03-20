@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @state 파싱 검증 — DiagramID, Transition, Message, Inputs 확인
 
-package parser
+package ssac
 
 import "testing"
 

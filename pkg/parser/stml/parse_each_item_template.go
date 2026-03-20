@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what data-each의 첫 번째 자식 요소를 반복 항목 템플릿으로 파싱
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

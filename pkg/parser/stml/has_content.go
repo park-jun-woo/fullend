@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=util control=iteration dimension=1
 //ff:what 요소에 텍스트 또는 자식 요소가 있는지 확인
-package parser
+package stml
 
 import (
 	"strings"

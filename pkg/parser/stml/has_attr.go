@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=util control=iteration dimension=1
 //ff:what 요소에 지정한 속성이 존재하는지 확인
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

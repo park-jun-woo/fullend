@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=parser control=iteration dimension=1
 //ff:what each 블록 내부를 순회하며 바인딩·state·component 수집
-package parser
+package stml
 
 import "golang.org/x/net/html"
 

@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 도메인 서브 폴더 파싱 검증 — Domain 필드가 폴더명으로 설정됨
 
-package parser
+package ssac
 
 import (
 	"os"

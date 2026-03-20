@@ -1,6 +1,6 @@
 //ff:type feature=stml-parse type=model
 //ff:what 바인딩이 없는 정적 HTML 요소를 나타내는 구조체
-package parser
+package stml
 
 // StaticElement represents a non-binding HTML element to preserve in output.
 type StaticElement struct {

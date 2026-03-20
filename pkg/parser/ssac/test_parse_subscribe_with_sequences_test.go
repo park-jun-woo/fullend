@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @subscribe 복수 시퀀스 파싱 검증 — get/call/put 3단계
 
-package parser
+package ssac
 
 import "testing"
 

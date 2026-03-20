@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what import에서 net/http 제외 확인 — 표준 라이브러리 필터링
 
-package parser
+package ssac
 
 import "testing"
 

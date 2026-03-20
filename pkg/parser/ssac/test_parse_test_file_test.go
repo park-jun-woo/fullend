@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what parseTestFile 헬퍼 — 소스 문자열을 임시 파일에 쓰고 ParseFile 호출
 
-package parser
+package ssac
 
 import (
 	"os"

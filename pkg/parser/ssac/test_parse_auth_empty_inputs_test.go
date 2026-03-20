@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @auth 빈 Inputs 파싱 검증 — {} 입력 시 Inputs 길이 0
 
-package parser
+package ssac
 
 import "testing"
 

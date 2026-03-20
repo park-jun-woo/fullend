@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what "Model.Method(args)" 호출 표현식 파싱
-package parser
+package ssac
 
 import "strings"
 

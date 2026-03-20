@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 패키지 접두사 모델 파싱 검증 — session.Session.Get → Package="session"
 
-package parser
+package ssac
 
 import "testing"
 

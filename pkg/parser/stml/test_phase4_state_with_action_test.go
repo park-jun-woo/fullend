@@ -1,7 +1,7 @@
 //ff:func feature=stml-parse type=parser control=sequence
 //ff:what TestPhase4_StateWithAction — state element containing a nested action child
 
-package parser
+package stml
 
 import (
 	"strings"

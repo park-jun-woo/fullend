@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @publish Options 파싱 검증 — {delay: 1800} 옵션 확인
 
-package parser
+package ssac
 
 import "testing"
 

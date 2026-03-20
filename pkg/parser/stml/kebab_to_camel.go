@@ -1,6 +1,6 @@
 //ff:func feature=stml-parse type=util control=iteration dimension=1 topic=string-convert
 //ff:what kebab-case 문자열을 camelCase로 변환
-package parser
+package stml
 
 import "strings"
 

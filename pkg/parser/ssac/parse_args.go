@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=iteration dimension=1
 //ff:what 쉼표 분리 인자를 파싱하여 []Arg 반환
-package parser
+package ssac
 
 import "strings"
 

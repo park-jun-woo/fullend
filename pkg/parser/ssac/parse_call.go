@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what @call 외부 함수 호출 시퀀스 파싱
-package parser
+package ssac
 
 import (
 	"strconv"

@@ -1,7 +1,7 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 전체 시퀀스 통합 파싱 검증 — auth/get/empty/state/call/put/get/response 8단계
 
-package parser
+package ssac
 
 import "testing"
 

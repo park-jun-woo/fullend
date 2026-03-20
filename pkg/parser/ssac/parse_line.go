@@ -1,6 +1,6 @@
 //ff:func feature=ssac-parse type=parser control=sequence
 //ff:what 한 줄의 @annotation을 파싱하여 Sequence 반환
-package parser
+package ssac
 
 import "strings"
 
