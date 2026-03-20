@@ -14,8 +14,8 @@ var (
 	reHurlResponse = regexp.MustCompile(`^HTTP\s+(\d+)`)
 )
 
-// parseHurlFile extracts request/response pairs from a .hurl file.
-func parseHurlFile(path string) []HurlEntry {
+// ParseFile extracts request/response pairs from a .hurl file.
+func ParseFile(path string) []HurlEntry {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil
