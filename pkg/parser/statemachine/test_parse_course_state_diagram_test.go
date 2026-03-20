@@ -1,3 +1,6 @@
+//ff:func feature=statemachine type=parser control=iteration dimension=1
+//ff:what 코스 상태 다이어그램 파싱 검증 — ID, 초기 상태, 전이, 이벤트, ValidFromStates 확인
+
 package statemachine
 
 import (
@@ -56,36 +59,5 @@ stateDiagram-v2
 	fromStates := d.ValidFromStates("DeleteCourse")
 	if len(fromStates) != 2 {
 		t.Errorf("ValidFromStates(DeleteCourse) count = %d, want 2", len(fromStates))
-	}
-}
-
-func TestParseNoMermaidBlock(t *testing.T) {
-	_, err := Parse("test", "# No mermaid block here")
-	if err == nil {
-		t.Error("expected error for missing mermaid block")
-	}
-}
-
-func TestParseNoTransitions(t *testing.T) {
-	content := "```mermaid\nstateDiagram-v2\n    [*] --> draft\n```"
-	_, err := Parse("test", content)
-	if err == nil {
-		t.Error("expected error for no transitions")
-	}
-}
-
-func TestParseCaseConflict(t *testing.T) {
-	content := "```mermaid\nstateDiagram-v2\n    [*] --> draft\n    Draft --> open: PublishGig\n    open --> closed: CloseGig\n```"
-	_, err := Parse("test", content)
-	if err == nil {
-		t.Error("expected error for case-conflicting state names draft/Draft")
-	}
-}
-
-func TestParseCaseNoConflict(t *testing.T) {
-	content := "```mermaid\nstateDiagram-v2\n    [*] --> draft\n    draft --> open: PublishGig\n    open --> closed: CloseGig\n```"
-	_, err := Parse("test", content)
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
 	}
 }

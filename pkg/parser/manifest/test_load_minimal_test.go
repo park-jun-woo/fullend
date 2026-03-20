@@ -1,0 +1,29 @@
+//ff:func feature=manifest type=parser control=sequence
+//ff:what 최소 fullend.yaml 로드 시 Auth nil 검증
+package manifest
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+func TestLoad_Minimal(t *testing.T) {
+	dir := t.TempDir()
+	content := `apiVersion: fullend/v1
+kind: Project
+metadata:
+  name: minimal
+backend:
+  module: github.com/test/minimal
+`
+	os.WriteFile(filepath.Join(dir, "fullend.yaml"), []byte(content), 0644)
+
+	cfg, err := Load(dir)
+	if err != nil {
+		t.Fatalf("Load() error: %v", err)
+	}
+	if cfg.Backend.Auth != nil {
+		t.Errorf("expected nil Auth, got %+v", cfg.Backend.Auth)
+	}
+}

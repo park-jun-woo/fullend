@@ -15,6 +15,7 @@ required:
     genmodel: "외부 OpenAPI → Go model 생성"
     genapi: "코드 생성 공통 타입"
     projectconfig: "fullend.yaml 파서"
+    manifest: "fullend.yaml 파서 (pkg/parser/manifest)"
     statemachine: "Mermaid stateDiagram 파서"
     policy: "OPA Rego 정책 파서"
     scenario: "Hurl 시나리오 파서"

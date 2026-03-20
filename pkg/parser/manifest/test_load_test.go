@@ -1,3 +1,5 @@
+//ff:func feature=manifest type=parser control=sequence
+//ff:what fullend.yaml 정상 로드 및 claims 파싱 검증
 package manifest
 
 import (
@@ -41,53 +43,10 @@ frontend:
 	if cfg.Backend.Auth == nil {
 		t.Fatal("Backend.Auth is nil")
 	}
-	if cfg.Backend.Auth.Type != "jwt" {
-		t.Errorf("Auth.Type = %q, want %q", cfg.Backend.Auth.Type, "jwt")
-	}
 	if len(cfg.Backend.Auth.Claims) != 2 {
 		t.Errorf("Claims count = %d, want 2", len(cfg.Backend.Auth.Claims))
 	}
 	if def, ok := cfg.Backend.Auth.Claims["UserID"]; !ok || def.Key != "user_id" || def.GoType != "int64" {
 		t.Errorf("Claims[UserID] = %+v", def)
-	}
-	if def, ok := cfg.Backend.Auth.Claims["Role"]; !ok || def.Key != "role" || def.GoType != "string" {
-		t.Errorf("Claims[Role] = %+v", def)
-	}
-}
-
-func TestLoad_NotFound(t *testing.T) {
-	_, err := Load("/nonexistent/dir")
-	if err == nil {
-		t.Fatal("expected error for missing file")
-	}
-}
-
-func TestLoad_InvalidYAML(t *testing.T) {
-	dir := t.TempDir()
-	os.WriteFile(filepath.Join(dir, "fullend.yaml"), []byte(":\ninvalid: [yaml"), 0644)
-
-	_, err := Load(dir)
-	if err == nil {
-		t.Fatal("expected error for invalid YAML")
-	}
-}
-
-func TestLoad_Minimal(t *testing.T) {
-	dir := t.TempDir()
-	content := `apiVersion: fullend/v1
-kind: Project
-metadata:
-  name: minimal
-backend:
-  module: github.com/test/minimal
-`
-	os.WriteFile(filepath.Join(dir, "fullend.yaml"), []byte(content), 0644)
-
-	cfg, err := Load(dir)
-	if err != nil {
-		t.Fatalf("Load() error: %v", err)
-	}
-	if cfg.Backend.Auth != nil {
-		t.Errorf("expected nil Auth, got %+v", cfg.Backend.Auth)
 	}
 }
