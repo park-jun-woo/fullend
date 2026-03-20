@@ -24,9 +24,9 @@ func Login(c *gin.Context) {}
 `
 	os.WriteFile(filepath.Join(authDir, "login.ssac"), []byte(src), 0644)
 
-	funcs, err := ParseDir(dir)
-	if err != nil {
-		t.Fatal(err)
+	funcs, diags := ParseDir(dir)
+	if len(diags) > 0 {
+		t.Fatalf("unexpected diagnostics: %v", diags[0].Message)
 	}
 	if len(funcs) != 1 {
 		t.Fatalf("expected 1 func, got %d", len(funcs))

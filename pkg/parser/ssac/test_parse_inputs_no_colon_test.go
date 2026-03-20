@@ -21,11 +21,11 @@ func ListGigs(c *gin.Context) {}
 	if err := os.WriteFile(path, []byte(src), 0644); err != nil {
 		t.Fatal(err)
 	}
-	_, err := ParseFile(path)
-	if err == nil {
-		t.Fatal("expected error for input without colon")
+	_, diags := ParseFile(path)
+	if len(diags) == 0 {
+		t.Fatal("expected diagnostic for input without colon")
 	}
-	if !strings.Contains(err.Error(), "유효하지 않은 입력 형식") {
-		t.Errorf("unexpected error: %v", err)
+	if !strings.Contains(diags[0].Message, "유효하지 않은 입력 형식") {
+		t.Errorf("unexpected diagnostic message: %s", diags[0].Message)
 	}
 }

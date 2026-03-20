@@ -16,9 +16,9 @@ func parseTestFile(t *testing.T, src string) []ServiceFunc {
 	if err := os.WriteFile(path, []byte(src), 0644); err != nil {
 		t.Fatal(err)
 	}
-	sfs, err := ParseFile(path)
-	if err != nil {
-		t.Fatal(err)
+	sfs, diags := ParseFile(path)
+	if len(diags) > 0 {
+		t.Fatalf("unexpected diagnostics: %v", diags[0].Message)
 	}
 	if len(sfs) == 0 {
 		t.Fatal("expected at least 1 ServiceFunc")

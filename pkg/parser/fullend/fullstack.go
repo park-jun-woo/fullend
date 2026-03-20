@@ -8,6 +8,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/open-policy-agent/opa/ast"
 
+	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 	"github.com/park-jun-woo/fullend/pkg/parser/scenario"
@@ -31,5 +32,5 @@ type Fullstack struct {
 	FullendPkgSpecs  []funcspec.FuncSpec
 	HurlFiles        []string
 	ModelDir         string
-	StatesErr        error
+	StatesDiags      []diagnostic.Diagnostic
 }

@@ -3,24 +3,45 @@
 package manifest
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strconv"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 )
 
+var reYAMLLine = regexp.MustCompile(`line (\d+)`)
+
 // Load reads and parses fullend.yaml from the given specs directory root.
-func Load(specsDir string) (*ProjectConfig, error) {
+func Load(specsDir string) (*ProjectConfig, []diagnostic.Diagnostic) {
 	path := filepath.Join(specsDir, "fullend.yaml")
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("fullend.yaml not found: %w", err)
+		return nil, []diagnostic.Diagnostic{{
+			File:    path,
+			Line:    0,
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: "fullend.yaml not found: " + err.Error(),
+		}}
 	}
 
 	var cfg ProjectConfig
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
-		return nil, fmt.Errorf("fullend.yaml parse error: %w", err)
+		line := 0
+		if m := reYAMLLine.FindStringSubmatch(err.Error()); len(m) == 2 {
+			line, _ = strconv.Atoi(m[1])
+		}
+		return nil, []diagnostic.Diagnostic{{
+			File:    path,
+			Line:    line,
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: "fullend.yaml parse error: " + err.Error(),
+		}}
 	}
 
 	// Post-process: convert RawClaims → Claims (ClaimDef).

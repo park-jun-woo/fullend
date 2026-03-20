@@ -3,18 +3,24 @@
 package parser
 
 import (
-	"fmt"
 	"io"
 	"strings"
 
+	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 	"golang.org/x/net/html"
 )
 
 // ParseReader parses HTML from a reader and returns a PageSpec.
-func ParseReader(filename string, r io.Reader) (PageSpec, error) {
+func ParseReader(filename string, r io.Reader) (PageSpec, []diagnostic.Diagnostic) {
 	doc, err := html.Parse(r)
 	if err != nil {
-		return PageSpec{}, fmt.Errorf("html parse: %w", err)
+		return PageSpec{}, []diagnostic.Diagnostic{{
+			File:    filename,
+			Line:    0,
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: "html parse: " + err.Error(),
+		}}
 	}
 
 	name := strings.TrimSuffix(filename, ".html")

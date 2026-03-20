@@ -47,9 +47,9 @@ func VerifyPassword(req VerifyPasswordRequest) (VerifyPasswordResponse, error) {
 	os.WriteFile(filepath.Join(authDir, "hash_password.go"), []byte(hash), 0644)
 	os.WriteFile(filepath.Join(authDir, "verify_password.go"), []byte(verify), 0644)
 
-	specs, err := ParseDir(dir)
-	if err != nil {
-		t.Fatalf("ParseDir error: %v", err)
+	specs, diags := ParseDir(dir)
+	if len(diags) > 0 {
+		t.Fatalf("ParseDir diagnostics: %v", diags)
 	}
 	if len(specs) != 2 {
 		t.Fatalf("ParseDir count = %d, want 2", len(specs))

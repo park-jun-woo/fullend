@@ -35,7 +35,10 @@ HTTP 201
 	path := filepath.Join(dir, "scenario-test.hurl")
 	os.WriteFile(path, []byte(content), 0644)
 
-	entries := ParseFile(path)
+	entries, diags := ParseFile(path)
+	if len(diags) > 0 {
+		t.Fatalf("unexpected diagnostics: %v", diags)
+	}
 	if len(entries) != 2 {
 		t.Fatalf("expected 2 entries, got %d", len(entries))
 	}

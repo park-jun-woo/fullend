@@ -5,8 +5,10 @@ package fullend
 import (
 	"github.com/getkin/kin-openapi/openapi3"
 
+	"github.com/park-jun-woo/fullend/pkg/parser/ddl"
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
+	"github.com/park-jun-woo/fullend/pkg/parser/rego"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
 	"github.com/park-jun-woo/fullend/pkg/parser/stml"
@@ -23,8 +25,8 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Ful
 	}
 
 	if _, ok := has[KindConfig]; ok && !skip[KindConfig] {
-		cfg, err := manifest.Load(root)
-		if err == nil {
+		cfg, diags := manifest.Load(root)
+		if len(diags) == 0 {
 			fs.Config = cfg
 		}
 	}
@@ -37,39 +39,45 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Ful
 	}
 
 	if d, ok := has[KindSSaC]; ok && !skip[KindSSaC] {
-		funcs, err := ssac.ParseDir(d.Path)
-		if err == nil {
+		funcs, diags := ssac.ParseDir(d.Path)
+		if len(diags) == 0 {
 			fs.ServiceFuncs = funcs
 		}
 	}
 
 	if d, ok := has[KindSTML]; ok && !skip[KindSTML] {
-		pages, err := stml.ParseDir(d.Path)
-		if err == nil {
+		pages, diags := stml.ParseDir(d.Path)
+		if len(diags) == 0 {
 			fs.STMLPages = pages
 		}
 	}
 
 	if d, ok := has[KindStates]; ok && !skip[KindStates] {
-		diagrams, err := statemachine.ParseDir(d.Path)
-		if err == nil {
+		diagrams, diags := statemachine.ParseDir(d.Path)
+		if len(diags) == 0 {
 			fs.StateDiagrams = diagrams
 		} else {
-			fs.StatesErr = err
+			fs.StatesDiags = diags
 		}
 	}
 
 	if d, ok := has[KindDDL]; ok && !skip[KindDDL] {
-		fs.DDLResults = parseDDLDir(d.Path)
+		results, diags := ddl.ParseDir(d.Path)
+		if len(diags) == 0 {
+			fs.DDLResults = results
+		}
 	}
 
 	if d, ok := has[KindPolicy]; ok && !skip[KindPolicy] {
-		fs.Policies = parseRegoDir(d.Path)
+		modules, diags := rego.ParseDir(d.Path)
+		if len(diags) == 0 {
+			fs.Policies = modules
+		}
 	}
 
 	if d, ok := has[KindFunc]; ok && !skip[KindFunc] {
-		specs, err := funcspec.ParseDir(d.Path)
-		if err == nil {
+		specs, diags := funcspec.ParseDir(d.Path)
+		if len(diags) == 0 {
 			fs.ProjectFuncSpecs = specs
 		}
 	}

@@ -24,9 +24,9 @@ func TestParseRoomEditPage(t *testing.T) {
   </footer>
 </main>`
 
-	page, err := ParseReader("room-edit-page.html", strings.NewReader(input))
-	if err != nil {
-		t.Fatal(err)
+	page, diags := ParseReader("room-edit-page.html", strings.NewReader(input))
+	if len(diags) > 0 {
+		t.Fatal(diags)
 	}
 
 	if len(page.Actions) != 2 {

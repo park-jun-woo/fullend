@@ -18,10 +18,15 @@
 | `manifest/` | `fullend.yaml` | `*ProjectConfig` | 프로젝트 설정 파싱 (yaml.v3 활용) |
 | `toulmin/` | Go `.go` | `*Graph` | Toulmin 규칙 그래프 파싱 (Go AST 활용) |
 
+## 외부 라이브러리 래퍼
+
+| 패키지 | 라이브러리 | 입력 | 출력 | 설명 |
+|--------|-----------|------|------|------|
+| `ddl/` | `pg_query_go` | `.sql` | `[]*pg_query.ParseResult` | DDL 테이블/컬럼/제약조건 |
+| `rego/` | `opa/ast` | `.rego` | `[]*ast.Module` | OPA 인가 정책 |
+
 ## 외부 라이브러리 (래퍼 없이 직접 사용)
 
 | 라이브러리 | 대상 | 출력 | 설명 |
 |-----------|------|------|------|
 | `kin-openapi` | OpenAPI YAML | `*openapi3.T` | API 엔드포인트 스키마 |
-| `pg_query_go` | SQL DDL | `*pg_query.ParseResult` | 테이블/컬럼/제약조건 |
-| `opa/ast` | OPA Rego | `*ast.Module` | 인가 정책 |

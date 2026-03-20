@@ -1,12 +1,12 @@
 //ff:func feature=manifest type=parser control=sequence
-//ff:what fullend.yaml 미존재 시 에러 반환 검증
+//ff:what fullend.yaml 미존재 시 diagnostic 반환 검증
 package manifest
 
 import "testing"
 
 func TestLoad_NotFound(t *testing.T) {
-	_, err := Load("/nonexistent/dir")
-	if err == nil {
-		t.Fatal("expected error for missing file")
+	_, diags := Load("/nonexistent/dir")
+	if len(diags) == 0 {
+		t.Fatal("expected diagnostics for missing file")
 	}
 }

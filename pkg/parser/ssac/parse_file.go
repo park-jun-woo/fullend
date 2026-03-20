@@ -3,36 +3,42 @@
 package parser
 
 import (
-	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
+
+	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 )
 
 // ParseFile은 단일 .ssac 파일을 파싱하여 []ServiceFunc를 반환한다.
-func ParseFile(path string) ([]ServiceFunc, error) {
+func ParseFile(path string) ([]ServiceFunc, []diagnostic.Diagnostic) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
 	if err != nil {
-		return nil, fmt.Errorf("Go 파싱 실패: %w", err)
+		return nil, []diagnostic.Diagnostic{{
+			File:    path,
+			Line:    0,
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: "Go 파싱 실패: " + err.Error(),
+		}}
 	}
 
 	imports := collectImports(f)
 	structs := collectStructs(f)
 	var funcs []ServiceFunc
+	var diags []diagnostic.Diagnostic
 
 	for _, decl := range f.Decls {
 		fn, ok := decl.(*ast.FuncDecl)
 		if !ok {
 			continue
 		}
-		sf, err := parseFuncDecl(fn, f, path, imports, structs)
-		if err != nil {
-			return nil, err
-		}
+		sf, d := parseFuncDecl(fset, fn, f, path, imports, structs)
+		diags = append(diags, d...)
 		if sf != nil {
 			funcs = append(funcs, *sf)
 		}
 	}
-	return funcs, nil
+	return funcs, diags
 }

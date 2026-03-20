@@ -45,9 +45,9 @@ type HashPasswordResponse struct {
 	os.WriteFile(filepath.Join(authDir, "hash_password_request.go"), []byte(reqFile), 0644)
 	os.WriteFile(filepath.Join(authDir, "hash_password_response.go"), []byte(respFile), 0644)
 
-	specs, err := ParseDir(dir)
-	if err != nil {
-		t.Fatalf("ParseDir error: %v", err)
+	specs, diags := ParseDir(dir)
+	if len(diags) > 0 {
+		t.Fatalf("ParseDir diagnostics: %v", diags)
 	}
 	if len(specs) != 1 {
 		t.Fatalf("ParseDir count = %d, want 1", len(specs))

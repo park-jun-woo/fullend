@@ -19,9 +19,9 @@ stateDiagram-v2
 ` + "```" + `
 `
 
-	d, err := Parse("course", content)
-	if err != nil {
-		t.Fatalf("Parse error: %v", err)
+	d, diags := Parse("course", content, "course.md")
+	if len(diags) > 0 {
+		t.Fatalf("Parse diagnostics: %v", diags)
 	}
 
 	if d.ID != "course" {

@@ -23,9 +23,9 @@ func TestPhase4_TagAndClassName(t *testing.T) {
   </div>
 </main>`
 
-	page, err := ParseReader("test.html", strings.NewReader(input))
-	if err != nil {
-		t.Fatal(err)
+	page, diags := ParseReader("test.html", strings.NewReader(input))
+	if len(diags) > 0 {
+		t.Fatal(diags)
 	}
 
 	// Fetch Tag + ClassName

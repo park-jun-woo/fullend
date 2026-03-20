@@ -3,18 +3,25 @@
 package funcspec
 
 import (
-	"fmt"
 	"go/parser"
 	"go/token"
 	"strings"
+
+	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 )
 
 // ParseFile parses a single func spec .go file.
-func ParseFile(path string) (*FuncSpec, error) {
+func ParseFile(path string) (*FuncSpec, []diagnostic.Diagnostic) {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
 	if err != nil {
-		return nil, fmt.Errorf("Go parse error: %w", err)
+		return nil, []diagnostic.Diagnostic{{
+			File:    path,
+			Line:    0,
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: "Go parse error: " + err.Error(),
+		}}
 	}
 
 	spec := &FuncSpec{

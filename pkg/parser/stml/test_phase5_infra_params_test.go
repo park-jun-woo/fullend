@@ -20,9 +20,9 @@ func TestPhase5_InfraParams(t *testing.T) {
   </section>
 </main>`
 
-	page, err := ParseReader("test.html", strings.NewReader(input))
-	if err != nil {
-		t.Fatal(err)
+	page, diags := ParseReader("test.html", strings.NewReader(input))
+	if len(diags) > 0 {
+		t.Fatal(diags)
 	}
 
 	fetch := page.Fetches[0]

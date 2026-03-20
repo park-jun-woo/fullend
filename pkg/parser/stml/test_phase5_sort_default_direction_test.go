@@ -13,9 +13,9 @@ func TestPhase5_SortDefaultDirection(t *testing.T) {
   <ul data-each="items"><li><span data-bind="name"></span></li></ul>
 </section>`
 
-	page, err := ParseReader("test.html", strings.NewReader(input))
-	if err != nil {
-		t.Fatal(err)
+	page, diags := ParseReader("test.html", strings.NewReader(input))
+	if len(diags) > 0 {
+		t.Fatal(diags)
 	}
 
 	fetch := page.Fetches[0]

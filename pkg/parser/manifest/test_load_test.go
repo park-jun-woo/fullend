@@ -26,9 +26,9 @@ frontend:
 `
 	os.WriteFile(filepath.Join(dir, "fullend.yaml"), []byte(content), 0644)
 
-	cfg, err := Load(dir)
-	if err != nil {
-		t.Fatalf("Load() error: %v", err)
+	cfg, diags := Load(dir)
+	if len(diags) > 0 {
+		t.Fatalf("Load() diagnostics: %v", diags)
 	}
 
 	if cfg.APIVersion != "fullend/v1" {

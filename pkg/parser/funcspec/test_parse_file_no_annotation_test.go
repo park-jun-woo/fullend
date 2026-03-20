@@ -18,9 +18,9 @@ func Foo() {}
 	path := filepath.Join(dir, "foo.go")
 	os.WriteFile(path, []byte(src), 0644)
 
-	spec, err := ParseFile(path)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+	spec, diags := ParseFile(path)
+	if len(diags) > 0 {
+		t.Fatalf("unexpected diagnostics: %v", diags)
 	}
 	if spec != nil {
 		t.Error("expected nil for file without @func annotation")

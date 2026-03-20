@@ -19,9 +19,9 @@ func TestPhase4_StateWithAction(t *testing.T) {
   </article>
 </main>`
 
-	page, err := ParseReader("test.html", strings.NewReader(input))
-	if err != nil {
-		t.Fatal(err)
+	page, diags := ParseReader("test.html", strings.NewReader(input))
+	if len(diags) > 0 {
+		t.Fatal(diags)
 	}
 
 	state := page.Fetches[0].States[0]

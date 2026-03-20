@@ -5,13 +5,21 @@ package parser
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 )
 
 // ParseFile parses a single HTML file and returns a PageSpec.
-func ParseFile(path string) (PageSpec, error) {
+func ParseFile(path string) (PageSpec, []diagnostic.Diagnostic) {
 	f, err := os.Open(path)
 	if err != nil {
-		return PageSpec{}, err
+		return PageSpec{}, []diagnostic.Diagnostic{{
+			File:    path,
+			Line:    0,
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: err.Error(),
+		}}
 	}
 	defer f.Close()
 

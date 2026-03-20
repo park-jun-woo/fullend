@@ -23,11 +23,11 @@ func Login() {}
 `
 	os.WriteFile(filepath.Join(dir, "login.ssac"), []byte(src), 0644)
 
-	_, err := ParseDir(dir)
-	if err == nil {
-		t.Fatal("expected error for flat service/ file, got nil")
+	_, diags := ParseDir(dir)
+	if len(diags) == 0 {
+		t.Fatal("expected diagnostic for flat service/ file, got none")
 	}
-	if !strings.Contains(err.Error(), "도메인 서브 폴더를 사용하세요") {
-		t.Errorf("unexpected error: %v", err)
+	if !strings.Contains(diags[0].Message, "도메인 서브 폴더를 사용하세요") {
+		t.Errorf("unexpected diagnostic message: %s", diags[0].Message)
 	}
 }

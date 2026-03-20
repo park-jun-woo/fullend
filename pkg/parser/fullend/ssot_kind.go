@@ -19,8 +19,3 @@ const (
 	KindToulmin  SSOTKind = "Toulmin"
 )
 
-// DetectedSSOT represents a detected SSOT file or directory.
-type DetectedSSOT struct {
-	Kind SSOTKind
-	Path string // absolute path to the relevant directory or file
-}

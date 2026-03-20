@@ -3,24 +3,38 @@
 package funcspec
 
 import (
-	"fmt"
 	"io/fs"
 	"path/filepath"
 	"strings"
+
+	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 )
 
 // ParseDir parses all .go files under dir (recursively by package subdirectory).
-// Returns a flat list of FuncSpecs.
-func ParseDir(dir string) ([]FuncSpec, error) {
+// Returns a flat list of FuncSpecs and accumulated diagnostics.
+func ParseDir(dir string) ([]FuncSpec, []diagnostic.Diagnostic) {
 	var specs []FuncSpec
 	var specDirs []string
-	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
-		if err != nil || d.IsDir() || !strings.HasSuffix(d.Name(), ".go") {
-			return err
-		}
-		fs, err := ParseFile(path)
+	var diags []diagnostic.Diagnostic
+
+	filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return fmt.Errorf("%s: %w", path, err)
+			diags = append(diags, diagnostic.Diagnostic{
+				File:    path,
+				Line:    0,
+				Phase:   diagnostic.PhaseParse,
+				Level:   diagnostic.LevelError,
+				Message: "walk error: " + err.Error(),
+			})
+			return nil
+		}
+		if d.IsDir() || !strings.HasSuffix(d.Name(), ".go") {
+			return nil
+		}
+		fs, dd := ParseFile(path)
+		if len(dd) > 0 {
+			diags = append(diags, dd...)
+			return nil
 		}
 		if fs != nil {
 			// Derive package from parent dir name.
@@ -34,9 +48,7 @@ func ParseDir(dir string) ([]FuncSpec, error) {
 		}
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
+
 	fillMissingFields(specs, specDirs)
-	return specs, nil
+	return specs, diags
 }

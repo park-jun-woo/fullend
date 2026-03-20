@@ -7,25 +7,38 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 )
 
 // ParseDir parses all .html files in the given directory and returns a PageSpec for each.
-func ParseDir(dir string) ([]PageSpec, error) {
+func ParseDir(dir string) ([]PageSpec, []diagnostic.Diagnostic) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		return nil, fmt.Errorf("read dir %s: %w", dir, err)
+		return nil, []diagnostic.Diagnostic{{
+			File:    dir,
+			Line:    0,
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: fmt.Sprintf("read dir %s: %s", dir, err),
+		}}
 	}
 
 	var pages []PageSpec
+	var allDiags []diagnostic.Diagnostic
 	for _, e := range entries {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".html") {
 			continue
 		}
-		page, err := ParseFile(filepath.Join(dir, e.Name()))
-		if err != nil {
-			return nil, fmt.Errorf("parse %s: %w", e.Name(), err)
+		page, diags := ParseFile(filepath.Join(dir, e.Name()))
+		if len(diags) > 0 {
+			allDiags = append(allDiags, diags...)
+			continue
 		}
 		pages = append(pages, page)
+	}
+	if len(allDiags) > 0 {
+		return nil, allDiags
 	}
 	return pages, nil
 }

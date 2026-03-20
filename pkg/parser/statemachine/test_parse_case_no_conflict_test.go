@@ -9,8 +9,8 @@ import (
 
 func TestParseCaseNoConflict(t *testing.T) {
 	content := "```mermaid\nstateDiagram-v2\n    [*] --> draft\n    draft --> open: PublishGig\n    open --> closed: CloseGig\n```"
-	_, err := Parse("test", content)
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
+	_, diags := Parse("test", content, "test.md")
+	if len(diags) != 0 {
+		t.Errorf("unexpected diagnostics: %v", diags)
 	}
 }

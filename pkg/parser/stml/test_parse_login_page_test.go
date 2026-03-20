@@ -17,9 +17,9 @@ func TestParseLoginPage(t *testing.T) {
   </div>
 </main>`
 
-	page, err := ParseReader("login-page.html", strings.NewReader(input))
-	if err != nil {
-		t.Fatal(err)
+	page, diags := ParseReader("login-page.html", strings.NewReader(input))
+	if len(diags) > 0 {
+		t.Fatal(diags)
 	}
 
 	if page.Name != "login-page" {

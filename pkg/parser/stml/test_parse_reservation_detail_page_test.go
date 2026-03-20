@@ -24,9 +24,9 @@ func TestParseReservationDetailPage(t *testing.T) {
   </article>
 </main>`
 
-	page, err := ParseReader("reservation-detail-page.html", strings.NewReader(input))
-	if err != nil {
-		t.Fatal(err)
+	page, diags := ParseReader("reservation-detail-page.html", strings.NewReader(input))
+	if len(diags) > 0 {
+		t.Fatal(diags)
 	}
 
 	if len(page.Fetches) != 1 {

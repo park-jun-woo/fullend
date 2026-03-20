@@ -7,6 +7,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 )
 
 var (
@@ -15,10 +17,16 @@ var (
 )
 
 // ParseFile extracts request/response pairs from a .hurl file.
-func ParseFile(path string) []HurlEntry {
+func ParseFile(path string) ([]HurlEntry, []diagnostic.Diagnostic) {
 	f, err := os.Open(path)
 	if err != nil {
-		return nil
+		return nil, []diagnostic.Diagnostic{{
+			File:    path,
+			Line:    0,
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: "cannot open hurl file: " + err.Error(),
+		}}
 	}
 	defer f.Close()
 
@@ -37,5 +45,5 @@ func ParseFile(path string) []HurlEntry {
 		entries = append(entries, *current)
 	}
 
-	return entries
+	return entries, nil
 }

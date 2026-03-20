@@ -37,9 +37,9 @@ func HashPassword(req HashPasswordRequest) (HashPasswordResponse, error) {
 	path := filepath.Join(pkgDir, "hash_password.go")
 	os.WriteFile(path, []byte(src), 0644)
 
-	spec, err := ParseFile(path)
-	if err != nil {
-		t.Fatalf("ParseFile error: %v", err)
+	spec, diags := ParseFile(path)
+	if len(diags) > 0 {
+		t.Fatalf("ParseFile diagnostics: %v", diags)
 	}
 	if spec == nil {
 		t.Fatal("expected non-nil spec")

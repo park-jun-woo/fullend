@@ -3,18 +3,27 @@
 package parser
 
 import (
-	"fmt"
 	"go/ast"
+	"go/token"
 	"path/filepath"
+
+	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 )
 
 // parseFuncDecl은 AST 함수 선언에서 ServiceFunc를 추출한다.
-func parseFuncDecl(fn *ast.FuncDecl, f *ast.File, path string, imports []string, structs []StructInfo) (*ServiceFunc, error) {
+func parseFuncDecl(fset *token.FileSet, fn *ast.FuncDecl, f *ast.File, path string, imports []string, structs []StructInfo) (*ServiceFunc, []diagnostic.Diagnostic) {
 	comments := collectFuncComments(f, fn.Pos())
 
 	sequences, err := parseComments(comments)
 	if err != nil {
-		return nil, fmt.Errorf("%s:%s — %w", filepath.Base(path), fn.Name.Name, err)
+		line := fset.Position(fn.Pos()).Line
+		return nil, []diagnostic.Diagnostic{{
+			File:    path,
+			Line:    line,
+			Phase:   diagnostic.PhaseParse,
+			Level:   diagnostic.LevelError,
+			Message: filepath.Base(path) + ":" + fn.Name.Name + " — " + err.Error(),
+		}}
 	}
 	if len(sequences) == 0 {
 		return nil, nil
