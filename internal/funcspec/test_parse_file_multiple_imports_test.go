@@ -1,0 +1,53 @@
+//ff:func feature=funcspec type=test control=iteration dimension=1
+//ff:what ParseFile: 복수 import 경로 추출 검증
+
+package funcspec
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+func TestParseFileMultipleImports(t *testing.T) {
+	dir := t.TempDir()
+
+	src := `package bad
+
+import (
+	"database/sql"
+	"fmt"
+	"net/http"
+)
+
+// @func badFunc
+// @description does bad things
+
+type BadFuncRequest struct{}
+type BadFuncResponse struct{}
+func BadFunc(req BadFuncRequest) (BadFuncResponse, error) {
+	return BadFuncResponse{}, nil
+}
+`
+	path := filepath.Join(dir, "bad_func.go")
+	os.WriteFile(path, []byte(src), 0644)
+
+	spec, err := ParseFile(path)
+	if err != nil {
+		t.Fatalf("ParseFile error: %v", err)
+	}
+	if spec == nil {
+		t.Fatal("expected non-nil spec")
+	}
+
+	if len(spec.Imports) != 3 {
+		t.Fatalf("Imports count = %d, want 3", len(spec.Imports))
+	}
+
+	expected := map[string]bool{"database/sql": true, "fmt": true, "net/http": true}
+	for _, imp := range spec.Imports {
+		if !expected[imp] {
+			t.Errorf("unexpected import: %q", imp)
+		}
+	}
+}

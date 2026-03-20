@@ -1,8 +1,0 @@
-package service
-
-// @auth "CreateWorkflow" "workflow" {} "Only admins can create workflows" 403
-// @get User me = User.FindByID({ID: currentUser.ID})
-// @empty me "User not found" 404
-// @post Workflow workflow = Workflow.Create({OrgID: me.OrgID, Title: request.title, TriggerEvent: request.trigger_event})
-// @response { workflow: workflow }
-func CreateWorkflow() {}

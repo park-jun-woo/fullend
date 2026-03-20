@@ -11,9 +11,3 @@ type Diagnostic struct {
 	Message string // human-readable message
 	Ref     *Loc   // counterpart location (crosscheck only, nil otherwise)
 }
-
-// Loc is a source location reference.
-type Loc struct {
-	File string
-	Line int
-}

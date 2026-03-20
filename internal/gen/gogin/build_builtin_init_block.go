@@ -1,10 +1,9 @@
-//ff:func feature=gen-gogin type=generator control=iteration dimension=1
+//ff:func feature=gen-gogin type=generator control=sequence
 //ff:what session/cache/file Init 코드 블록 + import 빌더
 
 package gogin
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/park-jun-woo/fullend/internal/projectconfig"
@@ -46,31 +45,9 @@ func buildBuiltinInitBlocks(sessionBackend, cacheBackend string, fileConfig *pro
 
 	// --- file ---
 	if fileConfig != nil {
-		imports = append(imports, `"github.com/park-jun-woo/fullend/pkg/file"`)
-		switch fileConfig.Backend {
-		case "local":
-			root := "./uploads"
-			if fileConfig.Local != nil && fileConfig.Local.Root != "" {
-				root = fileConfig.Local.Root
-			}
-			inits = append(inits, fmt.Sprintf(`
-	file.Init(file.NewLocalFile(%q))`, root))
-		case "s3":
-			bucket := ""
-			region := "ap-northeast-2"
-			if fileConfig.S3 != nil {
-				bucket = fileConfig.S3.Bucket
-				region = fileConfig.S3.Region
-			}
-			imports = append(imports, `"github.com/aws/aws-sdk-go-v2/config"`)
-			imports = append(imports, `"github.com/aws/aws-sdk-go-v2/service/s3"`)
-			inits = append(inits, fmt.Sprintf(`
-	awsCfg, err := config.LoadDefaultConfig(context.Background(), config.WithRegion(%q))
-	if err != nil {
-		log.Fatalf("aws config failed: %%v", err)
-	}
-	file.Init(file.NewS3File(s3.NewFromConfig(awsCfg), %q))`, region, bucket))
-		}
+		fileImports, fileInit := buildFileInitBlock(fileConfig)
+		imports = append(imports, fileImports...)
+		inits = append(inits, fileInit)
 	}
 
 	// --- context import (postgres session/cache 또는 s3에서 사용) ---

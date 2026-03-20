@@ -1,8 +1,0 @@
-package service
-
-// @auth "ListWorkflows" "workflow" {ResourceID: request.id} "Access denied" 403
-// @get Workflow workflow = Workflow.FindByID({ID: request.id})
-// @empty workflow "Workflow not found" 404
-// @get []Action actions = Action.ListByWorkflow({WorkflowID: request.id})
-// @response { actions: actions }
-func ListActions() {}

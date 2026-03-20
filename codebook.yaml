@@ -46,6 +46,8 @@ required:
     loader: "초기화/로더"
     util: "유틸리티 함수"
     walker: "파일/디렉토리 순회"
+    test: "테스트 함수"
+    test-helper: "테스트 헬퍼 함수"
 
 optional:
   topic:

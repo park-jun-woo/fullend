@@ -1,6 +1,0 @@
-package service
-
-// @auth "ListWebhooks" "webhook" {ResourceID: currentUser.ID} "Not authorized" 403
-// @get []Webhook webhooks = Webhook.ListByOrgID({OrgID: currentUser.OrgID})
-// @response { webhooks: webhooks }
-func ListWebhooks() {}

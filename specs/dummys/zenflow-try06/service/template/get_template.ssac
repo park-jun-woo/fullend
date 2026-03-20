@@ -1,8 +1,0 @@
-package service
-
-// @get Template tmpl = Template.FindByID({ID: request.id})
-// @empty tmpl "Template not found" 404
-// @get Organization org = Organization.FindByID({ID: tmpl.OrgID})
-// @empty org "Organization not found" 404
-// @response { template: tmpl, org_name: org.Name }
-func GetTemplate() {}

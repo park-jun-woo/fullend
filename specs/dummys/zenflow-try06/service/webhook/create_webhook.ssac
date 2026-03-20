@@ -1,6 +1,0 @@
-package service
-
-// @auth "CreateWebhook" "webhook" {ResourceID: currentUser.ID} "Not authorized" 403
-// @post Webhook wh = Webhook.Create({OrgID: currentUser.OrgID, URL: request.url, EventType: request.event_type})
-// @response { webhook: wh }
-func CreateWebhook() {}

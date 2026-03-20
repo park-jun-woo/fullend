@@ -1,8 +1,0 @@
-package service
-
-// @get Workflow wf = Workflow.FindByIDAndOrgID({ID: request.id, OrgID: currentUser.OrgID})
-// @empty wf "Workflow not found" 404
-// @auth "ListWorkflowVersions" "workflow" {ResourceID: wf.ID} "Not authorized" 403
-// @get []Workflow versions = Workflow.ListVersions({RootWorkflowID: wf.ID, OrgID: currentUser.OrgID})
-// @response { versions: versions }
-func ListWorkflowVersions() {}
