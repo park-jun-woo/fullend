@@ -1,6 +1,6 @@
 //ff:func feature=scenario type=parser control=sequence
 //ff:what 존재하지 않는 파일에 대해 diagnostic 반환 검증
-package scenario
+package hurl
 
 import "testing"
 

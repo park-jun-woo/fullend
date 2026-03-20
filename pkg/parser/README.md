@@ -14,7 +14,7 @@
 | `stml/` | `.html` | `[]PageSpec` | 프론트엔드 페이지 템플릿 파싱 (x/net/html 활용) |
 | `statemachine/` | Mermaid `.md` | `[]*StateDiagram` | 상태 전이 다이어그램 파싱 |
 | `funcspec/` | Go `.go` | `[]FuncSpec` | 커스텀 함수 스펙 파싱 (Go AST 활용) |
-| `scenario/` | `.hurl` | `[]HurlEntry` | 통합 테스트 시나리오 파싱 |
+| `hurl/` | `.hurl` | `[]HurlEntry` | 통합 테스트 시나리오 파싱 |
 | `manifest/` | `fullend.yaml` | `*ProjectConfig` | 프로젝트 설정 파싱 (yaml.v3 활용) |
 | `toulmin/` | Go `.go` | `*Graph` | Toulmin 규칙 그래프 파싱 (Go AST 활용) |
 

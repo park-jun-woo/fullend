@@ -11,7 +11,7 @@ import (
 	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
-	"github.com/park-jun-woo/fullend/pkg/parser/scenario"
+	"github.com/park-jun-woo/fullend/pkg/parser/hurl"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
 	"github.com/park-jun-woo/fullend/pkg/parser/stml"
@@ -27,7 +27,7 @@ type Fullstack struct {
 	ServiceFuncs     []ssac.ServiceFunc
 	STMLPages        []stml.PageSpec
 	StateDiagrams    []*statemachine.StateDiagram
-	HurlEntries      []scenario.HurlEntry
+	HurlEntries      []hurl.HurlEntry
 	ProjectFuncSpecs []funcspec.FuncSpec
 	FullendPkgSpecs  []funcspec.FuncSpec
 	HurlFiles        []string

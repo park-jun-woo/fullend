@@ -1,6 +1,6 @@
 //ff:func feature=scenario type=parser control=sequence
 //ff:what 절대 URL(http/https)이 포함된 .hurl 파일 파싱 검증
-package scenario
+package hurl
 
 import (
 	"os"

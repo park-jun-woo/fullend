@@ -9,7 +9,7 @@ import (
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 	"github.com/park-jun-woo/fullend/pkg/parser/rego"
-	"github.com/park-jun-woo/fullend/pkg/parser/scenario"
+	"github.com/park-jun-woo/fullend/pkg/parser/hurl"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
 	"github.com/park-jun-woo/fullend/pkg/parser/stml"
@@ -84,9 +84,9 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Ful
 	}
 
 	if d, ok := has[KindScenario]; ok && !skip[KindScenario] {
-		fs.HurlFiles = collectHurlFiles(d.Path)
+		fs.HurlFiles = hurl.CollectFiles(d.Path)
 		for _, hf := range fs.HurlFiles {
-			entries, _ := scenario.ParseFile(hf)
+			entries, _ := hurl.ParseFile(hf)
 			fs.HurlEntries = append(fs.HurlEntries, entries...)
 		}
 	}

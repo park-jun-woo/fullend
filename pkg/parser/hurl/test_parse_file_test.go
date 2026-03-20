@@ -1,6 +1,6 @@
 //ff:func feature=scenario type=parser control=sequence
 //ff:what ParseFile이 .hurl에서 요청/응답 쌍을 올바르게 추출하는지 검증
-package scenario
+package hurl
 
 import (
 	"os"
