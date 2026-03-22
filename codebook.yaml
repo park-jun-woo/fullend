@@ -36,6 +36,7 @@ required:
     pkg-session: "세션 모델 (PostgreSQL, Memory)"
     pkg-storage: "S3 호환 스토리지"
     pkg-text: "텍스트 처리 (slug, sanitize, truncate)"
+    stat: "Go AST 기반 코드 통계 스크립트"
   type:
     command: "CLI 명령 엔트리포인트"
     rule: "검증 규칙"
