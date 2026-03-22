@@ -20,7 +20,7 @@ import (
 // Fullstack holds all SSOT parsing results.
 // ParseAll() populates this; crosscheck and gen consume it.
 type Fullstack struct {
-	Config           *manifest.ProjectConfig
+	Manifest         *manifest.ProjectConfig
 	OpenAPIDoc       *openapi3.T
 	DDLResults       []*pg_query.ParseResult
 	Policies         []*ast.Module

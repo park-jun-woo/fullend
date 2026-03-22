@@ -28,7 +28,7 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Ful
 	if _, ok := has[KindConfig]; ok && !skip[KindConfig] {
 		cfg, diags := manifest.Load(root)
 		if len(diags) == 0 {
-			fs.Config = cfg
+			fs.Manifest = cfg
 		}
 	}
 
