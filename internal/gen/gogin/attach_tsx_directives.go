@@ -7,8 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/park-jun-woo/fullend/internal/contract"
 )
 
 // attachTSXDirectives scans pages/*.tsx files and injects // fullend:gen directive.
@@ -23,25 +21,7 @@ func attachTSXDirectives(artifactsDir string) error {
 			continue
 		}
 		path := filepath.Join(pagesDir, entry.Name())
-		src, err := os.ReadFile(path)
-		if err != nil {
-			continue
-		}
-		content := string(src)
-
-		// Skip if directive already present.
-		if strings.Contains(content, "fullend:") {
-			continue
-		}
-
-		// SSOT path: STML file derives from TSX filename.
-		stmlName := strings.TrimSuffix(entry.Name(), ".tsx") + ".html"
-		ssotPath := "frontend/" + stmlName
-		hash := contract.Hash7(content)
-
-		d := &contract.Directive{Ownership: "gen", SSOT: ssotPath, Contract: hash}
-		newContent := d.StringJS() + "\n" + content
-		os.WriteFile(path, []byte(newContent), 0644)
+		injectTSXDirective(path, entry.Name())
 	}
 	return nil
 }

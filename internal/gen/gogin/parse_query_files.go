@@ -4,7 +4,6 @@
 package gogin
 
 import (
-	"bufio"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -32,50 +31,14 @@ func parseQueryFiles(specsDir string) map[string]map[string]sqlcQuery {
 			continue
 		}
 
-		// Derive model name from filename (e.g. "course.sql" -> "Course").
 		baseName := strings.TrimSuffix(entry.Name(), ".sql")
 		modelName := singularize(baseName)
 
-		if result[modelName] == nil {
-			result[modelName] = make(map[string]sqlcQuery)
-		}
-
 		path := filepath.Join(queriesDir, entry.Name())
-		f, err := os.Open(path)
-		if err != nil {
-			continue
+		queries := parseSingleQueryFile(path, modelName, nameRe, paramRe, insertColRe, updateSetRe)
+		if len(queries) > 0 {
+			result[modelName] = queries
 		}
-
-		scanner := bufio.NewScanner(f)
-		var currentQuery *sqlcQuery
-		var sqlBuf strings.Builder
-
-		for scanner.Scan() {
-			line := scanner.Text()
-			matches := nameRe.FindStringSubmatch(line)
-			if matches == nil && currentQuery != nil {
-				sqlBuf.WriteString(line)
-				sqlBuf.WriteString("\n")
-			}
-			if matches == nil {
-				continue
-			}
-			if currentQuery != nil {
-				finishQuery(currentQuery, sqlBuf.String(), paramRe, insertColRe, updateSetRe)
-				result[modelName][currentQuery.Name] = *currentQuery
-			}
-			currentQuery = &sqlcQuery{
-				Name:        stripModelPrefix(matches[1], modelName),
-				Cardinality: matches[2],
-			}
-			sqlBuf.Reset()
-		}
-		// Save last query in file.
-		if currentQuery != nil {
-			finishQuery(currentQuery, sqlBuf.String(), paramRe, insertColRe, updateSetRe)
-			result[modelName][currentQuery.Name] = *currentQuery
-		}
-		f.Close()
 	}
 
 	return result

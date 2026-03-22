@@ -12,28 +12,13 @@ func parseCRUD(seqType, rest string, hasResult bool) (*Sequence, error) {
 	seq := &Sequence{Type: seqType}
 
 	if hasResult {
-		// Type var = Model.Method({Key: val, ...})
-		eqIdx := strings.Index(rest, "=")
-		if eqIdx < 0 {
-			return nil, nil
-		}
-		lhs := strings.TrimSpace(rest[:eqIdx])
-		rhs := strings.TrimSpace(rest[eqIdx+1:])
-
-		result := parseResult(lhs)
-		if result == nil {
-			return nil, nil
-		}
-		seq.Result = result
-
-		model, inputs, _, err := parseCallExprInputs(rhs)
-		if err != nil {
+		if err := parseCRUDWithResult(rest, seq); err != nil {
 			return nil, err
 		}
-		seq.Package, seq.Model = splitPackagePrefix(model)
-		seq.Inputs = inputs
+		if seq.Result == nil {
+			return nil, nil
+		}
 	} else {
-		// Model.Method({Key: val, ...})
 		model, inputs, _, err := parseCallExprInputs(rest)
 		if err != nil {
 			return nil, err

@@ -20,22 +20,12 @@ func scanPreservedFromSource(src string) map[string]*PreservedFunc {
 
 	for _, decl := range f.Decls {
 		fd, ok := decl.(*ast.FuncDecl)
-		if !ok || fd.Body == nil {
+		if !ok {
 			continue
 		}
-
-		d := extractDirectiveFromDoc(fd.Doc)
-		if d == nil || d.Ownership != "preserve" {
-			continue
-		}
-
-		bodyStart := fset.Position(fd.Body.Lbrace).Offset
-		bodyEnd := fset.Position(fd.Body.Rbrace).Offset
-		bodyText := src[bodyStart+1 : bodyEnd]
-
-		result[fd.Name.Name] = &PreservedFunc{
-			Directive: *d,
-			BodyText:  bodyText,
+		name, pf, found := extractPreservedFunc(fd, src, fset)
+		if found {
+			result[name] = pf
 		}
 	}
 

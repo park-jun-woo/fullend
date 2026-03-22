@@ -3,9 +3,7 @@
 package validator
 
 import (
-	"bufio"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -26,49 +24,10 @@ func (st *SymbolTable) loadSqlcQueries(dir string) error {
 			continue
 		}
 
-		modelName := sqlFileToModel(entry.Name())
-		ms := ModelSymbol{Methods: make(map[string]MethodInfo)}
-
-		f, err := os.Open(filepath.Join(dir, entry.Name()))
+		modelName, ms, err := parseSqlFileMethodsFromFile(dir, entry.Name())
 		if err != nil {
 			return err
 		}
-
-		scanner := bufio.NewScanner(f)
-		var currentMethod string
-		var currentCardinality string
-		var currentSQL strings.Builder
-
-		for scanner.Scan() {
-			line := strings.TrimSpace(scanner.Text())
-			// SQL 본문 행: -- name: 주석이 아닌 행은 현재 SQL에 누적
-			if !strings.HasPrefix(line, "-- name:") && currentMethod != "" {
-				currentSQL.WriteString(line + " ")
-			}
-			if !strings.HasPrefix(line, "-- name:") {
-				continue
-			}
-			// 이전 메서드의 SQL 처리
-			if currentMethod != "" {
-				ms.Methods[currentMethod] = MethodInfo{
-					Cardinality: currentCardinality,
-					Params:      extractSqlcParams(currentSQL.String()),
-				}
-			}
-			// 새 메서드 시작
-			currentMethod, currentCardinality = parseSqlcNameLine(line, modelName)
-			currentSQL.Reset()
-		}
-		// 마지막 메서드 처리
-		if currentMethod != "" {
-			params := extractSqlcParams(currentSQL.String())
-			ms.Methods[currentMethod] = MethodInfo{
-				Cardinality: currentCardinality,
-				Params:      params,
-			}
-		}
-		f.Close()
-
 		if len(ms.Methods) > 0 {
 			st.Models[modelName] = ms
 		}

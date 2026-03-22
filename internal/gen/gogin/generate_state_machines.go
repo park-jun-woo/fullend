@@ -4,11 +4,8 @@
 package gogin
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 
-	"github.com/park-jun-woo/fullend/internal/contract"
 	"github.com/park-jun-woo/fullend/internal/statemachine"
 )
 
@@ -22,25 +19,8 @@ func GenerateStateMachines(diagrams []*statemachine.StateDiagram, artifactsDir, 
 	statesBaseDir := filepath.Join(artifactsDir, "backend", "internal", "states")
 
 	for _, d := range diagrams {
-		pkgName := d.ID + "state"
-		pkgDir := filepath.Join(statesBaseDir, pkgName)
-		if err := os.MkdirAll(pkgDir, 0755); err != nil {
-			return fmt.Errorf("create states dir for %s: %w", d.ID, err)
-		}
-
-		src := generateStateMachineSource(d, pkgName)
-
-		// Inject file-level //fullend:gen directive.
-		dir := &contract.Directive{
-			Ownership: "gen",
-			SSOT:      "states/" + d.ID + ".md",
-			Contract:  contract.HashStateDiagram(d),
-		}
-		src = injectFileDirective(src, dir)
-
-		outPath := filepath.Join(pkgDir, pkgName+".go")
-		if err := os.WriteFile(outPath, []byte(src), 0644); err != nil {
-			return fmt.Errorf("write state machine %s: %w", d.ID, err)
+		if err := generateSingleStateMachine(d, statesBaseDir, modulePath); err != nil {
+			return err
 		}
 	}
 

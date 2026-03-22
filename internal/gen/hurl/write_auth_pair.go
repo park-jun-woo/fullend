@@ -3,7 +3,6 @@
 package hurl
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -22,47 +21,10 @@ func writeAuthPair(buf *strings.Builder, registerOp *openapi3.Operation, registe
 	}
 
 	if registerOp != nil {
-		if multiRole {
-			buf.WriteString(fmt.Sprintf("# Register (%s)\n", role))
-		} else {
-			buf.WriteString("# Register\n")
-		}
-		buf.WriteString(fmt.Sprintf("POST {{host}}%s\n", registerPath))
-		buf.WriteString("Content-Type: application/json\n")
-		reqSchema := getRequestSchema(registerOp)
-		body := generateRequestBodyWithOverrides(reqSchema, role, emailPrefix, checkEnums, captures)
-		buf.WriteString(body + "\n")
-		buf.WriteString(fmt.Sprintf("\nHTTP %s\n", getSuccessHTTPCode(registerOp)))
-
-		respSchema := getResponseSchema(registerOp)
-		asserts := generateResponseAssertions(respSchema, nil)
-		writeAssertLines(buf, asserts)
-		buf.WriteString("\n")
+		writeRegisterStep(buf, registerOp, registerPath, captures, role, emailPrefix, multiRole, checkEnums)
 	}
 
 	if loginOp != nil {
-		if multiRole {
-			buf.WriteString(fmt.Sprintf("# Login (%s)\n", role))
-		} else {
-			buf.WriteString("# Login\n")
-		}
-		buf.WriteString(fmt.Sprintf("POST {{host}}%s\n", loginPath))
-		buf.WriteString("Content-Type: application/json\n")
-		reqSchema := getRequestSchema(loginOp)
-		body := generateLoginBodyWithEmail(reqSchema, emailPrefix, checkEnums)
-		buf.WriteString(body + "\n")
-		buf.WriteString(fmt.Sprintf("\nHTTP %s\n", getSuccessHTTPCode(loginOp)))
-
-		// Find token field path from response schema (handles nested objects).
-		tokenField := findTokenJSONPath(getResponseSchema(loginOp))
-
-		tokenVar := "token" + suffix
-		buf.WriteString("[Captures]\n")
-		buf.WriteString(fmt.Sprintf("%s: jsonpath \"$.%s\"\n", tokenVar, tokenField))
-		captures[tokenVar] = true
-
-		buf.WriteString("[Asserts]\n")
-		buf.WriteString(fmt.Sprintf("jsonpath \"$.%s\" exists\n", tokenField))
-		buf.WriteString("\n")
+		writeLoginStep(buf, loginOp, loginPath, captures, role, emailPrefix, suffix, multiRole, checkEnums)
 	}
 }

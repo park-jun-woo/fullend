@@ -34,24 +34,7 @@ func Init(ctx context.Context, b string, d *sql.DB) error {
 
 	switch b {
 	case "postgres":
-		_, err := d.ExecContext(ctx, `
-			CREATE TABLE IF NOT EXISTS fullend_queue (
-				id           BIGSERIAL PRIMARY KEY,
-				topic        TEXT NOT NULL,
-				payload      JSONB NOT NULL,
-				priority     TEXT NOT NULL DEFAULT 'normal',
-				status       TEXT NOT NULL DEFAULT 'pending',
-				created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-				deliver_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-				processed_at TIMESTAMPTZ
-			)`)
-		if err != nil {
-			return err
-		}
-		_, err = d.ExecContext(ctx, `
-			CREATE INDEX IF NOT EXISTS idx_fullend_queue_pending
-			ON fullend_queue (topic, status, deliver_at) WHERE status = 'pending'`)
-		if err != nil {
+		if err := initPostgres(ctx, d); err != nil {
 			return err
 		}
 		db = d

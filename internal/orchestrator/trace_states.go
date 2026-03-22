@@ -4,8 +4,6 @@
 package orchestrator
 
 import (
-	"path/filepath"
-
 	"github.com/park-jun-woo/fullend/internal/statemachine"
 	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
@@ -30,23 +28,7 @@ func traceStates(sf *ssacparser.ServiceFunc, diagrams []*statemachine.StateDiagr
 		if !diagramIDs[d.ID] {
 			continue
 		}
-		relPath := "states/" + d.ID + ".md"
-		trans := transitions[d.ID]
-		// Find the transition line.
-		line := 0
-		if trans != "" {
-			line = grepLine(filepath.Join(specsDir, relPath), trans)
-		}
-		summary := "diagram: " + d.ID
-		if trans != "" {
-			summary += " -> " + trans
-		}
-		links = append(links, ChainLink{
-			Kind:    "StateDiag",
-			File:    relPath,
-			Line:    line,
-			Summary: summary,
-		})
+		links = append(links, buildStateChainLink(d.ID, specsDir, transitions))
 	}
 	return links
 }

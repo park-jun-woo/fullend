@@ -10,22 +10,7 @@ func extractRequestSchema(schema openAPISchema, allSchemas map[string]openAPISch
 	}
 	rs := RequestSchema{Fields: map[string]FieldConstraint{}}
 	for name, prop := range resolved.Properties {
-		prop = resolveSchema(prop, allSchemas)
-		fc := FieldConstraint{
-			Required:  requiredSet[name],
-			Format:    prop.Format,
-			MinLength: prop.MinLength,
-			MaxLength: prop.MaxLength,
-			Minimum:   prop.Minimum,
-			Maximum:   prop.Maximum,
-			Pattern:   prop.Pattern,
-		}
-		for _, e := range prop.Enum {
-			if s, ok := e.(string); ok {
-				fc.Enum = append(fc.Enum, s)
-			}
-		}
-		rs.Fields[name] = fc
+		rs.Fields[name] = buildFieldConstraint(name, prop, allSchemas, requiredSet)
 	}
 	return rs
 }

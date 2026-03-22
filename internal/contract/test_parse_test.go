@@ -62,19 +62,7 @@ func TestParse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Parse(tt.input)
-			if tt.wantErr {
-				if err == nil {
-					t.Errorf("Parse(%q) expected error, got %+v", tt.input, got)
-				}
-				return
-			}
-			if err != nil {
-				t.Fatalf("Parse(%q) unexpected error: %v", tt.input, err)
-			}
-			if got.Ownership != tt.want.Ownership || got.SSOT != tt.want.SSOT || got.Contract != tt.want.Contract {
-				t.Errorf("Parse(%q) = %+v, want %+v", tt.input, got, tt.want)
-			}
+			assertParseCase(t, tt.name, tt.input, tt.want, tt.wantErr)
 		})
 	}
 }

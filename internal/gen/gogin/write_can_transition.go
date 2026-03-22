@@ -15,19 +15,6 @@ func writeCanTransition(buf *strings.Builder, d *statemachine.StateDiagram, fiel
 	case "bool":
 		buf.WriteString(generateBoolCanTransition(d))
 	default:
-		buf.WriteString(`// CanTransition checks if the given event is valid from the current state.
-// Set DISABLE_STATE_CHECK=1 to bypass state transition checks.
-func CanTransition(input Input, event string) error {
-	if os.Getenv("DISABLE_STATE_CHECK") == "1" {
-		return nil
-	}
-	status, _ := input.Status.(string)
-	_, ok := transitions[transitionKey{from: status, event: event}]
-	if !ok {
-		return fmt.Errorf("cannot transition from %q via %q", status, event)
-	}
-	return nil
-}
-`)
+		writeStringCanTransition(buf, d)
 	}
 }
