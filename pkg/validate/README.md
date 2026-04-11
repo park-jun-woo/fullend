@@ -11,7 +11,7 @@
 | `ddl/` | `parser/ddl/` | D-1~D-3 | sqlc 중복, NOT NULL, 센티널 레코드 |
 | `openapi/` | kin-openapi 직접 | O-1 | path 파라미터 충돌 |
 | `ssac/` | `parser/ssac/` | S-1~S-58 | 필수 필드, 변수 흐름, 모델 검증, @subscribe 제약 등 |
-| `stml/` | `parser/stml/` | TM-1~TM-12 | fetch/action 바인딩, 파라미터, 컴포넌트 참조 |
+| `stml/` | `parser/stml/` | TM-1~TM-12 | fetch/action 바인딩, 파라미터, 컴포넌트 참조. 중첩 fetch/action에도 동일 규칙 재귀 적용 |
 | `statemachine/` | `parser/statemachine/` | ST-1 | 파싱 검증 |
 | `rego/` | `parser/rego/` | P-1 | 파싱 검증 |
 | `funcspec/` | `parser/funcspec/` | F-1 | built-in 패키지명 충돌 |
@@ -60,6 +60,8 @@ defeater = 예외 ("currentUser는 암묵적 선언" → IsImplicitVar)
 | TM-6 | `RefExists` | LookupKey=`OpenAPI.response.<operationId>` | `stml/` |
 | TM-10 | `RefExists` | LookupKey=`OpenAPI.sort.<operationId>` | `stml/` |
 | TM-11 | `RefExists` | LookupKey=`OpenAPI.filter.<operationId>` | `stml/` |
+
+**중첩 적용**: 중첩 fetch 블록(`NestedFetches`)과 fetch 내 action 블록(`Children[kind=action]`)에도 TM-1~TM-12가 재귀적으로 동일 적용된다. 별도 규칙 ID 없음 — 디스패처 함수(`validateNestedFetches`, `validateChildActions`)가 기존 규칙을 하위 블록에 전파한다.
 
 ### Defeater 사용
 
