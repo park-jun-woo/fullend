@@ -14,6 +14,8 @@ import (
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
+	"github.com/park-jun-woo/fullend/pkg/parser/ddl"
+	"github.com/park-jun-woo/fullend/pkg/parser/rego"
 	"github.com/park-jun-woo/fullend/pkg/parser/stml"
 	tanglparser "github.com/park-jun-woo/toulmin/pkg/tangl/parser"
 )
@@ -32,6 +34,8 @@ type Fullstack struct {
 	ProjectFuncSpecs []funcspec.FuncSpec
 	FullendPkgSpecs  []funcspec.FuncSpec
 	HurlFiles        []string
+	DDLTables        []ddl.Table
+	ParsedPolicies   []rego.Policy
 	TanglFiles       []*tanglparser.File
 	ModelDir         string
 	StatesDiags      []diagnostic.Diagnostic

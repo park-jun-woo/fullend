@@ -18,15 +18,41 @@
 | `manifest/` | `fullend.yaml` | `*ProjectConfig` | 프로젝트 설정 파싱 (yaml.v3 활용) |
 | `toulmin/` | Go `.go` | `*Graph` | Toulmin 규칙 그래프 파싱 (Go AST 활용) |
 
-## 외부 라이브러리 래퍼
+## 구조화 파서 + 외부 검증
 
-| 패키지 | 라이브러리 | 입력 | 출력 | 설명 |
-|--------|-----------|------|------|------|
-| `ddl/` | `pg_query_go` | `.sql` | `[]*pg_query.ParseResult` | DDL 테이블/컬럼/제약조건 |
-| `rego/` | `opa/ast` | `.rego` | `[]*ast.Module` | OPA 인가 정책 |
+| 패키지 | 구조화 파서 | 출력 | 외부 검증 | 설명 |
+|--------|-----------|------|----------|------|
+| `ddl/` | `ParseTables(dir)` | `[]Table` | `ParseDir()` → `pg_query_go` | DDL 테이블/컬럼/FK/인덱스/CHECK |
+| `rego/` | `ParsePolicies(dir)` | `[]Policy` | `ParseDir()` → `opa/ast` | allow 규칙, @ownership, claims 참조 |
 
 ## 외부 라이브러리 (래퍼 없이 직접 사용)
 
 | 라이브러리 | 대상 | 출력 | 설명 |
 |-----------|------|------|------|
 | `kin-openapi` | OpenAPI YAML | `*openapi3.T` | API 엔드포인트 스키마 |
+
+## DDL 구조체
+
+```go
+type Table struct {
+    Name        string
+    Columns     map[string]string   // column → Go type
+    ColumnOrder []string
+    ForeignKeys []ForeignKey        // {Column, RefTable, RefColumn}
+    Indexes     []Index             // {Name, Columns, IsUnique}
+    PrimaryKey  []string
+    VarcharLen  map[string]int      // column → VARCHAR(N)
+    CheckEnums  map[string][]string // column → CHECK IN values
+}
+```
+
+## Rego 구조체
+
+```go
+type Policy struct {
+    File       string
+    Rules      []AllowRule          // {Actions, Resource, UsesOwner, UsesRole, RoleValue}
+    Ownerships []OwnershipMapping   // {Resource, Table, Column, JoinTable, JoinFK}
+    ClaimsRefs []string             // input.claims.xxx 참조 (중복 제거)
+}
+```

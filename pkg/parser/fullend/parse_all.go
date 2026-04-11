@@ -67,12 +67,20 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Ful
 		if len(diags) == 0 {
 			fs.DDLResults = results
 		}
+		tables, tdiags := ddl.ParseTables(d.Path)
+		if len(tdiags) == 0 {
+			fs.DDLTables = tables
+		}
 	}
 
 	if d, ok := has[KindPolicy]; ok && !skip[KindPolicy] {
 		modules, diags := rego.ParseDir(d.Path)
 		if len(diags) == 0 {
 			fs.Policies = modules
+		}
+		policies, pdiags := rego.ParsePolicies(d.Path)
+		if len(pdiags) == 0 {
+			fs.ParsedPolicies = policies
 		}
 	}
 

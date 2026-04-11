@@ -23,6 +23,8 @@ func BuildGround(fs *fullend.Fullstack) *rule.Ground {
 	populateStates(g, fs)
 	populateFunc(g, fs)
 	populateManifest(g, fs)
+	populateDDL(g, fs)
+	populateRego(g, fs)
 	populateHurl(g, fs)
 	return g
 }
