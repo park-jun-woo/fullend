@@ -1,0 +1,14 @@
+package service
+
+import "github.com/example/zenflow/internal/billing"
+
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "workflow not found"
+// @auth "ActivateWorkflow" "workflow" {ResourceID: workflow.ID} "not authorized"
+// @call billing.CheckCreditsResponse credits = billing.CheckCredits({OrgID: workflow.OrgID})
+// @empty credits "insufficient credits" 402
+// @state workflow {status: workflow.Status} "ActivateWorkflow" "cannot activate"
+// @put Workflow.UpdateStatus({ID: workflow.ID, Status: "active"})
+// @get! Workflow updated = Workflow.FindByID({ID: workflow.ID})
+// @response { workflow: updated }
+func ActivateWorkflow() {}

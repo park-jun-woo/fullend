@@ -1,0 +1,17 @@
+package service
+
+import "github.com/example/zenflow/internal/billing"
+import "github.com/example/zenflow/internal/worker"
+
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "workflow not found"
+// @auth "ExecuteWorkflow" "workflow" {ResourceID: workflow.ID} "not authorized"
+// @state workflow {status: workflow.Status} "ExecuteWorkflow" "workflow not active" 409
+// @call billing.CheckCreditsResponse credits = billing.CheckCredits({OrgID: workflow.OrgID})
+// @empty credits "insufficient credits" 402
+// @get []Action actions = Action.ListByWorkflow({WorkflowID: workflow.ID})
+// @call worker.ProcessActionsResponse result = worker.ProcessActions({Actions: actions})
+// @call billing.DeductCreditResponse deducted = billing.DeductCredit({OrgID: workflow.OrgID, Amount: 1})
+// @post ExecutionLog log = ExecutionLog.Create({WorkflowID: workflow.ID, OrgID: workflow.OrgID, Status: "completed", CreditsSpent: 1})
+// @response { log: log }
+func ExecuteWorkflow() {}

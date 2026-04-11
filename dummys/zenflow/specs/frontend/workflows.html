@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head><title>Workflows</title></head>
+<body>
+  <div data-fetch="ListWorkflows" data-paginate data-sort="created_at:desc" data-filter="status">
+    <div data-each="items">
+      <h3 data-bind="title"></h3>
+      <span data-bind="status"></span>
+      <span data-bind="trigger_event"></span>
+    </div>
+  </div>
+  <form data-action="CreateWorkflow">
+    <input data-field="title" />
+    <input data-field="trigger_event" />
+    <button type="submit">Create</button>
+  </form>
+</body>
+</html>

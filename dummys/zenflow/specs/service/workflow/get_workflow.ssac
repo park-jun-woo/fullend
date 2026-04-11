@@ -1,0 +1,6 @@
+package service
+
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "workflow not found"
+// @response { workflow: workflow }
+func GetWorkflow() {}

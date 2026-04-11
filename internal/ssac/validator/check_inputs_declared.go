@@ -11,7 +11,7 @@ import (
 
 func checkInputsDeclared(seq parser.Sequence, ctx errCtx, declared map[string]bool, errs []ValidationError) []ValidationError {
 	for _, val := range seq.Inputs {
-		if strings.HasPrefix(val, `"`) {
+		if strings.HasPrefix(val, `"`) || parser.IsLiteral(val) {
 			continue
 		}
 		if strings.HasPrefix(val, "config.") {

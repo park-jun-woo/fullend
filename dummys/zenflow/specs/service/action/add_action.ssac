@@ -1,0 +1,8 @@
+package service
+
+// @get Workflow workflow = Workflow.FindByID({ID: request.id})
+// @empty workflow "workflow not found"
+// @auth "CreateWorkflow" "workflow" {ResourceID: workflow.ID} "not authorized"
+// @post Action action = Action.Create({WorkflowID: workflow.ID, ActionType: request.action_type, PayloadTemplate: request.payload_template, SequenceOrder: request.sequence_order})
+// @response { action: action }
+func AddAction() {}

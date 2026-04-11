@@ -1,0 +1,5 @@
+package service
+
+// @get Page[Workflow] workflowPage = Workflow.List({Query: query})
+// @response workflowPage
+func ListWorkflows() {}

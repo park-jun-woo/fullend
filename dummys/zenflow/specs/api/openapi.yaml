@@ -1,0 +1,287 @@
+openapi: "3.0.3"
+info:
+  title: ZenFlow API
+  version: "1.0.0"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Workflow:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
+        title: { type: string }
+        trigger_event: { type: string }
+        status: { type: string, enum: [draft, active, paused, archived] }
+        created_at: { type: string, format: date-time }
+    Action:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        workflow_id: { type: integer, format: int64 }
+        action_type: { type: string }
+        payload_template: { type: object }
+        sequence_order: { type: integer }
+    ExecutionLog:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        workflow_id: { type: integer, format: int64 }
+        org_id: { type: integer, format: int64 }
+        status: { type: string }
+        credits_spent: { type: integer }
+        executed_at: { type: string, format: date-time }
+
+paths:
+  /auth/register:
+    post:
+      operationId: Register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name, org_id]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                name: { type: string }
+                org_id: { type: integer, format: int64 }
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token: { type: string }
+
+  /auth/login:
+    post:
+      operationId: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token: { type: string }
+        "401":
+          description: Invalid credentials
+
+  /workflows:
+    get:
+      operationId: ListWorkflows
+      security:
+        - bearerAuth: []
+      x-pagination:
+        style: offset
+        defaultLimit: 20
+        maxLimit: 100
+      x-sort:
+        allowed: [created_at]
+        default: created_at
+        direction: desc
+      x-filter:
+        allowed: [status]
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Workflow' }
+                  total: { type: integer }
+    post:
+      operationId: CreateWorkflow
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, trigger_event]
+              properties:
+                title: { type: string }
+                trigger_event: { type: string }
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        "403":
+          description: Forbidden
+
+  /workflows/{id}:
+    get:
+      operationId: GetWorkflow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        "404":
+          description: Not found
+
+  /workflows/{id}/activate:
+    post:
+      operationId: ActivateWorkflow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        "402":
+          description: Insufficient credits
+        "403":
+          description: Forbidden
+        "409":
+          description: Invalid state transition
+
+  /workflows/{id}/pause:
+    post:
+      operationId: PauseWorkflow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        "403":
+          description: Forbidden
+        "409":
+          description: Invalid state transition
+
+  /workflows/{id}/archive:
+    post:
+      operationId: ArchiveWorkflow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow: { $ref: '#/components/schemas/Workflow' }
+        "403":
+          description: Forbidden
+        "409":
+          description: Invalid state transition
+
+  /workflows/{id}/execute:
+    post:
+      operationId: ExecuteWorkflow
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  log: { $ref: '#/components/schemas/ExecutionLog' }
+        "402":
+          description: Insufficient credits
+        "403":
+          description: Forbidden
+        "409":
+          description: Workflow not active
+
+  /workflows/{id}/actions:
+    post:
+      operationId: AddAction
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action_type, sequence_order]
+              properties:
+                action_type: { type: string }
+                payload_template: { type: object }
+                sequence_order: { type: integer }
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  action: { $ref: '#/components/schemas/Action' }
+        "403":
+          description: Forbidden

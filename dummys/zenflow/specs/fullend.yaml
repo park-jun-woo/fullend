@@ -1,0 +1,25 @@
+apiVersion: fullend/v1
+kind: Project
+metadata:
+  name: zenflow
+backend:
+  lang: go
+  framework: gin
+  module: github.com/example/zenflow
+  middleware:
+    - bearerAuth
+  auth:
+    type: jwt
+    secret_env: JWT_SECRET
+    claims:
+      ID: user_id
+      OrgID: org_id
+      Role: role
+    roles:
+      - admin
+      - member
+frontend:
+  lang: typescript
+  framework: react
+  bundler: vite
+  name: zenflow-web
