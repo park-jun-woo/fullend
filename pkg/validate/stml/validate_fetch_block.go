@@ -42,5 +42,15 @@ func validateFetchBlock(fb parsestml.FetchBlock, file string, ground *rule.Groun
 		errs = append(errs, toSTMLErrors(results, file, fb.OperationID)...)
 	}
 
+	// TM-10: data-sort column → OpenAPI x-sort allowed
+	if fb.Sort != nil {
+		errs = append(errs, validateSortRef(fb, file, ground)...)
+	}
+
+	// TM-11: data-filter column → OpenAPI x-filter allowed
+	if len(fb.Filters) > 0 {
+		errs = append(errs, validateFilterRef(fb, file, ground)...)
+	}
+
 	return errs
 }

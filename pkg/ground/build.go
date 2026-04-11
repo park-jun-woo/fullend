@@ -27,6 +27,8 @@ func Build(fs *fullend.Fullstack) *rule.Ground {
 	populateDDL(g, fs)
 	populateRego(g, fs)
 	populateOpenAPIConstraints(g, fs)
+	populateOpenAPIParams(g, fs)
+	populateSymbolTable(g, fs)
 	populateVarTypes(g, fs)
 	populateGoReservedWords(g)
 	populateHurl(g, fs)
