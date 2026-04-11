@@ -8,7 +8,7 @@ func buildFieldPresence(seq parsessac.Sequence) map[string]bool {
 	return map[string]bool{
 		"Model":      seq.Model != "",
 		"Result":     seq.Result != nil,
-		"Args":       len(seq.Args) > 0,
+		"Args":       len(seq.Args) > 0 || len(seq.Inputs) > 0,
 		"Target":     seq.Target != "",
 		"Message":    seq.Message != "",
 		"DiagramID":  seq.DiagramID != "",

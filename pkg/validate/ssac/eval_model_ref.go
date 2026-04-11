@@ -20,9 +20,10 @@ func evalModelRef(modelGraph, upperGraph *toulmin.Graph, ground *rule.Ground, fi
 		errs = append(errs, toValidationErrors(results, file, funcName, seqIdx)...)
 	}
 	if seq.Result != nil && seq.Result.Type != "" {
+		typeName := stripTypePrefix(seq.Result.Type)
 		ctx := toulmin.NewContext()
 		ctx.Set("ground", ground)
-		ctx.Set("claim", seq.Result.Type)
+		ctx.Set("claim", typeName)
 		results, _ := upperGraph.Evaluate(ctx)
 		errs = append(errs, toValidationErrors(results, file, funcName, seqIdx)...)
 	}

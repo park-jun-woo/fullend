@@ -1,5 +1,5 @@
 //ff:func feature=orchestrator type=rule control=iteration dimension=1
-//ff:what STML 페이지 스펙 검증 — 바인딩 수 집계 + stml validator 실행
+//ff:what STML 페이지 스펙 검증 — pkg/validate/stml toulmin 기반
 package orchestrator
 
 import (
@@ -7,7 +7,8 @@ import (
 
 	"github.com/park-jun-woo/fullend/internal/reporter"
 	stmlparser "github.com/park-jun-woo/fullend/internal/stml/parser"
-	stmlvalidator "github.com/park-jun-woo/fullend/internal/stml/validator"
+	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	pkgstml "github.com/park-jun-woo/fullend/pkg/validate/stml"
 )
 
 func validateSTML(root string, pages []stmlparser.PageSpec) reporter.StepResult {
@@ -23,12 +24,16 @@ func validateSTML(root string, pages []stmlparser.PageSpec) reporter.StepResult 
 		bindings += len(p.Fetches) + len(p.Actions)
 	}
 
-	verrs := stmlvalidator.Validate(pages, root)
+	detected, _ := fullend.DetectSSOTs(root)
+	fs := fullend.ParseAll(root, detected, nil)
+	ground := buildSTMLGround(fs)
+
+	verrs := pkgstml.Validate(fs.STMLPages, ground)
 	if len(verrs) > 0 {
 		step.Status = reporter.Fail
 		for _, ve := range verrs {
 			step.Errors = append(step.Errors, fmt.Sprintf("%s [%s] — %s",
-				ve.File, ve.Attr, ve.Message))
+				ve.File, ve.Rule, ve.Message))
 		}
 	} else {
 		step.Status = reporter.Pass
