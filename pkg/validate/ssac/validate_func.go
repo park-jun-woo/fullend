@@ -18,6 +18,12 @@ func validateFunc(fn parsessac.ServiceFunc, ground *rule.Ground) []validate.Vali
 	errs = append(errs, validateStaleResponse(fn)...)
 	errs = append(errs, validateDeleteInputs(fn)...)
 	errs = append(errs, validateErrStatus(fn)...)
+	errs = append(errs, validateUnknownSeq(fn)...)
+	errs = append(errs, validateFKGuard(fn)...)
+	errs = append(errs, validateMethodRef(fn, ground)...)
+	errs = append(errs, validateRequestRef(fn, ground)...)
+	errs = append(errs, validatePagination(fn)...)
+	errs = append(errs, validateSubscribeForbidden(fn, ground)...)
 	if fn.Subscribe != nil {
 		errs = append(errs, validateSubscribe(fn)...)
 	}
