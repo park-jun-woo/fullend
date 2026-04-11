@@ -11,10 +11,14 @@ import (
 )
 
 func checkSeqErrStatus(funcName string, seq ssac.Sequence, fs *fullend.Fullstack) []CrossError {
-	if seq.ErrStatus <= 0 {
+	status := seq.ErrStatus
+	if status <= 0 {
+		status = defaultErrStatus(seq.Type)
+	}
+	if status <= 0 {
 		return nil
 	}
-	code := strconv.Itoa(seq.ErrStatus)
+	code := strconv.Itoa(status)
 	if !openAPIHasResponse(fs, funcName, code) {
 		return []CrossError{{Rule: "X-21", Context: funcName, Level: "ERROR",
 			Message: fmt.Sprintf("ErrStatus %s not defined in OpenAPI responses", code)}}
