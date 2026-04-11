@@ -2,11 +2,14 @@
 //ff:what Run — Fullstack에서 모든 교차 검증을 실행하여 CrossError 목록 반환
 package crosscheck
 
-import "github.com/park-jun-woo/fullend/pkg/parser/fullend"
+import (
+	"github.com/park-jun-woo/fullend/pkg/ground"
+	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+)
 
 // Run executes all cross-validation rules against parsed SSOTs.
 func Run(fs *fullend.Fullstack) []CrossError {
-	g := BuildGround(fs)
+	g := ground.Build(fs)
 	var errs []CrossError
 	// SSaC ↔ OpenAPI
 	errs = append(errs, checkSSaCOpenAPI(g, fs)...)

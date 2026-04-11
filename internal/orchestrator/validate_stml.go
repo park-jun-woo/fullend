@@ -1,5 +1,5 @@
 //ff:func feature=orchestrator type=rule control=iteration dimension=1
-//ff:what STML 페이지 스펙 검증 — pkg/validate/stml toulmin 기반
+//ff:what STML 페이지 스펙 검증 — pkg/validate/stml + pkg/ground 기반
 package orchestrator
 
 import (
@@ -7,6 +7,7 @@ import (
 
 	"github.com/park-jun-woo/fullend/internal/reporter"
 	stmlparser "github.com/park-jun-woo/fullend/internal/stml/parser"
+	"github.com/park-jun-woo/fullend/pkg/ground"
 	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
 	pkgstml "github.com/park-jun-woo/fullend/pkg/validate/stml"
 )
@@ -26,9 +27,9 @@ func validateSTML(root string, pages []stmlparser.PageSpec) reporter.StepResult 
 
 	detected, _ := fullend.DetectSSOTs(root)
 	fs := fullend.ParseAll(root, detected, nil)
-	ground := buildSTMLGround(fs)
+	g := ground.Build(fs)
 
-	verrs := pkgstml.Validate(fs.STMLPages, ground)
+	verrs := pkgstml.Validate(fs.STMLPages, g)
 	if len(verrs) > 0 {
 		step.Status = reporter.Fail
 		for _, ve := range verrs {

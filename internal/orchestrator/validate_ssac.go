@@ -1,5 +1,5 @@
 //ff:func feature=orchestrator type=rule control=iteration dimension=1
-//ff:what SSaC 서비스 함수 검증 — pkg/validate/ssac toulmin 기반
+//ff:what SSaC 서비스 함수 검증 — pkg/validate/ssac + pkg/ground 기반
 package orchestrator
 
 import (
@@ -8,8 +8,8 @@ import (
 	"github.com/park-jun-woo/fullend/internal/reporter"
 	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/ground"
 	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
-	"github.com/park-jun-woo/fullend/pkg/rule"
 	pkgssac "github.com/park-jun-woo/fullend/pkg/validate/ssac"
 )
 
@@ -21,28 +21,11 @@ func validateSSaC(root string, funcs []ssacparser.ServiceFunc, st *ssacvalidator
 		return step
 	}
 
-	// Re-parse via pkg/parser for pkg types
 	detected, _ := fullend.DetectSSOTs(root)
 	fs := fullend.ParseAll(root, detected, nil)
-	ground := &rule.Ground{
-		Lookup:  make(map[string]rule.StringSet),
-		Types:   make(map[string]string),
-		Pairs:   make(map[string]rule.StringSet),
-		Config:  make(map[string]bool),
-		Vars:    make(rule.StringSet),
-		Flags:   make(rule.StringSet),
-		Schemas: make(map[string][]string),
-	}
-	// Populate Go reserved words for ForbiddenRef
-	ground.Lookup["go.reserved"] = rule.StringSet{
-		"break": true, "case": true, "chan": true, "const": true, "continue": true,
-		"default": true, "defer": true, "else": true, "fallthrough": true, "for": true,
-		"func": true, "go": true, "goto": true, "if": true, "import": true,
-		"interface": true, "map": true, "package": true, "range": true, "return": true,
-		"select": true, "struct": true, "switch": true, "type": true, "var": true,
-	}
+	g := ground.Build(fs)
 
-	verrs := pkgssac.Validate(fs.ServiceFuncs, ground)
+	verrs := pkgssac.Validate(fs.ServiceFuncs, g)
 	hasError := false
 	for _, ve := range verrs {
 		prefix := ""
