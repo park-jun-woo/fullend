@@ -1,5 +1,5 @@
 //ff:func feature=orchestrator type=rule control=iteration dimension=1
-//ff:what Mermaid stateDiagram 검증 — 다이어그램 수 + 전이 수 집계
+//ff:what Mermaid stateDiagram 검증 — pkg/validate/statemachine 기반
 package orchestrator
 
 import (
@@ -7,6 +7,8 @@ import (
 
 	"github.com/park-jun-woo/fullend/internal/reporter"
 	"github.com/park-jun-woo/fullend/internal/statemachine"
+	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	pkgstates "github.com/park-jun-woo/fullend/pkg/validate/statemachine"
 )
 
 func validateStates(diagrams []*statemachine.StateDiagram, parseErr error) reporter.StepResult {
@@ -26,11 +28,19 @@ func validateStates(diagrams []*statemachine.StateDiagram, parseErr error) repor
 		return step
 	}
 
-	totalTransitions := 0
-	for _, d := range diagrams {
-		totalTransitions += len(d.Transitions)
+	detected, _ := fullend.DetectSSOTs(".")
+	fs := fullend.ParseAll(".", detected, nil)
+	verrs := pkgstates.Validate(fs.StatesDiags)
+	for _, ve := range verrs {
+		step.Errors = append(step.Errors, ve.Message)
 	}
-	step.Status = reporter.Pass
+
+	totalTransitions := countTransitions(diagrams)
+	if len(step.Errors) > 0 {
+		step.Status = reporter.Fail
+	} else {
+		step.Status = reporter.Pass
+	}
 	step.Summary = fmt.Sprintf("%d diagrams, %d transitions", len(diagrams), totalTransitions)
 	return step
 }

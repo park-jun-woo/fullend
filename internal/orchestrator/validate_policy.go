@@ -1,5 +1,5 @@
-//ff:func feature=orchestrator type=rule control=iteration dimension=1
-//ff:what OPA Rego 정책 검증 — 파일 수, 규칙 수, 소유권 매핑 수 집계
+//ff:func feature=orchestrator type=rule control=sequence
+//ff:what OPA Rego 정책 검증 — pkg/validate/rego 기반
 package orchestrator
 
 import (
@@ -22,12 +22,8 @@ func validatePolicy(policies []*policy.Policy) reporter.StepResult {
 		return step
 	}
 
-	totalRules := 0
-	totalOwnerships := 0
-	for _, p := range policies {
-		totalRules += len(p.Rules)
-		totalOwnerships += len(p.Ownerships)
-	}
+	totalRules := countPolicyRules(policies)
+	totalOwnerships := countPolicyOwnerships(policies)
 	step.Status = reporter.Pass
 	step.Summary = fmt.Sprintf("%d files, %d rules, %d ownership mappings", len(policies), totalRules, totalOwnerships)
 	return step
