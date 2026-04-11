@@ -12,6 +12,7 @@ import (
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 	"github.com/park-jun-woo/fullend/pkg/parser/hurl"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
+	oapiparser "github.com/park-jun-woo/fullend/pkg/parser/openapi"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
 	"github.com/park-jun-woo/fullend/pkg/parser/ddl"
@@ -36,6 +37,8 @@ type Fullstack struct {
 	HurlFiles        []string
 	DDLTables        []ddl.Table
 	ParsedPolicies   []rego.Policy
+	RequestConstraints  map[string]map[string]oapiparser.FieldConstraint
+	ResponseConstraints map[string]map[string]oapiparser.FieldConstraint
 	TanglFiles       []*tanglparser.File
 	ModelDir         string
 	StatesDiags      []diagnostic.Diagnostic

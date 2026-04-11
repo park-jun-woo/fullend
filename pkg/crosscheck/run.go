@@ -13,13 +13,17 @@ func Run(fs *fullend.Fullstack) []CrossError {
 	errs = append(errs, checkOpenAPISSaC(g, fs)...)
 	errs = append(errs, checkResponseSchema(g, fs)...)
 	errs = append(errs, checkErrStatus(fs)...)
-	errs = append(errs, checkShorthandResponse(fs)...)
+	errs = append(errs, checkShorthandResponse(g, fs)...)
+	errs = append(errs, checkShorthandReverse(g, fs)...)
 	// OpenAPI ↔ DDL
 	errs = append(errs, checkOpenAPIDDL(g, fs)...)
 	errs = append(errs, checkSortIndex(g, fs)...)
 	errs = append(errs, checkXInclude(g, fs)...)
 	errs = append(errs, checkCursor(fs)...)
 	errs = append(errs, checkGhostProperties(g, fs)...)
+	errs = append(errs, checkXIncludeFK(g, fs)...)
+	errs = append(errs, checkCursorUnique(g, fs)...)
+	errs = append(errs, checkDDLOpenAPICoverage(g, fs)...)
 	// SSaC ↔ DDL
 	errs = append(errs, checkSSaCDDL(g, fs)...)
 	// States
@@ -45,6 +49,7 @@ func Run(fs *fullend.Fullstack) []CrossError {
 	errs = append(errs, checkFuncDetails(g, fs)...)
 	errs = append(errs, checkCallFuncName(fs)...)
 	errs = append(errs, checkCallTypeMatch(g, fs)...)
+	errs = append(errs, checkCallInputTypeMatch(g, fs)...)
 	errs = append(errs, checkCallSourceVar(fs)...)
 	// Config
 	errs = append(errs, checkConfig(g, fs)...)
@@ -66,6 +71,9 @@ func Run(fs *fullend.Fullstack) []CrossError {
 	errs = append(errs, checkSensitive(fs)...)
 	errs = append(errs, checkConstraints(fs)...)
 	errs = append(errs, checkDDLOpenAPIConstraints(g, fs)...)
+	errs = append(errs, checkVarcharMaxLength(fs)...)
+	errs = append(errs, checkOpenAPIRequired(g, fs)...)
+	errs = append(errs, checkDDLCheckOpenAPIEnum(g, fs)...)
 	// Authz
 	errs = append(errs, checkAuthzInputs(fs)...)
 	return errs

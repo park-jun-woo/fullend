@@ -9,6 +9,7 @@ import (
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 	"github.com/park-jun-woo/fullend/pkg/parser/hurl"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
+	oapiparser "github.com/park-jun-woo/fullend/pkg/parser/openapi"
 	"github.com/park-jun-woo/fullend/pkg/parser/rego"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
@@ -36,6 +37,8 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Ful
 		doc, err := openapi3.NewLoader().LoadFromFile(d.Path)
 		if err == nil {
 			fs.OpenAPIDoc = doc
+			fs.RequestConstraints = oapiparser.ExtractRequestConstraints(doc)
+			fs.ResponseConstraints = oapiparser.ExtractResponseConstraints(doc)
 		}
 	}
 

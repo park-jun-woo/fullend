@@ -25,6 +25,8 @@ func BuildGround(fs *fullend.Fullstack) *rule.Ground {
 	populateManifest(g, fs)
 	populateDDL(g, fs)
 	populateRego(g, fs)
+	populateOpenAPIConstraints(g, fs)
+	populateVarTypes(g, fs)
 	populateHurl(g, fs)
 	return g
 }
