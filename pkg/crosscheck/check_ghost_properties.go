@@ -15,10 +15,10 @@ func checkGhostProperties(g *rule.Ground, fs *fullend.Fullstack) []CrossError {
 	}
 	var errs []CrossError
 	for opID, fields := range g.Schemas {
-		if !strings.HasPrefix(opID, "OpenAPI.response.") {
+		if !strings.HasPrefix(opID, "OpenAPI.response.resolved.") {
 			continue
 		}
-		op := opID[len("OpenAPI.response."):]
+		op := opID[len("OpenAPI.response.resolved."):]
 		table := guessTableFromOp(op)
 		cols := g.Lookup["DDL.column."+table]
 		if len(cols) == 0 {

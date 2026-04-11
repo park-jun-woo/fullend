@@ -18,7 +18,7 @@ func checkDDLOpenAPICoverage(g *rule.Ground, fs *fullend.Fullstack) []CrossError
 	var errs []CrossError
 	for _, t := range fs.DDLTables {
 		model := inflection.Singular(strings.Title(t.Name))
-		schemaKey := "OpenAPI.response.Get" + model
+		schemaKey := "OpenAPI.response.resolved.Get" + model
 		target := g.Schemas[schemaKey]
 		if len(target) == 0 {
 			continue

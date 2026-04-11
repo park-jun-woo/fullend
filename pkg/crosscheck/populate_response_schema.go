@@ -28,6 +28,12 @@ func populateResponseSchema(g *rule.Ground, opID string, op *openapi3.Operation)
 			fields = append(fields, name)
 		}
 		g.Schemas["OpenAPI.response."+opID] = fields
+
+		// $ref 解決: property が object/$ref の場合、内部 property を展開
+		resolved := resolveRefProperties(ct.Schema.Value)
+		if len(resolved) > 0 {
+			g.Schemas["OpenAPI.response.resolved."+opID] = resolved
+		}
 		return
 	}
 }
