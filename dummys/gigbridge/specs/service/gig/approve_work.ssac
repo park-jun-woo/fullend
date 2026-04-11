@@ -1,0 +1,13 @@
+package service
+
+import "github.com/example/gigbridge/internal/billing"
+
+// @get Gig gig = Gig.FindByID({ID: request.id})
+// @empty gig "gig not found"
+// @auth "ApproveWork" "gig" {ResourceID: gig.ID} "not authorized"
+// @state gig {status: gig.Status} "ApproveWork" "cannot approve"
+// @call billing.ReleaseFundsResponse release = billing.ReleaseFunds({GigID: gig.ID, Amount: gig.Budget, FreelancerID: gig.FreelancerID})
+// @put Gig.UpdateStatus({ID: gig.ID, Status: "completed"})
+// @get! Gig updated = Gig.FindByID({ID: gig.ID})
+// @response { gig: updated }
+func ApproveWork() {}

@@ -19,10 +19,13 @@ func populateManifest(g *rule.Ground, fs *fullend.Fullstack) {
 
 	if fs.Manifest.Backend.Auth != nil {
 		claims := make(rule.StringSet)
-		for field := range fs.Manifest.Backend.Auth.Claims {
+		claimKeys := make(rule.StringSet)
+		for field, def := range fs.Manifest.Backend.Auth.Claims {
 			claims[field] = true
+			claimKeys[def.Key] = true
 		}
 		g.Lookup["Config.claims"] = claims
+		g.Lookup["Config.claims.keys"] = claimKeys
 		g.Config["backend.auth.claims"] = len(claims) > 0
 
 		roles := make(rule.StringSet)

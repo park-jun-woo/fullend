@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Gigs</title></head>
+<body>
+  <div data-fetch="ListGigs" data-paginate data-sort="created_at:desc" data-filter="status">
+    <div data-each="items">
+      <h3 data-bind="title"></h3>
+      <span data-bind="budget"></span>
+      <span data-bind="status"></span>
+    </div>
+  </div>
+</body>
+</html>

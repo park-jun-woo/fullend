@@ -16,6 +16,7 @@ import (
 func validateFKReferenceGuard(sf parser.ServiceFunc) []ValidationError {
 	var errs []ValidationError
 	declared := map[string]bool{}
+	varTypes := map[string]string{} // var name → Model type
 	if sf.Subscribe != nil {
 		declared["message"] = true
 	}
@@ -24,6 +25,7 @@ func validateFKReferenceGuard(sf parser.ServiceFunc) []ValidationError {
 		if seq.Type != parser.SeqGet || seq.Result == nil {
 			if seq.Result != nil {
 				declared[seq.Result.Var] = true
+				varTypes[seq.Result.Var] = seq.Result.Type
 			}
 			continue
 		}
@@ -31,27 +33,17 @@ func validateFKReferenceGuard(sf parser.ServiceFunc) []ValidationError {
 		// 슬라이스/래퍼 결과는 nil dereference 위험 없음
 		if strings.HasPrefix(seq.Result.Type, "[]") || seq.Result.Wrapper != "" {
 			declared[seq.Result.Var] = true
+			varTypes[seq.Result.Var] = seq.Result.Type
 			continue
 		}
 
 		// input 중 이전 result 변수 참조가 있는지 확인
-		hasFKRef := false
-		for _, val := range seq.Inputs {
-			if strings.HasPrefix(val, `"`) {
-				continue
-			}
-			ref := rootVar(val)
-			if ref == "request" || ref == "currentUser" || ref == "query" || ref == "message" || ref == "config" || ref == "" {
-				continue
-			}
-			if declared[ref] {
-				hasFKRef = true
-				break
-			}
-		}
+		// 같은 Model의 재쿼리(PK lookup)는 FK 참조가 아님
+		hasFKRef := hasForeignKeyRef(seq, declared, varTypes)
 
 		if seq.Result != nil {
 			declared[seq.Result.Var] = true
+			varTypes[seq.Result.Var] = seq.Result.Type
 		}
 		if !hasFKRef {
 			continue

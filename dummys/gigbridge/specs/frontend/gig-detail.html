@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><title>Gig Detail</title></head>
+<body>
+  <div data-fetch="GetGig" data-param-id="route.ID">
+    <h2 data-bind="gig.title"></h2>
+    <p data-bind="gig.description"></p>
+    <span data-bind="gig.status"></span>
+    <span data-bind="gig.budget"></span>
+
+    <div data-state="gig.status" data-state-value="draft">
+      <button data-action="PublishGig" data-param-id="route.ID">Publish</button>
+    </div>
+  </div>
+</body>
+</html>

@@ -5,6 +5,8 @@ package crosscheck
 import (
 	"strings"
 
+	"github.com/jinzhu/inflection"
+
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/rule"
 )
@@ -23,7 +25,10 @@ func populateSSaCSeq(g *rule.Ground, funcName string, seq ssac.Sequence,
 		pubTopics[seq.Topic] = true
 	case "get", "post", "put", "delete":
 		if idx := strings.IndexByte(seq.Model, '.'); idx > 0 {
-			modelRefs[seq.Model[:idx]] = true
+			model := seq.Model[:idx]
+			modelRefs[model] = true
+			// DDL table name = lowercase plural of model name
+			modelRefs[strings.ToLower(inflection.Plural(model))] = true
 		}
 	case "response":
 		populateResponseFields(g, funcName, seq)

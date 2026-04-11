@@ -22,5 +22,11 @@ func populateFunc(g *rule.Ground, fs *fullend.Fullstack) {
 		}
 		g.Schemas["Func.request."+sp.Name] = reqFields
 	}
+	// auth.issueToken/verifyToken/refreshToken are generated from claims config
+	if fs.Manifest != nil && fs.Manifest.Backend.Auth != nil && len(fs.Manifest.Backend.Auth.Claims) > 0 {
+		specs["auth.issuetoken"] = true
+		specs["auth.verifytoken"] = true
+		specs["auth.refreshtoken"] = true
+	}
 	g.Lookup["Func.spec"] = specs
 }

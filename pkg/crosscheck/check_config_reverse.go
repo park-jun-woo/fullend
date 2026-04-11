@@ -17,7 +17,7 @@ func checkConfigReverse(g *rule.Ground, fs *fullend.Fullstack) []CrossError {
 	// X-51: OpenAPI security → Config middleware
 	if fs.OpenAPIDoc != nil {
 		graph51 := toulmin.NewGraph("security-middleware")
-		graph51.Rule(rule.PairMatch).With(&rule.PairMatchSpec{
+		graph51.Rule(rule.RefExists).With(&rule.RefExistsSpec{
 			BaseSpec:  rule.BaseSpec{Rule: "X-51", Level: "ERROR", Message: "OpenAPI securityScheme not in Config middleware"},
 			LookupKey: "Config.middleware",
 		})
@@ -26,15 +26,15 @@ func checkConfigReverse(g *rule.Ground, fs *fullend.Fullstack) []CrossError {
 		}
 	}
 
-	// X-54: Config claims → Rego usage coverage
+	// X-54: Config claims → Rego usage coverage (compare by JWT claim key)
 	if len(fs.ParsedPolicies) > 0 {
 		graph54 := toulmin.NewGraph("claims-coverage")
 		graph54.Rule(rule.CoverageCheck).With(&rule.CoverageCheckSpec{
 			BaseSpec:  rule.BaseSpec{Rule: "X-54", Level: "WARNING", Message: "Config claim not referenced in Rego"},
 			LookupKey: "Rego.claims",
 		})
-		for field := range g.Lookup["Config.claims"] {
-			errs = append(errs, evalRef(graph54, g, field, field)...)
+		for key := range g.Lookup["Config.claims.keys"] {
+			errs = append(errs, evalRef(graph54, g, key, key)...)
 		}
 	}
 

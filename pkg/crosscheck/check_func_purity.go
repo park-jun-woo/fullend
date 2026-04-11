@@ -8,8 +8,7 @@ import (
 
 func checkFuncPurity(fs *fullend.Fullstack) []CrossError {
 	var errs []CrossError
-	allSpecs := append(fs.ProjectFuncSpecs, fs.FullendPkgSpecs...)
-	for _, sp := range allSpecs {
+	for _, sp := range fs.ProjectFuncSpecs {
 		errs = append(errs, checkSingleFuncPurity(sp.Package, sp.Name, sp.HasBody, sp.Imports)...)
 	}
 	return errs

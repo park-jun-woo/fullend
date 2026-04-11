@@ -1,0 +1,9 @@
+package service
+
+import "github.com/park-jun-woo/fullend/pkg/auth"
+
+// @call auth.HashPasswordResponse hp = auth.HashPassword({Password: request.password})
+// @post User user = User.Create({Email: request.email, PasswordHash: hp.HashedPassword, Role: request.role, Name: request.name})
+// @call auth.IssueTokenResponse token = auth.IssueToken({ID: user.ID, Email: user.Email, Role: user.Role})
+// @response { user: user, access_token: token.AccessToken }
+func Register() {}

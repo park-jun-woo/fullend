@@ -15,7 +15,7 @@ func checkMiddleware(g *rule.Ground, fs *fullend.Fullstack) []CrossError {
 	var errs []CrossError
 
 	graph := toulmin.NewGraph("middleware")
-	graph.Rule(rule.PairMatch).With(&rule.PairMatchSpec{
+	graph.Rule(rule.RefExists).With(&rule.RefExistsSpec{
 		BaseSpec:  rule.BaseSpec{Rule: "X-50", Level: "ERROR", Message: "Config middleware not in OpenAPI securitySchemes"},
 		LookupKey: "OpenAPI.security",
 	})

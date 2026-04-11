@@ -15,7 +15,7 @@ func checkClaimsRego(g *rule.Ground, fs *fullend.Fullstack) []CrossError {
 	graph := toulmin.NewGraph("claims-rego")
 	graph.Rule(rule.RefExists).With(&rule.RefExistsSpec{
 		BaseSpec:  rule.BaseSpec{Rule: "X-53", Level: "ERROR", Message: "Rego input.claims reference not in fullend.yaml claims"},
-		LookupKey: "Config.claims",
+		LookupKey: "Config.claims.keys",
 	})
 
 	var errs []CrossError

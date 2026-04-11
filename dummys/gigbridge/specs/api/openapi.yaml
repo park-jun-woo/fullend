@@ -1,0 +1,278 @@
+openapi: "3.0.3"
+info:
+  title: GigBridge API
+  version: "1.0.0"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        email: { type: string, format: email }
+        role: { type: string, enum: [client, freelancer, admin] }
+        name: { type: string }
+    Gig:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        client_id: { type: integer, format: int64 }
+        title: { type: string, maxLength: 200 }
+        description: { type: string }
+        budget: { type: integer }
+        status: { type: string, enum: [draft, open, in_progress, under_review, completed, disputed] }
+        freelancer_id: { type: integer, format: int64 }
+        created_at: { type: string, format: date-time }
+    Proposal:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        gig_id: { type: integer, format: int64 }
+        freelancer_id: { type: integer, format: int64 }
+        bid_amount: { type: integer }
+        status: { type: string, enum: [pending, accepted, rejected] }
+
+paths:
+  /auth/register:
+    post:
+      operationId: Register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, role, name]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                role: { type: string, enum: [client, freelancer] }
+                name: { type: string }
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/User' }
+                  access_token: { type: string }
+
+  /auth/login:
+    post:
+      operationId: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token: { type: string }
+        "401":
+          description: Invalid credentials
+
+  /gigs:
+    get:
+      operationId: ListGigs
+      x-pagination:
+        style: offset
+        defaultLimit: 20
+        maxLimit: 100
+      x-sort:
+        allowed: [created_at, budget]
+        default: created_at
+        direction: desc
+      x-filter:
+        allowed: [status]
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Gig' }
+                  total: { type: integer }
+    post:
+      operationId: CreateGig
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, description, budget]
+              properties:
+                title: { type: string, maxLength: 200 }
+                description: { type: string }
+                budget: { type: integer }
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gig: { $ref: '#/components/schemas/Gig' }
+
+  /gigs/{id}:
+    get:
+      operationId: GetGig
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gig: { $ref: '#/components/schemas/Gig' }
+        "404":
+          description: Not found
+
+  /gigs/{id}/publish:
+    put:
+      operationId: PublishGig
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gig: { $ref: '#/components/schemas/Gig' }
+        "403":
+          description: Forbidden
+        "409":
+          description: Invalid state transition
+
+  /gigs/{id}/proposals:
+    post:
+      operationId: SubmitProposal
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bid_amount]
+              properties:
+                bid_amount: { type: integer }
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  proposal: { $ref: '#/components/schemas/Proposal' }
+        "403":
+          description: Forbidden
+
+  /proposals/{id}/accept:
+    post:
+      operationId: AcceptProposal
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  proposal: { $ref: '#/components/schemas/Proposal' }
+                  gig: { $ref: '#/components/schemas/Gig' }
+        "403":
+          description: Forbidden
+        "409":
+          description: Invalid state transition
+
+  /gigs/{id}/submit-work:
+    post:
+      operationId: SubmitWork
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gig: { $ref: '#/components/schemas/Gig' }
+        "403":
+          description: Forbidden
+        "409":
+          description: Invalid state transition
+
+  /gigs/{id}/approve:
+    post:
+      operationId: ApproveWork
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gig: { $ref: '#/components/schemas/Gig' }
+        "403":
+          description: Forbidden
+        "409":
+          description: Invalid state transition
