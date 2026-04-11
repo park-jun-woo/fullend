@@ -7,9 +7,9 @@ import (
 
 	"github.com/park-jun-woo/fullend/pkg/parser/ddl"
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
+	"github.com/park-jun-woo/fullend/pkg/parser/hurl"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 	"github.com/park-jun-woo/fullend/pkg/parser/rego"
-	"github.com/park-jun-woo/fullend/pkg/parser/hurl"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
 	"github.com/park-jun-woo/fullend/pkg/parser/stml"
@@ -89,6 +89,10 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Ful
 			entries, _ := hurl.ParseFile(hf)
 			fs.HurlEntries = append(fs.HurlEntries, entries...)
 		}
+	}
+
+	if d, ok := has[KindToulmin]; ok && !skip[KindToulmin] {
+		fs.TanglFiles = parseTanglDir(d.Path)
 	}
 
 	if d, ok := has[KindModel]; ok {

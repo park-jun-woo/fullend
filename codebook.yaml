@@ -36,6 +36,7 @@ required:
     pkg-session: "세션 모델 (PostgreSQL, Memory)"
     pkg-storage: "S3 호환 스토리지"
     pkg-text: "텍스트 처리 (slug, sanitize, truncate)"
+    rule: "Toulmin 기반 검증 규칙 공통 함수"
     stat: "Go AST 기반 코드 통계 스크립트"
   type:
     command: "CLI 명령 엔트리포인트"
@@ -47,6 +48,7 @@ required:
     loader: "초기화/로더"
     util: "유틸리티 함수"
     walker: "파일/디렉토리 순회"
+    accessor: "getter/setter/인터페이스 메서드"
     test: "테스트 함수"
     test-helper: "테스트 헬퍼 함수"
 

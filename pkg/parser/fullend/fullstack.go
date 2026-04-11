@@ -10,11 +10,12 @@ import (
 
 	"github.com/park-jun-woo/fullend/pkg/diagnostic"
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
-	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 	"github.com/park-jun-woo/fullend/pkg/parser/hurl"
+	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
 	"github.com/park-jun-woo/fullend/pkg/parser/stml"
+	tanglparser "github.com/park-jun-woo/toulmin/pkg/tangl/parser"
 )
 
 // Fullstack holds all SSOT parsing results.
@@ -31,6 +32,7 @@ type Fullstack struct {
 	ProjectFuncSpecs []funcspec.FuncSpec
 	FullendPkgSpecs  []funcspec.FuncSpec
 	HurlFiles        []string
+	TanglFiles       []*tanglparser.File
 	ModelDir         string
 	StatesDiags      []diagnostic.Diagnostic
 }
