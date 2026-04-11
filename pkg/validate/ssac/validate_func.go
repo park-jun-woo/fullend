@@ -14,6 +14,10 @@ func validateFunc(fn parsessac.ServiceFunc, ground *rule.Ground) []validate.Vali
 	errs = append(errs, validateVariableFlow(fn, ground)...)
 	errs = append(errs, validateForbiddenRefs(fn, ground)...)
 	errs = append(errs, validateNameFormats(fn, ground)...)
+	errs = append(errs, validateModelRefs(fn, ground)...)
+	errs = append(errs, validateStaleResponse(fn)...)
+	errs = append(errs, validateDeleteInputs(fn)...)
+	errs = append(errs, validateErrStatus(fn)...)
 	if fn.Subscribe != nil {
 		errs = append(errs, validateSubscribe(fn)...)
 	}
