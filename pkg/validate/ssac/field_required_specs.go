@@ -36,6 +36,10 @@ func fieldRequiredSpecs(seqType string) []toulmin.Spec {
 			&rule.FieldRequiredSpec{BaseSpec: rule.BaseSpec{Rule: "S-12", Level: "ERROR", Message: "@empty requires Target"}, SeqType: "empty", Field: "Target", Required: true},
 			&rule.FieldRequiredSpec{BaseSpec: rule.BaseSpec{Rule: "S-13", Level: "ERROR", Message: "@empty requires Message"}, SeqType: "empty", Field: "Message", Required: true},
 		}
+	case "exists":
+		return []toulmin.Spec{
+			&rule.FieldRequiredSpec{BaseSpec: rule.BaseSpec{Rule: "S-22", Level: "ERROR", Message: "@exists requires Target"}, SeqType: "exists", Field: "Target", Required: true},
+		}
 	case "state":
 		return []toulmin.Spec{
 			&rule.FieldRequiredSpec{BaseSpec: rule.BaseSpec{Rule: "S-14", Level: "ERROR", Message: "@state requires DiagramID"}, SeqType: "state", Field: "DiagramID", Required: true},

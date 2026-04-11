@@ -9,19 +9,26 @@ import (
 
 func validateSubscribe(fn parsessac.ServiceFunc) []validate.ValidationError {
 	var errs []validate.ValidationError
+	// S-38: parameter variable must be "message"
 	if fn.Param == nil || fn.Param.VarName != "message" {
 		errs = append(errs, validate.ValidationError{
 			Rule: "S-38", File: fn.FileName, Func: fn.Name, SeqIdx: -1, Level: "ERROR",
 			Message: "@subscribe parameter variable must be named 'message'",
 		})
 	}
-	for i, seq := range fn.Sequences {
-		if seq.Type == "response" {
+	// S-39: message type must have matching struct
+	if fn.Param != nil && fn.Param.TypeName != "" {
+		if !hasStructDef(fn.Structs, fn.Param.TypeName) {
 			errs = append(errs, validate.ValidationError{
-				Rule: "S-45", File: fn.FileName, Func: fn.Name, SeqIdx: i, Level: "ERROR",
-				Message: "@subscribe cannot use @response",
+				Rule: "S-39", File: fn.FileName, Func: fn.Name, SeqIdx: -1, Level: "ERROR",
+				Message: "@subscribe message type " + fn.Param.TypeName + " has no struct definition",
 			})
 		}
+	}
+	// S-40: @subscribe cannot use request
+	// S-41: @subscribe cannot use query
+	for i, seq := range fn.Sequences {
+		errs = append(errs, checkSubscribeSeq(fn.FileName, fn.Name, i, seq)...)
 	}
 	return errs
 }

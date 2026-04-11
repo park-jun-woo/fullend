@@ -27,6 +27,20 @@ func evalSeqVarRefs(graph *toulmin.Graph, g *rule.Ground, file, funcName string,
 			refs = append(refs, ref)
 		}
 	}
+	// S-29: Target variable ref
+	if seq.Target != "" {
+		ref := strings.SplitN(seq.Target, ".", 2)[0]
+		if ref != "" && ref != "request" && ref != "currentUser" && ref != "query" && ref != "message" {
+			refs = append(refs, ref)
+		}
+	}
+	// S-30: response Fields variable refs
+	for _, val := range seq.Fields {
+		ref := strings.SplitN(val, ".", 2)[0]
+		if ref != "" && ref != "request" && ref != "currentUser" && ref != "query" && ref != "message" {
+			refs = append(refs, ref)
+		}
+	}
 	var errs []validate.ValidationError
 	for _, ref := range refs {
 		ctx := toulmin.NewContext()

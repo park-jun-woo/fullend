@@ -23,6 +23,11 @@ func validateFunc(fn parsessac.ServiceFunc, ground *rule.Ground) []validate.Vali
 	errs = append(errs, validateMethodRef(fn, ground)...)
 	errs = append(errs, validateRequestRef(fn, ground)...)
 	errs = append(errs, validatePagination(fn)...)
+	errs = append(errs, validatePaginationRefs(fn, ground)...)
+	errs = append(errs, validateConfigRef(fn)...)
+	errs = append(errs, validatePublishForbidden(fn)...)
+	errs = append(errs, validateResultReserved(fn, ground)...)
+	errs = append(errs, validateCallType(fn, ground)...)
 	errs = append(errs, validateSubscribeForbidden(fn, ground)...)
 	if fn.Subscribe != nil {
 		errs = append(errs, validateSubscribe(fn)...)
