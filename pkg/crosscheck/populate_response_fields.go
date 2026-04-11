@@ -1,0 +1,19 @@
+//ff:func feature=crosscheck type=loader control=iteration dimension=1
+//ff:what populateResponseFields — @response 필드를 Ground.Schemas에 등록
+package crosscheck
+
+import (
+	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
+	"github.com/park-jun-woo/fullend/pkg/rule"
+)
+
+func populateResponseFields(g *rule.Ground, funcName string, seq ssac.Sequence) {
+	if len(seq.Fields) == 0 {
+		return
+	}
+	var fields []string
+	for name := range seq.Fields {
+		fields = append(fields, name)
+	}
+	g.Schemas["SSaC.response."+funcName] = fields
+}
