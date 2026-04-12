@@ -6,7 +6,7 @@ import "github.com/park-jun-woo/toulmin/pkg/toulmin"
 
 func mergeTrace(p Pattern, entries []toulmin.TraceEntry) {
 	for _, t := range entries {
-		if t.Role == "warrant" {
+		if t.Role == "rule" {
 			p[t.Name] = t.Activated
 		}
 	}
