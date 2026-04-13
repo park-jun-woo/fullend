@@ -22,6 +22,6 @@ func Generate(fs *fullend.Fullstack, ground *rule.Ground, cfg *Config) error {
 		cfg.SpecsDir,
 		fs.StateDiagrams,
 		fs.ServiceFuncs,
-		adaptPolicies(fs.ParsedPolicies),
+		fs.ParsedPolicies,
 	)
 }

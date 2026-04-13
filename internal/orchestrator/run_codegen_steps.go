@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/park-jun-woo/fullend/internal/policy"
 	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
@@ -52,9 +51,8 @@ func runCodegenSteps(report *reporter.Report, profile *TargetProfile, specsDir, 
 	if _, ok := has[KindStates]; ok {
 		report.Steps = append(report.Steps, genStateMachines(specsDir, artifactsDir, fs))
 	}
-	if d, ok := has[KindPolicy]; ok {
-		policies, _ := policy.ParseDir(d.Path)
-		report.Steps = append(report.Steps, genAuthz(artifactsDir, policies))
+	if _, ok := has[KindPolicy]; ok {
+		report.Steps = append(report.Steps, genAuthz(artifactsDir, fs.ParsedPolicies))
 	}
 	if d, ok := has[KindFunc]; ok {
 		modulePath := determinePkgModulePath(specsDir, artifactsDir, fs.Manifest)

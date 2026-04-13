@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/park-jun-woo/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/pkg/parser/rego"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
 )
@@ -20,7 +20,7 @@ type MainGenInput struct {
 	ServiceFuncs   []ssacparser.ServiceFunc
 	ModulePath     string
 	QueueBackend   string
-	Policies       []*policy.Policy
+	Policies       []rego.Policy
 	SessionBackend string
 	CacheBackend   string
 	FileConfig     *manifest.FileBackend

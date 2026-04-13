@@ -2,10 +2,10 @@
 //ff:what Role mapping — extracts operation -> required role from OPA policies.
 package hurl
 
-import "github.com/park-jun-woo/fullend/internal/policy"
+import "github.com/park-jun-woo/fullend/pkg/parser/rego"
 
 // buildOperationRoleMap extracts operation -> required role from OPA policies.
-func buildOperationRoleMap(policies []*policy.Policy) map[string]string {
+func buildOperationRoleMap(policies []rego.Policy) map[string]string {
 	roleMap := make(map[string]string)
 	for _, p := range policies {
 		for _, rule := range p.Rules {

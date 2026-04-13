@@ -54,7 +54,7 @@ func (g *GoGin) Generate(fs *fullend.Fullstack, ground *rule.Ground, cfg *Config
 
 	models := collectModels(fs.ServiceFuncs)
 	funcs := collectFuncs(fs.ServiceFuncs)
-	policies := adaptPolicies(fs.ParsedPolicies)
+	policies := fs.ParsedPolicies
 
 	// Feature mode (Flat 제거됨)
 	if err := transformServiceFiles(intDir, fs.ServiceFuncs, models, funcs, cfg.ModulePath, fs.OpenAPIDoc); err != nil {

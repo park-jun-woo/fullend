@@ -1,51 +1,38 @@
 //ff:func feature=gen-gogin type=generator control=sequence topic=output
-//ff:what domain 모드 main.go 생성 템플릿 문자열을 반환한다
+//ff:what mainWithDomainsTemplate — text/template + embed 로 cmd/main.go 렌더
 
 package gogin
 
-import "fmt"
-
-// mainWithDomainsTemplate returns the fmt.Sprintf template for domain-mode cmd/main.go.
-// dbName: 기본 DB 이름 (DATABASE_URL env 미지정 시 fallback 에 삽입).
-func mainWithDomainsTemplate(osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock, dbName string) string {
-	return fmt.Sprintf(`package main
-
 import (
-	"database/sql"
-	"flag"
-	"log"%s
-
-	_ "github.com/lib/pq"
-%s%s%s
+	"bytes"
+	_ "embed"
+	"text/template"
 )
 
-func main() {
-	addr := flag.String("addr", ":8080", "listen address")
-	dsnDefault := os.Getenv("DATABASE_URL")
-	if dsnDefault == "" {
-		dsnDefault = "postgres://localhost:5432/%s?sslmode=disable"
-	}
-	dsn := flag.String("dsn", dsnDefault, "database connection string (or DATABASE_URL env)")
-	dbDriver := flag.String("db", "postgres", "database driver (postgres, mysql)")%s
-	flag.Parse()
+//go:embed templates/main.tmpl
+var mainTmplSrc string
 
-	conn, err := sql.Open(*dbDriver, *dsn)
-	if err != nil {
-		log.Fatalf("database connection failed: %%v", err)
-	}
-	defer conn.Close()
+var mainTmpl = template.Must(template.New("main").Option("missingkey=zero").Parse(mainTmplSrc))
 
-	if err := conn.Ping(); err != nil {
-		log.Fatalf("database ping failed: %%v", err)
+// mainWithDomainsTemplate renders the domain-mode cmd/main.go source.
+// Placeholder fields may be empty when a feature (auth/queue/...) is disabled.
+func mainWithDomainsTemplate(osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock, dbName string) string {
+	data := MainTmplData{
+		OsImport:            osImport,
+		ImportBlock:         importBlock,
+		QueueImport:         queueImport,
+		BuiltinImport:       builtinImport,
+		JWTFlagLine:         jwtFlagLine,
+		AuthzBlock:          authzBlock,
+		QueueInitBlock:      queueInitBlock,
+		BuiltinInitBlock:    builtinInitBlock,
+		InitBlock:           initBlock,
+		QueueSubscribeBlock: queueSubscribeBlock,
+		DBName:              dbName,
 	}
-%s%s%s
-	server := &service.Server{
-%s
+	var buf bytes.Buffer
+	if err := mainTmpl.Execute(&buf, data); err != nil {
+		return "// template execute error: " + err.Error()
 	}
-%s
-	r := service.SetupRouter(server)
-	log.Printf("server listening on %%s", *addr)
-	log.Fatal(r.Run(*addr))
-}
-`, osImport, importBlock, queueImport, builtinImport, dbName, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock)
+	return buf.String()
 }

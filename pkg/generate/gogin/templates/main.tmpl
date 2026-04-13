@@ -1,0 +1,39 @@
+package main
+
+import (
+	"database/sql"
+	"flag"
+	"log"{{.OsImport}}
+
+	_ "github.com/lib/pq"
+{{.ImportBlock}}{{.QueueImport}}{{.BuiltinImport}}
+)
+
+func main() {
+	addr := flag.String("addr", ":8080", "listen address")
+	dsnDefault := os.Getenv("DATABASE_URL")
+	if dsnDefault == "" {
+		dsnDefault = "postgres://localhost:5432/{{.DBName}}?sslmode=disable"
+	}
+	dsn := flag.String("dsn", dsnDefault, "database connection string (or DATABASE_URL env)")
+	dbDriver := flag.String("db", "postgres", "database driver (postgres, mysql)"){{.JWTFlagLine}}
+	flag.Parse()
+
+	conn, err := sql.Open(*dbDriver, *dsn)
+	if err != nil {
+		log.Fatalf("database connection failed: %v", err)
+	}
+	defer conn.Close()
+
+	if err := conn.Ping(); err != nil {
+		log.Fatalf("database ping failed: %v", err)
+	}
+{{.AuthzBlock}}{{.QueueInitBlock}}{{.BuiltinInitBlock}}
+	server := &service.Server{
+{{.InitBlock}}
+	}
+{{.QueueSubscribeBlock}}
+	r := service.SetupRouter(server)
+	log.Printf("server listening on %s", *addr)
+	log.Fatal(r.Run(*addr))
+}

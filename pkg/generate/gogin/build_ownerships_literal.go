@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/park-jun-woo/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/pkg/parser/rego"
 )
 
 // buildOwnershipsLiteral generates Go code for []authz.OwnershipMapping literal.
-func buildOwnershipsLiteral(policies []*policy.Policy) string {
+func buildOwnershipsLiteral(policies []rego.Policy) string {
 	var mappings []string
 	for _, p := range policies {
 		for _, om := range p.Ownerships {

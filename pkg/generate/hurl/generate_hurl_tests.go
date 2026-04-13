@@ -11,13 +11,13 @@ import (
 	"github.com/ettle/strcase"
 	"github.com/getkin/kin-openapi/openapi3"
 
-	"github.com/park-jun-woo/fullend/internal/policy"
+	"github.com/park-jun-woo/fullend/pkg/parser/rego"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
 )
 
 // generateHurlTests generates smoke.hurl from OpenAPI spec.
-func generateHurlTests(doc *openapi3.T, outDir, specsDir string, diagrams []*statemachine.StateDiagram, serviceFuncs []ssacparser.ServiceFunc, policies []*policy.Policy) error {
+func generateHurlTests(doc *openapi3.T, outDir, specsDir string, diagrams []*statemachine.StateDiagram, serviceFuncs []ssacparser.ServiceFunc, policies []rego.Policy) error {
 	if doc == nil || doc.Paths == nil {
 		return nil
 	}

@@ -6,19 +6,14 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/park-jun-woo/fullend/internal/policy"
 	"github.com/park-jun-woo/fullend/internal/reporter"
 	"github.com/park-jun-woo/fullend/pkg/generate/gogin"
+	"github.com/park-jun-woo/fullend/pkg/parser/rego"
 )
 
-func genAuthz(artifactsDir string, policies []*policy.Policy) reporter.StepResult {
+func genAuthz(artifactsDir string, policies []rego.Policy) reporter.StepResult {
 	step := reporter.StepResult{Name: "authz-gen"}
 
-	if policies == nil {
-		step.Status = reporter.Fail
-		step.Errors = append(step.Errors, "Policy parse failed")
-		return step
-	}
 	if len(policies) == 0 {
 		step.Status = reporter.Skip
 		step.Summary = "no policy files"
@@ -32,6 +27,6 @@ func genAuthz(artifactsDir string, policies []*policy.Policy) reporter.StepResul
 	}
 
 	step.Status = reporter.Pass
-	step.Summary = fmt.Sprintf("OPA authorizer generated (%d rules)", countPolicyRules(policies))
+	step.Summary = fmt.Sprintf("OPA authorizer generated (%d rules)", countRegoPolicyRules(policies))
 	return step
 }
