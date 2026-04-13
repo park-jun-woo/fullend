@@ -1,0 +1,28 @@
+//ff:func feature=ssac-gen type=generator control=selection topic=args-inputs
+//ff:what 단일 Arg를 Go 코드 표현으로 변환
+package ssac
+
+import (
+	"github.com/ettle/strcase"
+	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
+)
+
+func argToCode(a ssacparser.Arg) string {
+	switch {
+	case a.Literal != "":
+		return `"` + a.Literal + `"`
+	case a.Source == "query":
+		return "opts"
+	case a.Source == "request":
+		return strcase.ToGoCamel(a.Field)
+	case a.Source == "currentUser":
+		return a.Source + "." + a.Field
+	case a.Source != "":
+		if a.Field == "" {
+			return a.Source
+		}
+		return a.Source + "." + a.Field
+	default:
+		return a.Field
+	}
+}
