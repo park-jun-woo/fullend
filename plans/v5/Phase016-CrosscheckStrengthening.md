@@ -1,4 +1,4 @@
-# Phase016 — CrosscheckStrengthening
+# ✅ Phase016 — CrosscheckStrengthening (완료: e870181, v0.1.10)
 
 > Phase017 실측에서 **crosscheck 가 잡지 못한** 정합성 위반 6종을 `pkg/crosscheck/` 신규 규칙으로 추가. 재발 방지.
 

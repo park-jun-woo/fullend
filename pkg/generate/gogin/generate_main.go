@@ -87,7 +87,6 @@ func generateMain(in MainGenInput) error {
 	}
 
 	jwtFlagLine := ""
-	osImport := ""
 	if needs.Auth {
 		jwtFlagLine = `
 	jwtSecretDefault := os.Getenv("JWT_SECRET")
@@ -95,10 +94,13 @@ func generateMain(in MainGenInput) error {
 		jwtSecretDefault = "secret"
 	}
 	jwtSecret := flag.String("jwt-secret", jwtSecretDefault, "JWT signing secret")`
-		osImport = "\n\t\"os\""
 	}
+	// os 는 DATABASE_URL env 처리를 위해 항상 필요
+	osImport := "\n\t\"os\""
 
-	src := mainWithDomainsTemplate(osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock)
+	dbName := dbNameFromModule(modulePath)
+
+	src := mainWithDomainsTemplate(osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock, dbName)
 
 	path := filepath.Join(artifactsDir, "backend", "cmd", "main.go")
 	return os.WriteFile(path, []byte(src), 0644)

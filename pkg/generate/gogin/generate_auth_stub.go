@@ -24,12 +24,13 @@ func generateAuthStub(intDir string, modulePath string, claims map[string]manife
 	b.WriteString("package model\n\n")
 
 	// Generate CurrentUser from claims config — claims are required when auth is present.
+	// `authz:"<key>"` 태그는 authz.ClaimsFromStruct 가 JWT claim key 조회에 사용.
 	b.WriteString("// CurrentUser is the authenticated user extracted by JWT middleware.\n")
 	b.WriteString("type CurrentUser struct {\n")
 	fields := sortedClaimFields(claims)
 	for _, field := range fields {
 		def := claims[field]
-		b.WriteString(fmt.Sprintf("\t%s %s\n", field, def.GoType))
+		b.WriteString(fmt.Sprintf("\t%s %s `authz:%q`\n", field, def.GoType, def.Key))
 	}
 	b.WriteString("}\n\n")
 

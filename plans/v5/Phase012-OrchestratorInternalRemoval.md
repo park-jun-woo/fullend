@@ -1,4 +1,4 @@
-# Phase012 — OrchestratorInternalRemoval
+# ✅ Phase012 — OrchestratorInternalRemoval (완료: 403eae5)
 
 > `internal/orchestrator/` 를 pkg 전용으로 전환. Phase004/008 의 이월 부채 청산.
 

@@ -7,6 +7,5 @@ CREATE TABLE users (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-INSERT INTO users (id, email, password_hash, role, name)
-VALUES (0, 'nobody@system', '', 'system', 'Nobody')
-ON CONFLICT DO NOTHING;
+-- nobody seed 는 fullend gen 이 backend.db.auto_nobody_seed=true 에 의해 자동 주입.
+-- (Phase018: gigs.freelancer_id DEFAULT 0 REFERENCES users(id) 패턴 감지)

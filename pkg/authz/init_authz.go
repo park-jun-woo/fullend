@@ -1,5 +1,6 @@
 //ff:func feature=pkg-authz type=loader control=sequence
-//ff:what 글로벌 인가 상태를 초기화한다
+//ff:what 글로벌 인가 상태를 초기화 — OPA_POLICY_PATH env 또는 기본 경로 탐색
+
 package authz
 
 import (
@@ -13,8 +14,10 @@ var globalDB *sql.DB
 var globalOwnerships []OwnershipMapping
 
 // Init initializes the global authz state.
-// Reads OPA policy from OPA_POLICY_PATH environment variable.
-// Skips initialization when DISABLE_AUTHZ=1.
+// OPA policy source resolution:
+//  1. OPA_POLICY_PATH env — file or directory (directory loads all *.rego)
+//  2. fallback: ./internal/authz, ./authz, ./policy (first existing directory)
+// DISABLE_AUTHZ=1 전체 skip.
 func Init(db *sql.DB, ownerships []OwnershipMapping) error {
 	globalDB = db
 	globalOwnerships = ownerships
@@ -23,16 +26,16 @@ func Init(db *sql.DB, ownerships []OwnershipMapping) error {
 		return nil
 	}
 
-	policyPath := os.Getenv("OPA_POLICY_PATH")
-	if policyPath == "" {
-		return fmt.Errorf("OPA_POLICY_PATH environment variable is required (set DISABLE_AUTHZ=1 to skip)")
+	policyPath, ok := resolvePolicyPath()
+	if !ok {
+		return fmt.Errorf("OPA_POLICY_PATH env not set and no fallback path exists " +
+			"(tried ./internal/authz, ./authz, ./policy — set DISABLE_AUTHZ=1 to skip)")
 	}
 
-	policyData, err := os.ReadFile(policyPath)
+	data, err := loadPolicyFromPath(policyPath)
 	if err != nil {
-		return fmt.Errorf("read OPA policy %s: %w", policyPath, err)
+		return err
 	}
-
-	globalPolicy = string(policyData)
+	globalPolicy = data
 	return nil
 }

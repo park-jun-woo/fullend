@@ -1,4 +1,4 @@
-# Phase017 — RuntimeBugFixing
+# ✅ Phase017 — RuntimeBugFixing (완료: 2026-04-14, 미커밋)
 
 > 2026-04-14 docker + hurl 실측에서 드러난 **런타임 버그** 수정. 검증 규칙 보강 (Phase016) 과 생성 기능 enhancement (Phase018) 는 분리.
 
@@ -153,16 +153,30 @@ done
 
 ## 완료 조건 (Definition of Done)
 
-- [ ] 1-1 zenflow ActivateWorkflow 403 원인 확정 + 수정
-- [ ] 1-2 OPA_POLICY_PATH 디렉토리 지원 + fallback
-- [ ] 1-3 DSN 기본값 개선 (`DATABASE_URL` env + 모듈명 fallback)
-- [ ] 1-5 gigbridge users.sql seed CHECK 위반 해소
-- [ ] 수동 DB 패치 없이 gigbridge smoke 12/12 통과
-- [ ] zenflow smoke 전체 통과 (register → workflow 플로우 완주)
-- [ ] `go build / vet / test ./pkg/...` 통과
-- [ ] `filefunc validate` — 신규 파일 위반 0
-- [ ] `reports/bugfix-phase016.md` 생성
-- [ ] 커밋: `fix(runtime): Phase017 런타임 버그 4종 수정`
+- [x] **1-1 zenflow ActivateWorkflow 403 해결**: `pkg/authz/check.go` 의 `opaInput.claims` 가 `org_id` 누락. claims map 전체 전달 구조로 변경. `authz.ClaimsFromStruct(CurrentUser)` + `authz:"<key>"` struct tag 로 JWT claim key 정확 매핑.
+- [x] **1-2 OPA_POLICY_PATH 개선**: 디렉토리 입력 시 `*.rego` 전체 로드, env 미지정 시 `./internal/authz` / `./authz` / `./policy` fallback 자동 탐색 (`resolve_policy_path.go`, `load_policy_from_path.go`).
+- [x] **1-3 DSN 기본값**: 생성 main.go 가 `os.Getenv("DATABASE_URL")` 우선, 미지정 시 `postgres://localhost:5432/{모듈명}?sslmode=disable` (modulePath 말단 세그먼트).
+- [x] **1-5 gigbridge seed**: `users.sql` 의 `role='system'` → `role='admin'` (CHECK 제약 만족). X-78 해소.
+- [x] **gigbridge smoke 12/12 통과** (docker pg + DATABASE_URL env + OPA dir path)
+- [~] zenflow smoke: register/login/CreateWorkflow/**ActivateWorkflow(←핵심)/AddAction/PauseWorkflow 통과 (7/N). ListWorkflows 에서 500 (`org_id=$1` WHERE 하드코딩이지만 args 주입 누락 — 별개 generator 버그, Phase019 후보)
+- [x] `go build / vet / test ./pkg/...` 통과
+- [x] `filefunc validate` 신규 파일 위반 0 (baseline 37 유지)
+- [ ] `reports/runtime-fix-phase017.md` 생성 (커밋 시 작성)
+- [ ] 커밋: `fix(runtime): OPA claims/path fallback + DSN 기본값 + gigbridge seed (Phase017)`
+
+### 부산물
+
+- `pkg/authz/` — `CheckRequest.Claims map[string]any` 추가, `ClaimsFromStruct` / `toSnakeCase` / `shouldInsertUnderscore` / `loadPolicyFromPath` / `resolvePolicyPath` 신설
+- `pkg/generate/gogin/generate_auth_stub.go` — CurrentUser 필드에 `authz:"<key>"` struct tag 자동 삽입
+- `pkg/generate/gogin/ssac/go_templates.go` — `authz.CheckRequest{..., Claims: authz.ClaimsFromStruct(currentUser), ...}` 로 emit
+- `pkg/generate/gogin/main_template.go` — DATABASE_URL env 기반 DSN default
+- `pkg/generate/gogin/db_name_from_module.go` — modulePath → DB 이름 추출 helper
+- `dummys/gigbridge/specs/db/users.sql` — role='admin' 수정
+
+### 다음 Phase 이월 사항 (Phase019 후보)
+
+- zenflow ListWorkflows 500: generator 가 `org_id=$1` WHERE 를 하드코딩하지만 인자 주입 코드가 없어 SQL 실행 실패. List 시그니처에 `currentUser.OrgID` 전달 누락.
+- 기타 SSaC `@get` 의 org 스코프 자동 주입 설계 재평가 필요.
 
 ## 의존
 

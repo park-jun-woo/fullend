@@ -1,4 +1,4 @@
-# 🟡 Phase008 — orchestrator 배선 교체 (gen_glue 완료, genSSaC/genSTML 보류)
+# ✅ Phase008 — orchestrator 배선 교체 (Phase012 에서 완결: 403eae5)
 
 ## 목표
 

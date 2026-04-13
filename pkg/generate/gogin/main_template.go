@@ -6,7 +6,8 @@ package gogin
 import "fmt"
 
 // mainWithDomainsTemplate returns the fmt.Sprintf template for domain-mode cmd/main.go.
-func mainWithDomainsTemplate(osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock string) string {
+// dbName: 기본 DB 이름 (DATABASE_URL env 미지정 시 fallback 에 삽입).
+func mainWithDomainsTemplate(osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock, dbName string) string {
 	return fmt.Sprintf(`package main
 
 import (
@@ -20,7 +21,11 @@ import (
 
 func main() {
 	addr := flag.String("addr", ":8080", "listen address")
-	dsn := flag.String("dsn", "postgres://localhost:5432/app?sslmode=disable", "database connection string")
+	dsnDefault := os.Getenv("DATABASE_URL")
+	if dsnDefault == "" {
+		dsnDefault = "postgres://localhost:5432/%s?sslmode=disable"
+	}
+	dsn := flag.String("dsn", dsnDefault, "database connection string (or DATABASE_URL env)")
 	dbDriver := flag.String("db", "postgres", "database driver (postgres, mysql)")%s
 	flag.Parse()
 
@@ -42,5 +47,5 @@ func main() {
 	log.Printf("server listening on %%s", *addr)
 	log.Fatal(r.Run(*addr))
 }
-`, osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock)
+`, osImport, importBlock, queueImport, builtinImport, dbName, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock)
 }

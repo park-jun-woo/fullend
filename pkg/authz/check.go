@@ -27,8 +27,12 @@ func Check(req CheckRequest) (CheckResponse, error) {
 		return CheckResponse{}, fmt.Errorf("load owners: %w", err)
 	}
 
+	claims := req.Claims
+	if claims == nil {
+		claims = map[string]any{"user_id": req.UserID, "role": req.Role}
+	}
 	opaInput := map[string]interface{}{
-		"claims":      map[string]interface{}{"user_id": req.UserID, "role": req.Role},
+		"claims":      claims,
 		"action":      req.Action,
 		"resource":    req.Resource,
 		"resource_id": req.ResourceID,
