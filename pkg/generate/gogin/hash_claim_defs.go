@@ -1,0 +1,22 @@
+//ff:func feature=gen-gogin type=util control=iteration dimension=1
+//ff:what computes a contract hash for ClaimDef claims
+
+package gogin
+
+import (
+	"strings"
+
+	"github.com/park-jun-woo/fullend/pkg/contract"
+	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
+)
+
+// HashClaimDefs computes a contract hash for ClaimDef claims.
+func HashClaimDefs(claims map[string]manifest.ClaimDef) string {
+	fields := sortedClaimFields(claims)
+	var parts []string
+	for _, f := range fields {
+		def := claims[f]
+		parts = append(parts, f+":"+def.Key+":"+def.GoType)
+	}
+	return contract.Hash7(strings.Join(parts, ","))
+}
