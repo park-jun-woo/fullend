@@ -1,8 +1,8 @@
-# Phase005 — 실용 검증 + 구조 건전성 지표
+# Phase008 — Dummy 실용 검증 + 구조 건전성 지표
 
 ## 목표
 
-Phase004 결과물이 **실용적으로 동작하고**, **구조 건전성이 internal 대비 개선** 되었는지 지표로 확인한다.
+Phase007 결과물이 **실용적으로 동작하고**, **구조 건전성이 internal 대비 개선** 되었는지 지표로 확인한다.
 
 **중요한 재정의**: 이 Phase 는 "internal 과 diff 0" 을 요구하지 않는다. internal 은 참고용이지 재현 대상이 아니다. 성공 기준은:
 
@@ -16,9 +16,9 @@ Phase004 결과물이 **실용적으로 동작하고**, **구조 건전성이 in
 
 ## 전제
 
-- **Phase004 완료** — pkg/generate 가 살아있고 orchestrator 가 pkg 경로로 배선됨.
+- **Phase007 완료** — pkg/generate 가 살아있고 orchestrator 가 pkg 경로로 배선됨.
 - `internal/gen` 은 복사 방식으로 보존됨 (참조용 — 본 Phase 에서 호출하지 않음).
-- `go build ./pkg/...` 과 `go test ./pkg/ground/...` 가 이미 통과된 상태 (Phase004 의 DoD).
+- `go build ./pkg/...` 과 `go test ./pkg/ground/...` 가 이미 통과된 상태 (Phase005~007 의 DoD).
 
 ---
 
@@ -173,7 +173,7 @@ go run ./scripts/structural_metrics/compare.go > reports/metrics-phase005.md
 
 ### Step 5. 판정
 
-- Tier 1 전부 통과 + 구조 지표 악화 없음 → **Phase005 통과**.
+- Tier 1 전부 통과 + 구조 지표 악화 없음 → **Phase008 통과**.
 - Tier 1 실패 → Phase004 복귀.
 - 구조 지표 악화 (예: 매개변수 평균 증가, Toulmin 0건) → Phase004 구조 정리 보강 후 재측정.
 
@@ -191,7 +191,7 @@ feat(phase005): 실용 검증 통과 — 구조 건전성 internal 대비 개선
 
 ### R1. "불완전 허용" 은 Tier 2/3 에만 적용
 
-Tier 1 (go build, go vet, pkg/ground test) 실패는 **구조 안정성 불안** 의 증거라 반드시 해결. Phase004 완료 기준이 이미 Tier 1 포함.
+Tier 1 (go build, go vet, pkg/ground test) 실패는 **구조 안정성 불안** 의 증거라 반드시 해결. Phase007 완료 기준이 이미 Tier 1 포함.
 
 ### R2. 구조 지표 악화 대응
 
@@ -208,7 +208,7 @@ Tier 1 (go build, go vet, pkg/ground test) 실패는 **구조 안정성 불안**
 
 ### R4. dummy 프로젝트 동결
 
-Phase005 기간 중 gigbridge·zenflow SSOT 를 바꾸지 않음. 변경 시 구조 지표 비교가 오염.
+Phase008 기간 중 gigbridge·zenflow SSOT 를 바꾸지 않음. 변경 시 구조 지표 비교가 오염.
 
 ### R5. internal/gen 호출 금지
 
@@ -223,7 +223,7 @@ Phase005 기간 중 gigbridge·zenflow SSOT 를 바꾸지 않음. 변경 시 구
 
 ## 의존성
 
-- **Phase004 완료** — 본 Phase 전제.
+- **Phase007 완료** — 본 Phase 전제.
 - **외부 도구**: `go`, `hurl` (선택).
 - **측정 스크립트**: 본 Phase 에서 새로 작성 (`scripts/structural_metrics/`).
 
