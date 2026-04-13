@@ -10,4 +10,5 @@ func parseDDLContent(content string, tables map[string]*Table) {
 	for _, line := range lines {
 		currentTable = parseDDLLine(line, currentTable, tables)
 	}
+	extractInserts(content, tables)
 }

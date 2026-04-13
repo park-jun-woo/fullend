@@ -4,12 +4,13 @@ package funcspec
 
 // FuncSpec holds a parsed func spec file.
 type FuncSpec struct {
-	Package        string   // "auth"
-	Name           string   // "hashPassword"
-	Description    string   // @description value
-	ErrStatus      int      // @error HTTP status code (0 = unspecified)
-	RequestFields  []Field  // FuncNameRequest struct fields
-	ResponseFields []Field  // FuncNameResponse struct fields
-	HasBody        bool     // true if function body is not just "// TODO: implement"
-	Imports        []string // import paths (e.g. "database/sql", "net/http")
+	Package         string   // "auth"
+	Name            string   // "hashPassword"
+	Description     string   // @description value
+	ErrStatus       int      // @error HTTP status code (0 = unspecified)
+	RequestFields   []Field  // FuncNameRequest struct fields
+	ResponseFields  []Field  // FuncNameResponse struct fields
+	ResponsePointer bool     // true if function's first return is *T (used for @empty nilable detection)
+	HasBody         bool     // true if function body is not just "// TODO: implement"
+	Imports         []string // import paths (e.g. "database/sql", "net/http")
 }

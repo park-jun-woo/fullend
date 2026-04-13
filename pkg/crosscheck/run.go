@@ -29,6 +29,8 @@ func Run(fs *fullend.Fullstack) []CrossError {
 	errs = append(errs, checkDDLOpenAPICoverage(g, fs)...)
 	// SSaC ↔ DDL
 	errs = append(errs, checkSSaCDDL(g, fs)...)
+	errs = append(errs, checkDDLCheckVsSeed(g, fs)...)
+	errs = append(errs, checkDefaultFKSeed(g, fs)...)
 	// States
 	errs = append(errs, checkStates(g, fs)...)
 	errs = append(errs, checkSSaCStates(g, fs)...)
@@ -41,6 +43,7 @@ func Run(fs *fullend.Fullstack) []CrossError {
 	errs = append(errs, checkOwnership(g, fs)...)
 	errs = append(errs, checkOwnershipAnnotation(g, fs)...)
 	errs = append(errs, checkOwnershipVia(g, fs)...)
+	errs = append(errs, checkSSaCRoleVsPolicy(g, fs)...)
 	// Hurl
 	errs = append(errs, checkHurl(g, fs)...)
 	errs = append(errs, checkHurlMethod(g, fs)...)
@@ -54,6 +57,8 @@ func Run(fs *fullend.Fullstack) []CrossError {
 	errs = append(errs, checkCallTypeMatch(g, fs)...)
 	errs = append(errs, checkCallInputTypeMatch(g, fs)...)
 	errs = append(errs, checkCallSourceVar(fs)...)
+	errs = append(errs, checkEmptyNilable(g, fs)...)
+	errs = append(errs, checkCallInputsVsFuncspec(g, fs)...)
 	// Config
 	errs = append(errs, checkConfig(g, fs)...)
 	errs = append(errs, checkClaims(g, fs)...)
@@ -61,6 +66,7 @@ func Run(fs *fullend.Fullstack) []CrossError {
 	errs = append(errs, checkConfigReverse(g, fs)...)
 	errs = append(errs, checkEndpointSecurity(fs)...)
 	errs = append(errs, checkJWTClaims(g, fs)...)
+	errs = append(errs, checkClaimsVsDDL(g, fs)...)
 	// Roles
 	errs = append(errs, checkRoles(g, fs)...)
 	errs = append(errs, checkDDLCheckRoles(g, fs)...)

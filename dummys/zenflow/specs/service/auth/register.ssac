@@ -3,7 +3,7 @@ package service
 import "github.com/park-jun-woo/fullend/pkg/auth"
 
 // @call auth.HashPasswordResponse hp = auth.HashPassword({Password: request.password})
-// @post User user = User.Create({OrgID: request.org_id, Email: request.email, PasswordHash: hp.HashedPassword, Role: "member", Name: request.name})
+// @post User user = User.Create({OrgID: request.org_id, Email: request.email, PasswordHash: hp.HashedPassword, Role: "admin", Name: request.name})
 // @call auth.IssueTokenResponse token = auth.IssueToken({ID: user.ID, OrgID: user.OrgID, Role: user.Role})
 // @response { access_token: token.AccessToken }
 func Register() {}

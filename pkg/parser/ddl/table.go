@@ -12,4 +12,6 @@ type Table struct {
 	PrimaryKey  []string
 	VarcharLen  map[string]int      // column → VARCHAR(N)
 	CheckEnums  map[string][]string // column → CHECK IN values
+	Defaults    map[string]string   // column → DEFAULT literal value (quotes stripped)
+	Seeds       []map[string]string // INSERT seed rows: each map is col → literal value
 }

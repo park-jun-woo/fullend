@@ -20,4 +20,7 @@ func parseColumnDef(line, upper string, t *Table) {
 	if strings.Contains(upper, "CHECK") {
 		applyCheckEnum(line, colName, t)
 	}
+	if strings.Contains(upper, "DEFAULT") {
+		applyDefault(line, colName, t)
+	}
 }

@@ -21,10 +21,13 @@ internal 코드젠을 프로덕션 레벨로 끌어올리는 기반 다지기.
 | 009 | StructuralCleanup | ✅ | generateMain struct 수렴. Toulmin 도입은 Phase010 에서 처리 완료 |
 | 010 | ToulminPoints → **Decide\* 순수 함수 수렴** | ✅ | 2-depth 기준점 적용 결과 Toulmin 미채택. 3 포인트 모두 `Decide*(facts) Decision` 순수 함수로 수렴. 커밋 `aab3c48` |
 | 011 | DummyRegressionValidation | ✅ | Tier 1 통과, gigbridge 빌드 ✓, zenflow 17 type-mismatch (Phase013 이월). `reports/metrics-phase011.md` 생성. 커밋 `304769d` (v0.1.9) |
-| **012** | **OrchestratorInternalRemoval** | **대기** | orchestrator 내 internal/* import 23건 완전 제거 (genSSaC/genSTML/parsed.go/gen_authz 등) |
-| 013 | GenerateQualityFixing | 대기 | zenflow 17 type-mismatch 해소 + dummy go.mod replace 자동 주입 |
-| 014 | InternalGenRemoval | 대기 | `internal/gen/*`, `internal/ssac/generator`, `internal/stml/generator`, `internal/genapi`, `internal/contract` 일괄 삭제 |
-| 015 | TemplateAndResiduals | 대기 | `main_template.go` 등 `text/template` 화 + 잔여 internal 의존 정리 + filefunc F1/F2 완화 논의 |
+| 012 | OrchestratorInternalRemoval | ✅ | orchestrator `internal/{gen,ssac/generator,stml/generator,genapi,contract}` import 0 달성. 커밋 `403eae5` |
+| 013 | GenerateQualityFixing | ✅ | zenflow spec 정합화로 14 type-mismatch 해소. `FULLEND_LOCAL_PATH` env replace 옵션. 커밋 `8ed9352` |
+| **014** | **InternalGenRemoval** | **대기** | `internal/gen/*`, `ssac/generator`, `stml/generator`, `genapi`, `contract` 일괄 삭제 (pkg/cmd/crosscheck 선행 정리 필요) |
+| 015 | TemplateAndResiduals | 대기 | `*_template.go` → `text/template` + pkg→internal 역의존(7) 제거 + filefunc F1/F2 정책 결정 |
+| **016** | **CrosscheckStrengthening** | **대기** | 정합성 규칙 6종 추가 — validate/crosscheck 먼저 강화해 spec 결함을 사전 검출 (DDL CHECK↔INSERT / DEFAULT FK↔seed / claims↔DDL / SSaC role↔OPA / @empty↔nilable / @call 인자 타입) |
+| 017 | RuntimeBugFixing | 대기 | 실측 런타임 버그 4종 수정 (zenflow 403, OPA path, DSN, gigbridge seed). Phase016 validate 결과를 작업 리스트로 활용 |
+| 018 | DDLPipelineIntegration | 대기 | DDL 위상정렬 + `schema.sql` 통합 산출 + `DEFAULT N FK` auto nobody seed |
 
 ## 검증 상태 (Phase011 기준선)
 
@@ -54,20 +57,40 @@ internal 코드젠을 프로덕션 레벨로 끌어올리는 기반 다지기.
 
 ## 다음 세션 시작 지점
 
-**Phase012 — OrchestratorInternalRemoval**
+**Phase016 — CrosscheckStrengthening** (권장 — validate/crosscheck 먼저 강화) 또는 **Phase014 — InternalGenRemoval** (구조 정리 트랙)
 
-`internal/orchestrator/` 내부 **23개 internal/* import** 전부 제거해 orchestrator 를 pkg 전용으로 전환.
+### Phase016 → 017 → 018 (실측 버그 트랙 — 검증 먼저)
+2026-04-14 docker+hurl 실측에서 드러난 결함 대응을 **3개 Phase 로 분할**. **"도구 먼저 고치고 그 도구로 버그 잡기"** 원칙:
+- **016 CrosscheckStrengthening** (중): 정합성 규칙 6종 추가 — spec 결함을 validate 단계에서 사전 검출
+- **017 RuntimeBugFixing** (소-중): zenflow 403, OPA path, DSN 기본값, gigbridge seed — 016 의 validate 결과 + validate 로 못 잡는 순수 런타임 버그
+- **018 DDLPipelineIntegration** (중): DDL 위상정렬, `schema.sql` 통합, auto nobody seed — 기능 추가
 
-대상 import 군:
-- `internal/ssac/generator` — genSSaC, default_profile, target_profile_model (3 파일)
-- `internal/stml/generator` — genSTML, default_profile, target_profile_model (3 파일)
-- `internal/genapi` — parsed.go 타입 + validate_with/run_cross_validate/append_ssac_after_ddl/inject_func_err_status_from_parsed 등 (8 파일)
-- `internal/gen/gogin` — gen_authz, gen_state_machines (2 파일)
-- `internal/contract` — gen_with, trace_artifacts, run_contract_validate, restore_preserved (4 파일)
+권장 순서: **016 → 017 → 018**. 016/018 은 순서 바꿔도 되나 016 먼저 하면 017 조사 범위가 줄어듦.
 
-`parsed.go` 의 `SymbolTable` 필드 제거 포함.
+### Phase014 (구조 정리 트랙)
+Phase012 후 잔여 cmd/crosscheck/reporter 의 internal 의존 정리 후 일괄 삭제. Phase015 로 이어짐.
 
-상세: `plans/v5/Phase012-OrchestratorInternalRemoval.md`.
+상세: `plans/v5/Phase{016,017,018,014,015}-*.md`.
+
+---
+
+## 구조 건전성 실측 (2026-04-14)
+
+Phase013 완료 후 실측 결과 — 전 지표 개선:
+
+| 지표 | internal/gen | pkg/generate | 변화 |
+|------|-------------|--------------|------|
+| 평균 복잡도 (cyclomatic) | 5.28 | **3.95** | **-25%** ✅ |
+| 고복잡(16+) 함수 비율 | 4.3% | **1.6%** | **-63%** ✅ |
+| 단순(1) 함수 비율 | 13.8% | **23.5%** | **+70%** ✅ |
+| 평균 매개변수 | 2.56 | **2.23** | -13% ✅ |
+| `*WithDomains` 중복 | 4 | **0** | -100% ✅ |
+| `Decide*` 수렴점 | 0 | **3** | Phase010 ✅ |
+| orchestrator 대상 internal 의존 | 23 | **0** | Phase012 ✅ |
+
+상세: `reports/structural-evaluation-2026-04-14.md`.
+
+기능 결함 (OPA owners 정확 원인, crosscheck 사각지대) 은 구조와 별개 — Phase016 대상.
 
 ## 주요 산출 변경 (누적)
 
