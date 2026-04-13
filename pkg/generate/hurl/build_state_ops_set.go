@@ -1,0 +1,19 @@
+//ff:func feature=gen-hurl type=util control=iteration dimension=2
+//ff:what Returns operationIDs that have @state annotations in SSaC.
+package hurl
+
+import ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
+
+// buildStateOpsSet returns operationIDs that have @state annotations in SSaC.
+func buildStateOpsSet(serviceFuncs []ssacparser.ServiceFunc) map[string]bool {
+	ops := make(map[string]bool)
+	for _, sf := range serviceFuncs {
+		for _, seq := range sf.Sequences {
+			if seq.Type == ssacparser.SeqState {
+				ops[sf.Name] = true
+				break
+			}
+		}
+	}
+	return ops
+}
