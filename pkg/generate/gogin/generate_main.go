@@ -14,8 +14,29 @@ import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
 )
 
-// generateMain creates cmd/main.go with domain handler initialization.
-func generateMain(artifactsDir string, serviceFuncs []ssacparser.ServiceFunc, modulePath string, queueBackend string, policies []*policy.Policy, sessionBackend, cacheBackend string, fileConfig *manifest.FileBackend) error {
+// MainGenInput bundles generateMain's inputs to reduce parameter count.
+type MainGenInput struct {
+	ArtifactsDir   string
+	ServiceFuncs   []ssacparser.ServiceFunc
+	ModulePath     string
+	QueueBackend   string
+	Policies       []*policy.Policy
+	SessionBackend string
+	CacheBackend   string
+	FileConfig     *manifest.FileBackend
+}
+
+// generateMain creates cmd/main.go with feature handler initialization.
+func generateMain(in MainGenInput) error {
+	artifactsDir := in.ArtifactsDir
+	serviceFuncs := in.ServiceFuncs
+	modulePath := in.ModulePath
+	queueBackend := in.QueueBackend
+	policies := in.Policies
+	sessionBackend := in.SessionBackend
+	cacheBackend := in.CacheBackend
+	fileConfig := in.FileConfig
+
 	if modulePath == "" {
 		base := filepath.Base(artifactsDir)
 		modulePath = base + "/backend"
