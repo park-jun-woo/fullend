@@ -1,4 +1,4 @@
-# Phase001 — pkg/fullend 분리 + Domain→Feature 리네임
+# ✅ Phase001 — pkg/fullend 분리 + Domain→Feature 리네임 (완료: f2d606d)
 
 ## 목표
 
