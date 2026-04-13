@@ -1,10 +1,8 @@
 //ff:func feature=gen-react type=generator control=sequence
-//ff:what Generate — React + Vite 프론트엔드 생성 진입점 (Phase004 stub)
+//ff:what Generate — React + Vite 프론트엔드 생성 진입점
 package react
 
 import (
-	"fmt"
-
 	"github.com/park-jun-woo/fullend/pkg/fullend"
 )
 
@@ -21,7 +19,14 @@ type STMLGenOutput struct {
 }
 
 // Generate creates React + Vite frontend from Fullstack + STML output.
-// STUB — Phase004 후속 작업에서 활성화.
 func Generate(fs *fullend.Fullstack, cfg *Config, stmlOut *STMLGenOutput) error {
-	return fmt.Errorf("pkg/generate/react.Generate 는 아직 활성화되지 않았습니다 (Phase004 후속 작업)")
+	var deps map[string]string
+	var pages []string
+	var pageOps map[string]string
+	if stmlOut != nil {
+		deps = stmlOut.Deps
+		pages = stmlOut.Pages
+		pageOps = stmlOut.PageOps
+	}
+	return generateFrontendSetup(cfg.ArtifactsDir, fs.OpenAPIDoc, deps, pages, pageOps)
 }

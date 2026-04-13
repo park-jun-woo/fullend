@@ -1,20 +1,19 @@
 //ff:func feature=orchestrator type=command control=sequence
-//ff:what genAuthz generates OPA authorizer package from parsed Rego policies.
+//ff:what genAuthz generates OPA authorizer package from parsed Rego policies (pkg 경로).
 
 package orchestrator
 
 import (
 	"fmt"
 
-	"github.com/park-jun-woo/fullend/internal/gen/gogin"
-	"github.com/park-jun-woo/fullend/internal/genapi"
+	"github.com/park-jun-woo/fullend/internal/policy"
 	"github.com/park-jun-woo/fullend/internal/reporter"
+	"github.com/park-jun-woo/fullend/pkg/generate/gogin"
 )
 
-func genAuthz(artifactsDir string, parsed *genapi.ParsedSSOTs) reporter.StepResult {
+func genAuthz(artifactsDir string, policies []*policy.Policy) reporter.StepResult {
 	step := reporter.StepResult{Name: "authz-gen"}
 
-	policies := parsed.Policies
 	if policies == nil {
 		step.Status = reporter.Fail
 		step.Errors = append(step.Errors, "Policy parse failed")

@@ -1,5 +1,5 @@
 //ff:func feature=orchestrator type=command control=iteration dimension=1
-//ff:what genSTML generates frontend pages from STML specs.
+//ff:what genSTML generates frontend pages from STML specs (pkg 경로).
 
 package orchestrator
 
@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/park-jun-woo/fullend/internal/reporter"
-	stmlgenerator "github.com/park-jun-woo/fullend/internal/stml/generator"
-	stmlparser "github.com/park-jun-woo/fullend/internal/stml/parser"
+	stmlgenerator "github.com/park-jun-woo/fullend/pkg/generate/react/stml"
+	stmlparser "github.com/park-jun-woo/fullend/pkg/parser/stml"
 )
 
 func genSTML(profile *TargetProfile, specsDir, artifactsDir string, pages []stmlparser.PageSpec) (reporter.StepResult, map[string]string, []string, map[string]string) {
@@ -22,7 +22,6 @@ func genSTML(profile *TargetProfile, specsDir, artifactsDir string, pages []stml
 		return step, nil, nil, nil
 	}
 
-	// Output to frontend/src/pages/
 	outDir := filepath.Join(artifactsDir, "frontend", "src", "pages")
 	if err := os.MkdirAll(outDir, 0755); err != nil {
 		step.Status = reporter.Fail
@@ -40,7 +39,6 @@ func genSTML(profile *TargetProfile, specsDir, artifactsDir string, pages []stml
 		return step, nil, nil, nil
 	}
 
-	// Collect generated page names and primary operationIDs for glue-gen.
 	var pageNames []string
 	pageOps := make(map[string]string)
 	for _, p := range pages {

@@ -7,7 +7,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/park-jun-woo/fullend/internal/funcspec"
-	"github.com/park-jun-woo/fullend/internal/genapi"
+	
 	"github.com/park-jun-woo/fullend/internal/policy"
 	"github.com/park-jun-woo/fullend/internal/projectconfig"
 	"github.com/park-jun-woo/fullend/internal/statemachine"
@@ -19,8 +19,8 @@ import (
 // ParseAll parses all detected SSOTs once and returns the cached results.
 // Errors during parsing are recorded in the returned slices (nil values
 // indicate parse failure). Skipped kinds are not parsed.
-func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *genapi.ParsedSSOTs {
-	p := &genapi.ParsedSSOTs{}
+func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *ParsedSSOTs {
+	p := &ParsedSSOTs{}
 
 	has := make(map[SSOTKind]DetectedSSOT)
 	for _, d := range detected {

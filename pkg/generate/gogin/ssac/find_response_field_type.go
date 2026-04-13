@@ -2,7 +2,7 @@
 //ff:what 응답 필드 배열에서 이름으로 타입을 검색
 package ssac
 
-import "github.com/park-jun-woo/fullend/internal/funcspec"
+import "github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 
 func findResponseFieldType(fields []funcspec.Field, fieldName string) string {
 	for _, f := range fields {

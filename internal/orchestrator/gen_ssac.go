@@ -1,5 +1,5 @@
 //ff:func feature=orchestrator type=command control=sequence
-//ff:what genSSaC generates service functions and model interfaces from SSaC specs.
+//ff:what genSSaC generates service functions and model interfaces from SSaC specs (pkg 경로).
 
 package orchestrator
 
@@ -8,15 +8,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/park-jun-woo/fullend/internal/genapi"
 	"github.com/park-jun-woo/fullend/internal/reporter"
-	ssacgenerator "github.com/park-jun-woo/fullend/internal/ssac/generator"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
+	ssacgenerator "github.com/park-jun-woo/fullend/pkg/generate/gogin/ssac"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func genSSaC(profile *TargetProfile, specsDir, artifactsDir string, parsed *genapi.ParsedSSOTs) []reporter.StepResult {
+func genSSaC(profile *TargetProfile, specsDir, artifactsDir string, fs *fullend.Fullstack, g *rule.Ground) []reporter.StepResult {
 	var steps []reporter.StepResult
 
-	funcs := parsed.ServiceFuncs
+	funcs := fs.ServiceFuncs
 	if funcs == nil {
 		steps = append(steps, reporter.StepResult{
 			Name:   "ssac-gen",
@@ -26,22 +27,19 @@ func genSSaC(profile *TargetProfile, specsDir, artifactsDir string, parsed *gena
 		return steps
 	}
 
-	if parsed.SymbolTable == nil {
+	if g == nil {
 		steps = append(steps, reporter.StepResult{
 			Name:   "ssac-gen",
 			Status: reporter.Fail,
-			Errors: []string{"SSaC symbol table not available"},
+			Errors: []string{"Ground not available"},
 		})
 		return steps
 	}
 
-	// Clone SymbolTable for gen path — injectFuncErrStatus mutates Models.
-	genST := parsed.SymbolTable.Clone()
+	if gt, ok := profile.Backend.(*ssacgenerator.GoTarget); ok {
+		gt.FuncSpecs = append(fs.FullendPkgSpecs, fs.ProjectFuncSpecs...)
+	}
 
-	// Inject @error annotations from func specs into the cloned symbol table.
-	injectFuncErrStatusFromParsed(genST, parsed)
-
-	// Generate service functions → backend/internal/service/
 	serviceOutDir := filepath.Join(artifactsDir, "backend", "internal", "service")
 	if err := os.MkdirAll(serviceOutDir, 0755); err != nil {
 		steps = append(steps, reporter.StepResult{
@@ -52,12 +50,8 @@ func genSSaC(profile *TargetProfile, specsDir, artifactsDir string, parsed *gena
 		return steps
 	}
 
-	if gt, ok := profile.Backend.(*ssacgenerator.GoTarget); ok {
-		gt.FuncSpecs = append(parsed.FullendPkgSpecs, parsed.ProjectFuncSpecs...)
-	}
-
 	step := reporter.StepResult{Name: "ssac-gen"}
-	if err := ssacgenerator.GenerateWith(profile.Backend, funcs, serviceOutDir, genST); err != nil {
+	if err := ssacgenerator.GenerateWith(profile.Backend, funcs, serviceOutDir, g); err != nil {
 		step.Status = reporter.Fail
 		step.Errors = append(step.Errors, fmt.Sprintf("SSaC generate error: %v", err))
 	} else {
@@ -66,8 +60,6 @@ func genSSaC(profile *TargetProfile, specsDir, artifactsDir string, parsed *gena
 	}
 	steps = append(steps, step)
 
-	// Generate model interfaces → backend/internal/model/
-	// SSaC writes to outDir/model/, so pass backend/internal/ as outDir.
 	modelOutDir := filepath.Join(artifactsDir, "backend", "internal")
 	if err := os.MkdirAll(modelOutDir, 0755); err != nil {
 		steps = append(steps, reporter.StepResult{
@@ -79,7 +71,7 @@ func genSSaC(profile *TargetProfile, specsDir, artifactsDir string, parsed *gena
 	}
 
 	modelStep := reporter.StepResult{Name: "ssac-model"}
-	if err := profile.Backend.GenerateModelInterfaces(funcs, genST, modelOutDir); err != nil {
+	if err := profile.Backend.GenerateModelInterfaces(funcs, g, modelOutDir); err != nil {
 		modelStep.Status = reporter.Fail
 		modelStep.Errors = append(modelStep.Errors, fmt.Sprintf("SSaC model interface error: %v", err))
 	} else {

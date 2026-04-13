@@ -3,7 +3,7 @@
 package ssac
 
 import (
-	"github.com/park-jun-woo/fullend/internal/funcspec"
+	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 

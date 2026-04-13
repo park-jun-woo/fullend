@@ -2,7 +2,7 @@
 //ff:what Go 언어용 코드 생성기 구조체
 package ssac
 
-import "github.com/park-jun-woo/fullend/internal/funcspec"
+import "github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 
 // GoTarget은 Go 언어용 코드 생성기다.
 type GoTarget struct {

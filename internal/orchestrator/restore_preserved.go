@@ -6,7 +6,7 @@ package orchestrator
 import (
 	"fmt"
 
-	"github.com/park-jun-woo/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/pkg/contract"
 	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 

@@ -3,12 +3,12 @@
 package orchestrator
 
 import (
-	"github.com/park-jun-woo/fullend/internal/genapi"
+	
 	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 // ValidateWith runs validation using pre-parsed SSOTs.
-func ValidateWith(root string, detected []DetectedSSOT, parsed *genapi.ParsedSSOTs, skip map[SSOTKind]bool) *reporter.Report {
+func ValidateWith(root string, detected []DetectedSSOT, parsed *ParsedSSOTs, skip map[SSOTKind]bool) *reporter.Report {
 	report := &reporter.Report{}
 
 	has := make(map[SSOTKind]DetectedSSOT)

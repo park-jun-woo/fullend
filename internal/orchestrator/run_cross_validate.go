@@ -8,11 +8,11 @@ import (
 	pkgcross "github.com/park-jun-woo/fullend/pkg/crosscheck"
 	"github.com/park-jun-woo/fullend/pkg/fullend"
 
-	"github.com/park-jun-woo/fullend/internal/genapi"
+	
 	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
-func runCrossValidate(root string, parsed *genapi.ParsedSSOTs) reporter.StepResult {
+func runCrossValidate(root string, parsed *ParsedSSOTs) reporter.StepResult {
 	step := reporter.StepResult{Name: "Cross"}
 
 	if parsed.OpenAPIDoc == nil || parsed.SymbolTable == nil || parsed.ServiceFuncs == nil {

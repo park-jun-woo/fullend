@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/park-jun-woo/fullend/internal/contract"
+	"github.com/park-jun-woo/fullend/pkg/contract"
 	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
@@ -71,7 +71,7 @@ func GenWith(profile *TargetProfile, specsDir, artifactsDir string, skipKinds ma
 	}
 
 	// 2-12. Run all codegen steps.
-	runCodegenSteps(report, profile, specsDir, artifactsDir, has, parsed)
+	runCodegenSteps(report, profile, specsDir, artifactsDir, has)
 
 	// Post-gen: restore preserved function bodies.
 	if step := restorePreserved(preserveSnap); step != nil {

@@ -4,12 +4,12 @@
 package orchestrator
 
 import (
-	"github.com/park-jun-woo/fullend/internal/genapi"
+	
 	"github.com/park-jun-woo/fullend/internal/reporter"
 )
 
 // appendSSaCAfterDDL runs SSaC validation right after DDL if SSaC is detected.
-func appendSSaCAfterDDL(report *reporter.Report, root string, parsed *genapi.ParsedSSOTs, has map[SSOTKind]DetectedSSOT, done map[SSOTKind]bool) {
+func appendSSaCAfterDDL(report *reporter.Report, root string, parsed *ParsedSSOTs, has map[SSOTKind]DetectedSSOT, done map[SSOTKind]bool) {
 	if _, ok := has[KindSSaC]; !ok {
 		return
 	}
