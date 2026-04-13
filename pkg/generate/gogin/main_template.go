@@ -1,30 +1,27 @@
 //ff:func feature=gen-gogin type=generator control=sequence topic=output
-//ff:what main.go 생성 템플릿 문자열을 반환한다
+//ff:what domain 모드 main.go 생성 템플릿 문자열을 반환한다
 
 package gogin
 
 import "fmt"
 
-// mainTemplate returns the fmt.Sprintf template for flat-mode cmd/main.go.
-func mainTemplate(modulePath, authzImport, queueImport, builtinImport, authzInitBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock string) string {
+// mainWithDomainsTemplate returns the fmt.Sprintf template for domain-mode cmd/main.go.
+func mainWithDomainsTemplate(osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock string) string {
 	return fmt.Sprintf(`package main
 
 import (
 	"database/sql"
 	"flag"
-	"log"
-	"net/http"
+	"log"%s
 
 	_ "github.com/lib/pq"
-
-	"%s/internal/model"
-	"%s/internal/service"%s%s%s
+%s%s%s
 )
 
 func main() {
 	addr := flag.String("addr", ":8080", "listen address")
 	dsn := flag.String("dsn", "postgres://localhost:5432/app?sslmode=disable", "database connection string")
-	dbDriver := flag.String("db", "postgres", "database driver (postgres, mysql)")
+	dbDriver := flag.String("db", "postgres", "database driver (postgres, mysql)")%s
 	flag.Parse()
 
 	conn, err := sql.Open(*dbDriver, *dsn)
@@ -41,9 +38,9 @@ func main() {
 %s
 	}
 %s
-	handler := service.Handler(server)
+	r := service.SetupRouter(server)
 	log.Printf("server listening on %%s", *addr)
-	log.Fatal(http.ListenAndServe(*addr, handler))
+	log.Fatal(r.Run(*addr))
 }
-`, modulePath, modulePath, authzImport, queueImport, builtinImport, authzInitBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock)
+`, osImport, importBlock, queueImport, builtinImport, jwtFlagLine, authzBlock, queueInitBlock, builtinInitBlock, initBlock, queueSubscribeBlock)
 }

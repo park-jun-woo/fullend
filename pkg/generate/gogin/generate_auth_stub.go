@@ -12,9 +12,9 @@ import (
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 )
 
-// generateAuthStubWithDomains creates model/auth.go with CurrentUser type and Authorizer interface.
+// generateAuthStub creates model/auth.go with CurrentUser type and Authorizer interface.
 // CurrentUser fields are derived from fullend.yaml claims config.
-func generateAuthStubWithDomains(intDir string, modulePath string, claims map[string]manifest.ClaimDef) error {
+func generateAuthStub(intDir string, modulePath string, claims map[string]manifest.ClaimDef) error {
 	modelDir := filepath.Join(intDir, "model")
 	if err := os.MkdirAll(modelDir, 0755); err != nil {
 		return err
