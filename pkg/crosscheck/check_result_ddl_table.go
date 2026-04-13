@@ -12,10 +12,7 @@ import (
 
 func checkResultDDLTable(g *rule.Ground, funcName, resultType string) []CrossError {
 	table := strings.ToLower(inflection.Plural(resultType))
-	if _, ok := g.Lookup["DDL.column."+table]; ok {
-		return nil
-	}
-	if g.Lookup["DDL.table"][table] {
+	if _, ok := g.Tables[table]; ok {
 		return nil
 	}
 	return []CrossError{{Rule: "X-12", Context: funcName, Level: "WARNING",

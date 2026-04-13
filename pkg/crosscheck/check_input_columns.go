@@ -10,8 +10,8 @@ import (
 )
 
 func checkInputColumns(g *rule.Ground, funcName string, seq ssac.Sequence, table string) []CrossError {
-	cols := g.Lookup["DDL.column."+table]
-	if len(cols) == 0 {
+	t, ok := g.Tables[table]
+	if !ok || len(t.Columns) == 0 {
 		return nil
 	}
 	var errs []CrossError
@@ -20,7 +20,7 @@ func checkInputColumns(g *rule.Ground, funcName string, seq ssac.Sequence, table
 			continue
 		}
 		snakeField := strcase.ToSnake(arg.Field)
-		if !cols[snakeField] {
+		if _, colOk := t.Columns[snakeField]; !colOk {
 			errs = append(errs, CrossError{Rule: "X-13", Context: funcName, Level: "WARNING",
 				Message: "SSaC input " + arg.Field + " not found in DDL table " + table})
 		}
