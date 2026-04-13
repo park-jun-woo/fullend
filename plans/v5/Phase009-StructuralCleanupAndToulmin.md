@@ -1,8 +1,8 @@
-# Phase007 — 구조 정리 + Toulmin 포인트 도입
+# Phase009 — 구조 정리 + Toulmin 포인트 도입
 
 ## 목표
 
-Phase006 까지 pkg/generate 가 동작하는 상태가 됐다. 이제 **구조 건전성을 실질적으로 올리는** 작업.
+Phase008 까지 pkg/generate 가 동작하는 상태가 됐다. 이제 **구조 건전성을 실질적으로 올리는** 작업.
 
 1. **매개변수 비대 해소** — `generateMain` 등 다매개변수 함수를 struct 로.
 2. **결정 분산 해소** — Queue init 등 판정 로직을 한 곳에 취합.
@@ -13,7 +13,7 @@ Phase006 까지 pkg/generate 가 동작하는 상태가 됐다. 이제 **구조 
    - hurl 시나리오 순서 결정 (5-phase + FK topological) → Toulmin Loop + Subscribe
 
 성공 기준:
-- 지표가 internal 대비 개선 (Phase008 측정)
+- 지표가 internal 대비 개선 (Phase010 측정)
 - 행동 보존 — 생성 산출물 기능 유지 (단 bit-동일 의무 없음; 구조적 개선 허용)
 - `go build` + `go test ./pkg/...` 통과
 
@@ -21,7 +21,7 @@ Phase006 까지 pkg/generate 가 동작하는 상태가 됐다. 이제 **구조 
 
 ## 전제
 
-- **Phase006 완료** — pkg/generate 가 실제 동작, orchestrator 가 pkg 호출.
+- **Phase008 완료** — pkg/generate 가 실제 동작, orchestrator 가 pkg 호출.
 - internal/gen 은 dead code 로 남음 (본 Phase 에서도 유지).
 
 ---
@@ -77,7 +77,7 @@ Phase006 까지 pkg/generate 가 동작하는 상태가 됐다. 이제 **구조 
 ### 포함하지 않음
 
 - 나머지 Toulmin 도입 — 본 Phase 3군데만. 추가는 별도 Phase.
-- Dummy 실용 검증 — Phase008.
+- Dummy 실용 검증 — Phase010.
 
 ---
 
@@ -85,7 +85,7 @@ Phase006 까지 pkg/generate 가 동작하는 상태가 됐다. 이제 **구조 
 
 ### Step 1. 구조 지표 현 상태 캡처
 
-Phase008 에서 측정할 지표의 "before" 값 수집 (내부 함수 매개변수 평균, 결정 분산 파일 수 등). 본 Phase 가 얼마나 개선했는지 추후 비교용.
+Phase010 에서 측정할 지표의 "before" 값 수집 (내부 함수 매개변수 평균, 결정 분산 파일 수 등). 본 Phase 가 얼마나 개선했는지 추후 비교용.
 
 ### Step 2. Part A — 구조 정리 (순수 리팩토링)
 
@@ -135,7 +135,7 @@ Part B 3군데 외 "내 눈엔 복잡해 보임" 같은 이유로 추가 Toulmin
 - 우선순위/defeat 의미 필요
 - 규칙 집합이 증가형
 
-모호하면 if-else 유지. Phase008 지표 확인 후 Phase00X 에서 추가 고려.
+모호하면 if-else 유지. Phase010 지표 확인 후 Phase00X 에서 추가 고려.
 
 ### R3. 행동 변화 허용 범위
 
@@ -143,7 +143,7 @@ Part B 3군데 외 "내 눈엔 복잡해 보임" 같은 이유로 추가 Toulmin
 - 생성된 산출물의 **실질 기능 동일** 유지 (API 시그니처, 비즈니스 로직)
 - 산출물의 공백·순서 등 사소한 차이는 허용
 
-### R4. Phase007 완료 시점 판단
+### R4. Phase009 완료 시점 판단
 
 - 3개 Toulmin 포인트 모두 적용 + 구조 정리 Part A 완료 → DoD
 - 시간 초과 시 Part B1 (가장 명확) 만이라도 완료하고 Part B2, B3 는 별도 Phase 로 분리 가능
