@@ -1,8 +1,8 @@
-# Phase010 — Dummy 실용 검증 + 구조 건전성 지표
+# Phase011 — Dummy 실용 검증 + 구조 건전성 지표
 
 ## 목표
 
-Phase009 결과물이 **실용적으로 동작하고**, **구조 건전성이 internal 대비 개선** 되었는지 지표로 확인한다.
+Phase010 결과물 (또는 Phase009 결과물 — Toulmin 도입 전 기준선)이 **실용적으로 동작하고**, **구조 건전성이 internal 대비 개선** 되었는지 지표로 확인한다.
 
 **중요한 재정의**: 이 Phase 는 "internal 과 diff 0" 을 요구하지 않는다. internal 은 참고용이지 재현 대상이 아니다. 성공 기준은:
 
@@ -84,7 +84,7 @@ scripts/structural_metrics/
 ### 리포트 형식
 
 ```
-# Structural Metrics Report (Phase010)
+# Structural Metrics Report (Phase011)
 
 ## 매개변수 분포
                    internal   pkg/generate
@@ -133,7 +133,7 @@ go run ./cmd/fullend gen dummys/gigbridge/specs dummys/gigbridge/artifacts
 go run ./cmd/fullend gen dummys/zenflow/specs  dummys/zenflow/artifacts
 ```
 
-에러가 나면 기록하고 계속 (Tier 2 허용). 에러 로그를 Phase011+ 의 입력으로 쌓음.
+에러가 나면 기록하고 계속 (Tier 2 허용). 에러 로그를 Phase012+ 의 입력으로 쌓음.
 
 ### Step 3. Tier 2 목표 검증
 
@@ -149,7 +149,7 @@ cd dummys/zenflow/artifacts/backend && go build ./... ; cd -
 - **누락 파일** → 생성기 범위 누락
 - **문법 오류** → 템플릿 조립 버그
 
-범주별 카운트만 리포트에 기록. 이 Phase 에서 고치지 않음 (Phase011+ 로 이월).
+범주별 카운트만 리포트에 기록. 이 Phase 에서 고치지 않음 (Phase012+ 로 이월).
 
 Hurl 검증 (best effort):
 ```bash
@@ -173,7 +173,7 @@ go run ./scripts/structural_metrics/compare.go > reports/metrics-phase005.md
 
 ### Step 5. 판정
 
-- Tier 1 전부 통과 + 구조 지표 악화 없음 → **Phase010 통과**.
+- Tier 1 전부 통과 + 구조 지표 악화 없음 → **Phase011 통과**.
 - Tier 1 실패 → Phase006~009 복귀.
 - 구조 지표 악화 (예: 매개변수 평균 증가, Toulmin 0건) → Phase004 구조 정리 보강 후 재측정.
 
@@ -198,7 +198,7 @@ Tier 1 (go build, go vet, pkg/ground test) 실패는 **구조 안정성 불안**
 지표 악화(예: 매개변수 평균 증가)가 나오면:
 - 어느 함수가 원인인지 추적.
 - Phase009 의 즉시 해소 누락분 식별.
-- Phase004 로 복귀해 해당 함수 정리 후 Phase010 재측정.
+- Phase004 로 복귀해 해당 함수 정리 후 Phase011 재측정.
 
 이 Phase 에서 해결하지 않음 (Phase 경계 명확히).
 
@@ -208,7 +208,7 @@ Tier 1 (go build, go vet, pkg/ground test) 실패는 **구조 안정성 불안**
 
 ### R4. dummy 프로젝트 동결
 
-Phase010 기간 중 gigbridge·zenflow SSOT 를 바꾸지 않음. 변경 시 구조 지표 비교가 오염.
+Phase011 기간 중 gigbridge·zenflow SSOT 를 바꾸지 않음. 변경 시 구조 지표 비교가 오염.
 
 ### R5. internal/gen 호출 금지
 
@@ -246,5 +246,5 @@ Phase010 기간 중 gigbridge·zenflow SSOT 를 바꾸지 않음. 변경 시 구
 
 ## 다음 Phase 예고
 
-- **Phase011+ (프로덕션화)** — Tier 2/3 에서 기록된 실패를 하나씩 해소해 생성 산출물의 실제 동작 수준을 올림. 핸들러 body 채우기, 타입 오류 수정, 누락 기능 추가 등.
+- **Phase012+ (프로덕션화)** — Tier 2/3 에서 기록된 실패를 하나씩 해소해 생성 산출물의 실제 동작 수준을 올림. 핸들러 body 채우기, 타입 오류 수정, 누락 기능 추가 등.
 - **Phase00N (internal 삭제)** — pkg/generate 가 internal 을 완전히 대체한 시점에 일괄 삭제.
