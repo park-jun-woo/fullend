@@ -1,4 +1,4 @@
-# Phase007 — react.Generate + hurl.Generate 활성화
+# ✅ Phase007 — react.Generate + hurl.Generate 활성화 (완료)
 
 ## 목표
 
