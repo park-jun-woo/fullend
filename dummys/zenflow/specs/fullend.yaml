@@ -12,8 +12,8 @@ backend:
     type: jwt
     secret_env: JWT_SECRET
     claims:
-      ID: user_id
-      OrgID: org_id
+      ID: user_id:int64
+      OrgID: org_id:int64
       Role: role
     roles:
       - admin

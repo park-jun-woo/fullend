@@ -1,15 +1,12 @@
 package worker
 
+import "github.com/example/zenflow/internal/model"
+
 // @func processActions
 // @description Processes all actions in sequence order
 
 type ProcessActionsRequest struct {
-	Actions []ActionInput
-}
-
-type ActionInput struct {
-	ActionType      string
-	PayloadTemplate string
+	Actions []model.Action
 }
 
 type ProcessActionsResponse struct {

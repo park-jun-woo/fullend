@@ -12,7 +12,7 @@ type DeductCreditResponse struct {
 	Remaining int64
 }
 
-func DeductCredit(req DeductCreditRequest) (DeductCreditResponse, error) {
+func DeductCredit(req DeductCreditRequest) (*DeductCreditResponse, error) {
 	remaining := int64(99) - req.Amount
-	return DeductCreditResponse{Remaining: remaining}, nil
+	return &DeductCreditResponse{Remaining: remaining}, nil
 }

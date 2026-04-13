@@ -44,6 +44,11 @@ func generateMain(in MainGenInput) error {
 			return err
 		}
 		goModContent := fmt.Sprintf("module %s\n\ngo 1.22\n\nrequire github.com/gin-gonic/gin v1.10.0\n", modulePath)
+		// Opt-in: FULLEND_LOCAL_PATH 가 지정되면 로컬 fullend 로 replace.
+		// 개발 환경에서 fullend 모듈 경로 충돌(park-jun-woo vs geul-org) 해소용.
+		if localPath := os.Getenv("FULLEND_LOCAL_PATH"); localPath != "" {
+			goModContent += fmt.Sprintf("\nreplace github.com/park-jun-woo/fullend => %s\n", localPath)
+		}
 		if err := os.WriteFile(goModPath, []byte(goModContent), 0644); err != nil {
 			return err
 		}

@@ -11,8 +11,8 @@ type CheckCreditsResponse struct {
 	Balance int64
 }
 
-func CheckCredits(req CheckCreditsRequest) (CheckCreditsResponse, error) {
+func CheckCredits(req CheckCreditsRequest) (*CheckCreditsResponse, error) {
 	// Simulated: always return positive balance
 	balance := int64(100)
-	return CheckCreditsResponse{Balance: balance}, nil
+	return &CheckCreditsResponse{Balance: balance}, nil
 }

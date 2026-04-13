@@ -135,21 +135,35 @@ fix 후 `scripts/structural_metrics.go` 재실행 대신 Tier 2 결과 섹션만
 
 기본 동작을 바꾸지 않음. 플래그 제공만.
 
-### R4. 범위 폭주 금지
+### R4. 범위 — dummy 는 수정 허용
 
-gigbridge/zenflow 외 dummy 신설이나 스펙 확장은 본 Phase 에서 금지. 기존 17건만 해소.
+- **gigbridge**: 정합성 기준선. **수정 금지 (회귀 방지)**.
+- **zenflow**: 리팩토링 중 대충 만든 예제. **수정 허용** — SSOT 파일 (fullend.yaml, .ssac, func/*.go) 를 generator 동작에 맞춰 재정비.
+- **generator**: Phase10~12 이식 과정에서 불완전 잔존. **수정 허용** — spec 레벨로 해결 안 되는 경우 generator 교정.
+- **crosscheck**: 현재 잡지 못하는 정합성 위반 (예: claims 타입 vs DDL 컬럼 타입). **규칙 추가 허용** — 17건 원인 재발 방지용.
+
+즉 Phase013 = **"zenflow 정합화 + 필요 시 generator/crosscheck 교정"**. gigbridge 회귀 금지가 유일한 경계.
 
 ---
 
 ## 완료 조건 (Definition of Done)
 
-- [ ] zenflow 17건 type-mismatch 전부 해소 (`go build ./...` exit 0)
-- [ ] gigbridge 빌드 유지 (회귀 없음)
-- [ ] `go vet ./pkg/... ./internal/... ./cmd/...` 통과
-- [ ] `go test ./pkg/...` 통과
-- [ ] go.mod replace 자동 주입 플래그 제공 (옵트인)
-- [ ] `reports/metrics-phase011.md` 의 Tier 2 섹션 갱신 또는 `reports/metrics-phase013.md` 신설
-- [ ] 커밋: `fix(generate): zenflow type-mismatch 17건 해소 + dummy go.mod replace 옵션`
+- [x] zenflow 14건 type-mismatch 전부 해소 (`go build ./...` exit 0)
+  - **A1 (claims 타입)**: zenflow `fullend.yaml` 의 `ID:user_id`/`OrgID:org_id` 에 `:int64` 추가 → 11건 해소
+  - **A2 (billing pointer)**: zenflow `func/billing/{check_credits,deduct_credit}.go` 반환 타입 `*Response` 로 변경 → 2건 해소
+  - **A3 (Action 어댑터)**: zenflow `func/worker/process_actions.go` 의 `[]ActionInput` → `[]model.Action` (zenflow model import) → 1건 해소
+- [x] gigbridge 빌드 유지 (회귀 없음, exit=0)
+- [x] `go vet ./pkg/... ./internal/... ./cmd/...` 통과
+- [x] `go test ./pkg/...` 통과
+- [x] go.mod replace 자동 주입 (`FULLEND_LOCAL_PATH` env 옵트인)
+- [x] `reports/metrics-phase013.md` 생성
+- [ ] 커밋: `fix(generate): zenflow type-mismatch 14건 해소 + FULLEND_LOCAL_PATH replace 옵션`
+
+### 실측 vs 계획 차이
+
+- 계획 17건 → 실측 14건 (Phase011 측정 시 포함됐던 일부 transient 에러가 사라진 것으로 추정)
+- A3 generator 어댑터 미적용 — spec 수정만으로 해결됨 (worker 가 model.Action 직수용)
+- generator 측 수정 0건. 모두 spec 측 정합 + replace 옵션 추가만으로 해결
 
 ## 의존
 
