@@ -3,7 +3,7 @@
 package crosscheck
 
 import (
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 )
 
 func checkCursor(fs *fullend.Fullstack) []CrossError {

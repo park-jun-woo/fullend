@@ -6,7 +6,7 @@ package ssac
 type ServiceFunc struct {
 	Name      string         // 함수명 (e.g. "GetCourse")
 	FileName  string         // 원본 파일명
-	Domain    string         // 도메인 폴더명 (e.g. "auth", 없으면 "")
+	Feature   string         // feature 폴더명 (e.g. "auth", 없으면 "")
 	Sequences []Sequence     // 시퀀스 목록
 	Imports   []string       // Go import 경로
 	Subscribe *SubscribeInfo // nil이면 HTTP 트리거

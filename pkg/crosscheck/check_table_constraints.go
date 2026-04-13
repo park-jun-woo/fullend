@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/park-jun-woo/fullend/pkg/parser/ddl"
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 )
 
 func checkTableConstraints(t ddl.Table, fs *fullend.Fullstack) []CrossError {

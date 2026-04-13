@@ -9,7 +9,7 @@ import (
 	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
 	"github.com/park-jun-woo/fullend/pkg/ground"
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 	pkgssac "github.com/park-jun-woo/fullend/pkg/validate/ssac"
 )
 

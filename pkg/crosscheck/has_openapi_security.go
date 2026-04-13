@@ -2,7 +2,7 @@
 //ff:what hasOpenAPISecurity — OpenAPI 경로에 security 설정이 하나라도 있는지 확인
 package crosscheck
 
-import "github.com/park-jun-woo/fullend/pkg/parser/fullend"
+import "github.com/park-jun-woo/fullend/pkg/fullend"
 
 func hasOpenAPISecurity(fs *fullend.Fullstack) bool {
 	for _, item := range fs.OpenAPIDoc.Paths.Map() {

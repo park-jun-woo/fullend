@@ -4,7 +4,7 @@ package crosscheck
 
 import (
 	"github.com/park-jun-woo/fullend/pkg/ground"
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 )
 
 // Run executes all cross-validation rules against parsed SSOTs.

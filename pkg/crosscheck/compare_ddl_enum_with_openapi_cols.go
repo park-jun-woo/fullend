@@ -2,7 +2,7 @@
 //ff:what compareDDLEnumWithOpenAPICols — 테이블의 각 CHECK enum 컬럼을 OpenAPI enum과 비교
 package crosscheck
 
-import "github.com/park-jun-woo/fullend/pkg/parser/fullend"
+import "github.com/park-jun-woo/fullend/pkg/fullend"
 
 func compareDDLEnumWithOpenAPICols(table string, checkEnums map[string][]string, fs *fullend.Fullstack) []CrossError {
 	var errs []CrossError

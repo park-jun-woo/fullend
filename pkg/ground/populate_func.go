@@ -5,7 +5,7 @@ package ground
 import (
 	"strings"
 
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 

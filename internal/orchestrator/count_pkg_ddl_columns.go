@@ -2,7 +2,7 @@
 //ff:what countPkgDDLColumns — pkg/parser/ddl Table에서 총 컬럼 수 집계
 package orchestrator
 
-import "github.com/park-jun-woo/fullend/pkg/parser/fullend"
+import "github.com/park-jun-woo/fullend/pkg/fullend"
 
 func countPkgDDLColumns(fs *fullend.Fullstack) int {
 	cols := 0

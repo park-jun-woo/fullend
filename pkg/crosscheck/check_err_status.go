@@ -2,7 +2,7 @@
 //ff:what checkErrStatus — @empty/@exists/@state/@auth ErrStatus OpenAPI 응답 존재 검증 (X-21, X-22)
 package crosscheck
 
-import "github.com/park-jun-woo/fullend/pkg/parser/fullend"
+import "github.com/park-jun-woo/fullend/pkg/fullend"
 
 func checkErrStatus(fs *fullend.Fullstack) []CrossError {
 	if fs.OpenAPIDoc == nil {

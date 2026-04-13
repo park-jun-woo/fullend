@@ -2,7 +2,7 @@
 //ff:what collectCurrentUserFields — SSaC에서 currentUser.Field 참조 수집
 package crosscheck
 
-import "github.com/park-jun-woo/fullend/pkg/parser/fullend"
+import "github.com/park-jun-woo/fullend/pkg/fullend"
 
 func collectCurrentUserFields(fs *fullend.Fullstack) []string {
 	seen := make(map[string]bool)

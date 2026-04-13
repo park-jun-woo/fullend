@@ -1,5 +1,5 @@
 //ff:func feature=ssac-parse type=parser control=sequence
-//ff:what 도메인 서브 폴더 파싱 검증 — Domain 필드가 폴더명으로 설정됨
+//ff:what feature 서브 폴더 파싱 검증 — Feature 필드가 폴더명으로 설정됨
 
 package ssac
 
@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestParseDomainFolder(t *testing.T) {
+func TestParseFeatureFolder(t *testing.T) {
 	dir := t.TempDir()
 	authDir := filepath.Join(dir, "auth")
 	os.MkdirAll(authDir, 0755)
@@ -31,5 +31,5 @@ func Login(c *gin.Context) {}
 	if len(funcs) != 1 {
 		t.Fatalf("expected 1 func, got %d", len(funcs))
 	}
-	assertEqual(t, "Domain", funcs[0].Domain, "auth")
+	assertEqual(t, "Feature", funcs[0].Feature, "auth")
 }

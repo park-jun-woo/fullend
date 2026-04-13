@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"strings"
 
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 )
 
 func funcHasResponse(callKey string, fs *fullend.Fullstack) bool {

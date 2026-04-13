@@ -7,7 +7,7 @@ import (
 
 	"github.com/park-jun-woo/fullend/internal/reporter"
 	ssacvalidator "github.com/park-jun-woo/fullend/internal/ssac/validator"
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 	pkgddl "github.com/park-jun-woo/fullend/pkg/validate/ddl"
 )
 

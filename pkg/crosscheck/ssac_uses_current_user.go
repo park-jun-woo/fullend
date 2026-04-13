@@ -2,7 +2,7 @@
 //ff:what ssacUsesCurrentUser — SSaC에서 currentUser 참조 여부 확인
 package crosscheck
 
-import "github.com/park-jun-woo/fullend/pkg/parser/fullend"
+import "github.com/park-jun-woo/fullend/pkg/fullend"
 
 func ssacUsesCurrentUser(fs *fullend.Fullstack) bool {
 	for _, fn := range fs.ServiceFuncs {

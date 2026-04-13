@@ -3,7 +3,7 @@
 package ground
 
 import (
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 

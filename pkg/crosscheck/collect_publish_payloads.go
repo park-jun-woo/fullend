@@ -2,7 +2,7 @@
 //ff:what collectPublishPayloads — @publish 시퀀스에서 topic별 payload 필드 수집
 package crosscheck
 
-import "github.com/park-jun-woo/fullend/pkg/parser/fullend"
+import "github.com/park-jun-woo/fullend/pkg/fullend"
 
 func collectPublishPayloads(fs *fullend.Fullstack) map[string][]string {
 	payloads := make(map[string][]string)

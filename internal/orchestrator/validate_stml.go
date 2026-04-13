@@ -8,7 +8,7 @@ import (
 	"github.com/park-jun-woo/fullend/internal/reporter"
 	stmlparser "github.com/park-jun-woo/fullend/internal/stml/parser"
 	"github.com/park-jun-woo/fullend/pkg/ground"
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 	pkgstml "github.com/park-jun-woo/fullend/pkg/validate/stml"
 )
 

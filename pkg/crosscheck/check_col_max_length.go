@@ -5,7 +5,7 @@ package crosscheck
 import (
 	"strconv"
 
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 )
 
 func checkColMaxLength(table, col string, vLen int, fs *fullend.Fullstack) []CrossError {

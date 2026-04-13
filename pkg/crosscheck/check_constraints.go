@@ -3,7 +3,7 @@
 package crosscheck
 
 import (
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 )
 
 func checkConstraints(fs *fullend.Fullstack) []CrossError {

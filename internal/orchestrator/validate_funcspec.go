@@ -7,7 +7,7 @@ import (
 
 	"github.com/park-jun-woo/fullend/internal/funcspec"
 	"github.com/park-jun-woo/fullend/internal/reporter"
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 	pkgfunc "github.com/park-jun-woo/fullend/pkg/validate/funcspec"
 )
 

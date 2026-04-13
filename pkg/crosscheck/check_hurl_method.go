@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/park-jun-woo/fullend/pkg/parser/fullend"
+	"github.com/park-jun-woo/fullend/pkg/fullend"
 	"github.com/park-jun-woo/fullend/pkg/rule"
 	"github.com/park-jun-woo/toulmin/pkg/toulmin"
 )

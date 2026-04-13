@@ -27,7 +27,7 @@ func Login() {}
 	if len(diags) == 0 {
 		t.Fatal("expected diagnostic for flat service/ file, got none")
 	}
-	if !strings.Contains(diags[0].Message, "도메인 서브 폴더를 사용하세요") {
+	if !strings.Contains(diags[0].Message, "feature 서브 폴더를 사용하세요") {
 		t.Errorf("unexpected diagnostic message: %s", diags[0].Message)
 	}
 }
