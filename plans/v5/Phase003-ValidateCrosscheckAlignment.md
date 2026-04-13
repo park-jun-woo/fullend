@@ -71,14 +71,16 @@ refactor(validate): {규칙명} 을 Ground 구조적 필드로 마이그
 모든 규칙 마이그 후, 기존 평탄 populate 중 사용처 0 이 된 것을 삭제:
 
 ```bash
-# populate 한 키 검색
-grep -rn "g\.Lookup\[\"SymbolTable.model\"\]" pkg/validate/ pkg/crosscheck/
-# 결과 0 이면 populate_symbol_table.go 안전 제거 가능
+# 예: populate 한 키 검색
+grep -rn "g\.Lookup\[\"해당.키\"\]" pkg/validate/ pkg/crosscheck/
+# 결과 0 이면 해당 populate 안전 제거 가능
 ```
 
 제거 후보 (예시 — 실제는 Phase002 설계에 따라 변동):
-- `populate_symbol_table.go` (→ `populate_models.go` 로 대체됨)
-- `populate_op_params.go` 일부 (→ `populate_op_details.go` 로 대체)
+- `populate_op_params.go` 일부 (→ `populate_ops.go` 로 대체됨)
+- 기타 평탄 필드 중 신 구조적 필드로 대체 가능한 것
+
+**비고**: `populate_symbol_table.go` 는 Phase002 Part D 에서 이미 제거 완료됨 (사용처 0건 실측 기반). 본 Phase 에서 별도 처리 불필요.
 
 **실측 필수** — 사용처 확인 없이 제거 금지.
 
