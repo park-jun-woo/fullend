@@ -39,8 +39,4 @@ func TestBuildDummyGigbridge(t *testing.T) {
 		t.Logf("ReqSchemas empty — 가능 (요청 body 없는 operation 만 있으면)")
 	}
 
-	// legacy bridge 확인
-	if _, ok := g.Lookup["SymbolTable.model"]; !ok {
-		t.Error("legacy Lookup['SymbolTable.model'] missing — populateModelLookup 미동작")
-	}
 }

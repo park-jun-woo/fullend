@@ -43,9 +43,5 @@ func Build(fs *fullend.Fullstack) *rule.Ground {
 	populateOps(g, fs)
 	populateRequestSchemas(g, fs)
 
-	// legacy bridge — validate 규칙(S-48 등) 이 아직 Lookup["SymbolTable.model"] 을 쓰므로
-	// g.Models 에서 파생해 유지. Phase003 에서 validate 마이그 후 제거 예정.
-	populateModelLookup(g)
-
 	return g
 }
