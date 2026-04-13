@@ -2,15 +2,17 @@
 //ff:what checkGhostFields — 단일 operation의 response field가 DDL 컬럼에 있는지 검증
 package crosscheck
 
-import "github.com/park-jun-woo/fullend/pkg/rule"
-
-func checkGhostFields(op, table string, fields []string, cols rule.StringSet) []CrossError {
+func checkGhostFields(op, table string, fields []string, cols map[string]string) []CrossError {
 	var errs []CrossError
 	for _, f := range fields {
-		if !cols[f] && f != "id" {
-			errs = append(errs, CrossError{Rule: "X-9", Context: op, Level: "WARNING",
-				Message: "OpenAPI property " + f + " not found in DDL table " + table})
+		if _, ok := cols[f]; ok {
+			continue
 		}
+		if f == "id" {
+			continue
+		}
+		errs = append(errs, CrossError{Rule: "X-9", Context: op, Level: "WARNING",
+			Message: "OpenAPI property " + f + " not found in DDL table " + table})
 	}
 	return errs
 }

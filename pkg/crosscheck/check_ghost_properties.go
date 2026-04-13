@@ -10,7 +10,7 @@ import (
 )
 
 func checkGhostProperties(g *rule.Ground, fs *fullend.Fullstack) []CrossError {
-	if fs.OpenAPIDoc == nil || len(fs.DDLTables) == 0 {
+	if fs.OpenAPIDoc == nil || len(g.Tables) == 0 {
 		return nil
 	}
 	var errs []CrossError
@@ -20,11 +20,11 @@ func checkGhostProperties(g *rule.Ground, fs *fullend.Fullstack) []CrossError {
 		}
 		op := opID[len("OpenAPI.response.resolved."):]
 		table := guessTableFromOp(op)
-		cols := g.Lookup["DDL.column."+table]
-		if len(cols) == 0 {
+		t, ok := g.Tables[table]
+		if !ok || len(t.Columns) == 0 {
 			continue
 		}
-		errs = append(errs, checkGhostFields(op, table, fields, cols)...)
+		errs = append(errs, checkGhostFields(op, table, fields, t.Columns)...)
 	}
 	return errs
 }
