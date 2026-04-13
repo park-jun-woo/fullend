@@ -1,4 +1,4 @@
-# Phase008 — orchestrator 배선 교체 (internal/gen → pkg/generate)
+# 🟡 Phase008 — orchestrator 배선 교체 (gen_glue 완료, genSSaC/genSTML 보류)
 
 ## 목표
 
@@ -134,9 +134,9 @@ dead code 로 남김. 실제 삭제는 별도 Phase (Phase00N — 로드맵 끝)
 
 ## 완료 조건 (Definition of Done)
 
-- [ ] `buildPkgContext` 어댑터 함수 작성
-- [ ] gen_glue.go 가 pkg/generate 호출
-- [ ] orchestrator 의 internal/gen 계열 import 0건
+- [x] `buildPkgContext` 어댑터 함수 작성
+- [x] gen_glue.go 가 pkg/generate 호출
+- [ ] orchestrator 의 internal/gen 계열 import 0건 (**보류** — genSSaC/genSTML/parsed.go 가 여전히 internal 생성기·타입 사용)
 - [ ] `go build ./pkg/... ./internal/... ./cmd/...` 통과
 - [ ] `go vet` 통과
 - [ ] `fullend validate` 동작 유지
