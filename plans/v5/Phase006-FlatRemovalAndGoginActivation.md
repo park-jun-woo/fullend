@@ -1,4 +1,4 @@
-# Phase006 — Flat mode 제거 + gogin.Generate 활성화
+# ✅ Phase006 — Flat mode 제거 + gogin.Generate 활성화 (완료)
 
 ## 목표
 
