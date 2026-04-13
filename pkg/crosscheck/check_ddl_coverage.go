@@ -8,8 +8,7 @@ import (
 )
 
 func checkDDLCoverage(g *rule.Ground) []CrossError {
-	tables := g.Lookup["DDL.table"]
-	if len(tables) == 0 {
+	if len(g.Tables) == 0 {
 		return nil
 	}
 	graph := toulmin.NewGraph("ddl-coverage")
@@ -22,7 +21,7 @@ func checkDDLCoverage(g *rule.Ground) []CrossError {
 	d.Attacks(w)
 
 	var errs []CrossError
-	for table := range tables {
+	for table := range g.Tables {
 		ctx := toulmin.NewContext()
 		ctx.Set("ground", g)
 		ctx.Set("claim", table)
