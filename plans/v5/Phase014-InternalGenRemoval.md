@@ -1,4 +1,4 @@
-# Phase014 — InternalGenRemoval
+# ⛔ Phase014 — InternalGenRemoval (실행 금지 — 현재 진행 안함)
 
 > `internal/gen/*`, `internal/ssac/generator`, `internal/stml/generator`, `internal/genapi`, `internal/contract` 일괄 삭제. v5 로드맵의 "참조 유지" 단계 종료.
 

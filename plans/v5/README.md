@@ -23,8 +23,8 @@ internal 코드젠을 프로덕션 레벨로 끌어올리는 기반 다지기.
 | 011 | DummyRegressionValidation | ✅ | Tier 1 통과, gigbridge 빌드 ✓, zenflow 14 type-mismatch (Phase013 이월). 커밋 `304769d` (v0.1.9) |
 | 012 | OrchestratorInternalRemoval | ✅ | orchestrator `internal/{gen,ssac/generator,stml/generator,genapi,contract}` import 0 달성. 커밋 `403eae5` |
 | 013 | GenerateQualityFixing | ✅ | zenflow spec 정합화로 14 type-mismatch 해소. `FULLEND_LOCAL_PATH` env replace. 커밋 `8ed9352` |
-| 014 | InternalGenRemoval | 대기 | `internal/{gen,ssac/generator,stml/generator,genapi,contract}` 일괄 삭제 |
-| 015 | TemplateAndResiduals | 대기 | `*_template.go` → `text/template` + pkg→internal 역의존 제거 + filefunc F1/F2 정책 |
+| 014 | InternalGenRemoval | ⛔ 실행 금지 | 사용자 지시로 **현재 진행 안함** — internal/* 삭제는 v5 이후 별도 판단 |
+| 015 | TemplateAndResiduals | ⛔ 실행 금지 | 사용자 지시로 **현재 진행 안함** — template 전환 + 잔여 정리는 보류 |
 | 016 | CrosscheckStrengthening | ✅ | 정합성 규칙 6종 (X-74~X-79) 추가. 파서 확장 (DDL Defaults/Seeds, FuncSpec.ResponsePointer). 커밋 `e870181` (v0.1.10) |
 | 017 | RuntimeBugFixing | ✅ | 런타임 버그 4종 (zenflow 403 ← OPA claims `org_id` 누락 / OPA path 디렉토리+fallback / DSN DATABASE_URL+모듈명 / gigbridge seed). gigbridge smoke 12/12. **미커밋** |
 | 018 | DDLPipelineIntegration | ✅ | DDL 위상정렬 (Kahn) + `schema.sql` 통합 산출 + `DEFAULT N FK` auto nobody seed (opt-in). gigbridge schema.sql 1회 실행으로 DB 초기화. **미커밋** |
@@ -57,14 +57,21 @@ internal 코드젠을 프로덕션 레벨로 끌어올리는 기반 다지기.
 
 ## 다음 세션 시작 지점
 
-**Phase014 — InternalGenRemoval** (구조 정리 마감) 또는 **Phase015 — TemplateAndResiduals** (template 전환 + 잔여 정리)
+**v5 핵심 트랙 전부 완료** (Phase001~013, 016, 017, 018). Phase014/015 는 **사용자 지시로 보류** (현재 실행 금지).
 
-v5 로드맵의 **버그·검증·자동화 축 (Phase016/017/018) 은 마감**. 남은 건 구조 정리 두 Phase.
+이후는 v6 영역 (기능 확장) — 별도 로드맵으로 이관 예정.
+
+### 후속 판단 필요 항목 (v6 or 별도 Phase 후보)
+
+- **zenflow ListWorkflows 500**: SSaC `@get` 의 org 스코프 자동 주입 설계 (Phase017 에서 발견)
+- **internal/* 삭제** (Phase014 원안): 필요 시 재활성화
+- **template text/template 화** (Phase015 원안): 필요 시 재활성화
+- **filefunc F1/F2 정책**: 현재 baseline 37 유지 중, 공식 정책 문서화 여부
 
 ### Phase016 → 017 → 018 (실측 버그 트랙 — 마감 ✅)
 - **016 ✅ CrosscheckStrengthening**: 정합성 규칙 6종 (X-74~X-79) 추가. 파서 확장. 커밋 `e870181` / v0.1.10
-- **017 ✅ RuntimeBugFixing**: zenflow ActivateWorkflow 403 root cause (OPA claims.org_id 누락) + OPA path fallback + DSN DATABASE_URL + gigbridge seed. gigbridge smoke 12/12. **미커밋**
-- **018 ✅ DDLPipelineIntegration**: DDL 위상정렬 + schema.sql 통합 + auto nobody seed (opt-in). **미커밋**
+- **017 ✅ RuntimeBugFixing**: zenflow ActivateWorkflow 403 root cause (OPA claims.org_id 누락) + OPA path fallback + DSN DATABASE_URL + gigbridge seed. gigbridge smoke 12/12.
+- **018 ✅ DDLPipelineIntegration**: DDL 위상정렬 + schema.sql 통합 + auto nobody seed (opt-in).
 
 ### Phase014 (구조 정리 트랙)
 Phase012 후 잔여 cmd/crosscheck/reporter 의 internal 의존 정리 후 일괄 삭제. Phase015 로 이어짐.

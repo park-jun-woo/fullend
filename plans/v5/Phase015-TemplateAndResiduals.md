@@ -1,4 +1,4 @@
-# Phase015 — TemplateAndResiduals
+# ⛔ Phase015 — TemplateAndResiduals (실행 금지 — 현재 진행 안함)
 
 > 문자열 조립 기반 템플릿을 `text/template` 로 전환 + Phase012~014 에서 남은 잔여 internal 의존 정리 + filefunc F1/F2 완화 논의 결론.
 
