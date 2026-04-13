@@ -11,9 +11,8 @@ import (
 
 func validateModelRefs(fn parsessac.ServiceFunc, ground *rule.Ground) []validate.ValidationError {
 	modelGraph := toulmin.NewGraph("ssac-model-ref")
-	modelGraph.Rule(rule.RefExists).With(&rule.RefExistsSpec{
-		BaseSpec:  rule.BaseSpec{Rule: "S-48", Level: "ERROR", Message: "model not found in symbol table"},
-		LookupKey: "SymbolTable.model",
+	modelGraph.Rule(rule.ModelRefExists).With(&rule.ModelRefExistsSpec{
+		BaseSpec: rule.BaseSpec{Rule: "S-48", Level: "ERROR", Message: "model not found in symbol table"},
 	})
 	upperGraph := toulmin.NewGraph("ssac-result-upper")
 	upperGraph.Rule(rule.NameFormat).With(&rule.NameFormatSpec{
