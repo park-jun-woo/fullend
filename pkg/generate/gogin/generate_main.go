@@ -27,15 +27,11 @@ type MainGenInput struct {
 }
 
 // generateMain creates cmd/main.go with feature handler initialization.
+// Per-axis decisions are delegated to DecideMainInit; this function consumes InitNeeds
+// and composes template blocks. It holds no judgment logic itself.
 func generateMain(in MainGenInput) error {
 	artifactsDir := in.ArtifactsDir
-	serviceFuncs := in.ServiceFuncs
 	modulePath := in.ModulePath
-	queueBackend := in.QueueBackend
-	policies := in.Policies
-	sessionBackend := in.SessionBackend
-	cacheBackend := in.CacheBackend
-	fileConfig := in.FileConfig
 
 	if modulePath == "" {
 		base := filepath.Base(artifactsDir)
@@ -57,15 +53,15 @@ func generateMain(in MainGenInput) error {
 		return err
 	}
 
-	domains := uniqueDomains(serviceFuncs)
-	anyNeedsAuth := anyDomainNeedsAuth(serviceFuncs, domains)
+	facts := newMainFacts(in)
+	needs := DecideMainInit(facts)
 
-	initBlock := buildDomainInitBlock(serviceFuncs, domains, anyNeedsAuth)
-	importBlock := buildDomainImportsBlock(domains, modulePath, anyNeedsAuth)
+	initBlock := buildDomainInitBlock(in.ServiceFuncs, facts.Domains, needs.Auth)
+	importBlock := buildDomainImportsBlock(facts.Domains, modulePath, needs.Auth)
 
 	authzBlock := ""
-	if anyNeedsAuth {
-		ownershipsCode := buildOwnershipsLiteral(policies)
+	if needs.Authz {
+		ownershipsCode := buildOwnershipsLiteral(in.Policies)
 		authzBlock = fmt.Sprintf(`
 	os.Setenv("JWT_SECRET", *jwtSecret)
 
@@ -75,16 +71,19 @@ func generateMain(in MainGenInput) error {
 `, ownershipsCode)
 	}
 
-	queueImport, queueInitBlock, queueSubscribeBlock := buildQueueBlocks(serviceFuncs, queueBackend)
+	queueImport, queueInitBlock, queueSubscribeBlock := "", "", ""
+	if needs.Queue {
+		queueImport, queueInitBlock, queueSubscribeBlock = buildQueueBlocks(in.ServiceFuncs, in.QueueBackend)
+	}
 
-	builtinImport, builtinInitBlock := buildBuiltinInitBlocks(sessionBackend, cacheBackend, fileConfig)
+	builtinImport, builtinInitBlock := buildBuiltinInitBlocks(in.SessionBackend, in.CacheBackend, in.FileConfig)
 	if strings.Contains(queueImport, `"context"`) {
 		builtinImport = strings.Replace(builtinImport, "\n\t\"context\"", "", 1)
 	}
 
 	jwtFlagLine := ""
 	osImport := ""
-	if anyNeedsAuth {
+	if needs.Auth {
 		jwtFlagLine = `
 	jwtSecretDefault := os.Getenv("JWT_SECRET")
 	if jwtSecretDefault == "" {

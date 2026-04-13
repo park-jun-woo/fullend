@@ -51,6 +51,7 @@ required:
     accessor: "getter/setter/인터페이스 메서드"
     test: "테스트 함수"
     test-helper: "테스트 헬퍼 함수"
+    decider: "Decide* 순수 판정 함수 — facts struct → Pattern/Needs/Decision"
 
 optional:
   topic:
@@ -91,6 +92,9 @@ optional:
     queue-check: "publish ↔ subscribe 토픽 교차, 설정 검증"
     authz-check: "SSaC @auth 입력 ↔ authz CheckRequest 필드"
     sensitive: "DDL 컬럼 민감 패턴 감지"
+    # --- decider topics (Phase010) ---
+    main-init: "cmd/main.go 초기화 블록 축 판정 (auth/queue/session/cache/file)"
+    scenario-order: "hurl 시나리오 phase/order 판정 (Mid classifier)"
   ssot:
     openapi: ""
     ddl: ""

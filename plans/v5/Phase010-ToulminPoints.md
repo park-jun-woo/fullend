@@ -1,18 +1,44 @@
-#  Phase010 — Toulmin 포인트 도입 (3군데)
+#  Phase010 — 결정 지점 구조 정비 (Toulmin 후보 3군데 재평가)
 
-## 목표
+## 기준점 (2026-04-13 추가)
 
-Phase009 구조 정리 위에서 **복잡한 결정 지점 3군데를 Toulmin graph 로 전환**.
+**"if-else 2-depth 이내에 해결 안되면 Toulmin"** — 사용자 확정 기준.
 
-1. **method_from_iface** 의 7-case switch (축 5개)
-2. **main 초기화 블록 조합** (6축 독립 조건)
-3. **hurl 시나리오 순서** (5-phase + FK topological + state BFS + branch skip)
+- `depth 1`: `if X {} else if Y {} else {}` (flat chain / switch case)
+- `depth 2`: 위의 각 분기 내부에 중첩 if 1회
+- `depth 3+`: Toulmin 적용 대상
 
-Toulmin 도입은 "**결정을 명시적 규칙 그래프로 표현** + **defeat 관계로 우선순위 선언**" 이 목적. 단순 if/for 로 충분한 곳엔 도입 금지.
+**조건식 AND/OR 복합도는 depth 에 불포함** (수평 확장). depth 는 수직 중첩만 계수.
+
+## 3 포인트 depth 재평가
+
+| 포인트 | 최소 표현 depth | 판정 |
+|-------|--------------|------|
+| B1 — method_from_iface dispatch | switch(1) + default 내 if(2) = **2** | ✗ **Toulmin 제외** — `DecideMethodPattern` 순수 함수 |
+| B2 — main 초기화 블록 | 축별 독립 if = **1** | ✗ **Toulmin 제외** — `DecideMainInit` 순수 함수 |
+| B3 — hurl mid classifier | early-return chain = **2** | ✗ **Toulmin 제외** — `DecideMidStepClass` 순수 함수 |
+
+> 결론: **3 포인트 모두 2-depth 이내**로 해결 가능. Phase010 은 "Toulmin 도입"이 아니라 **판정 로직을 `Decide*` 순수 함수로 수렴 + facts/needs/decision struct 분리** 의 구조 정비 Phase 로 축소한다.
+
+> Toulmin graph 는 depth 초과 또는 규칙 집합이 증가형·defeat 의미 필요한 경우에만. 현 3 포인트는 그런 속성이 없다.
+
+## 목표 (수정)
+
+Phase009 구조 정리 위에서 **복잡한 결정 지점 3군데를 `Decide*` 순수 함수로 수렴**.
+
+1. **method_from_iface** 의 7-case switch → `DecideMethodPattern(facts) Pattern`
+2. **main 초기화 블록 조합** → `DecideMainInit(facts) InitNeeds`
+3. **hurl mid classifier** → `DecideMidStepClass(step, maps) MidDecision`
+
+각 `Decide*` 는:
+- 입력: 평범 facts struct
+- 출력: enum/struct 단일 결정
+- 내부: `switch` 또는 `if-else` 2-depth 이내
+- 호출자: 반환값을 평범 `switch` 로 소비 (판정 로직 無)
 
 성공 기준:
-- 3군데 모두 Toulmin graph 적용
-- 각 지점별 "Decide* 함수 → Pattern/Info/Order struct 반환" 구조 (호출자는 평범 Go 소비)
+- 3군데 모두 `Decide*` 로 분리
+- 판정 로직이 호출자에 남지 않음
 - 행동 보존 (bit-동일 아니어도 기능 동일)
 - `go build` + `go test ./pkg/...` 통과
 
@@ -46,9 +72,10 @@ Toulmin 도입 3군데 각각 **설계 문서** 선행:
 
 ## 원칙 (재확인)
 
-- **단순은 if-else, 복잡은 Toulmin** (축 3+ 직교 또는 우선순위 의미 있을 때 Toulmin).
-- Toulmin 도입 시에도 "결정 함수 하나 → 패턴 반환" 구조 유지.
-- 호출자는 평범한 Go if/for 로 Pattern 소비.
+- **2-depth 이내는 if-else, 초과는 Toulmin** (상단 기준점).
+- "결정 함수 하나 → Pattern/Needs/Decision 반환" 구조 유지.
+- 호출자는 평범한 Go switch 로 소비.
+- Toulmin 적용 불필요 시에도 **facts/decision struct 분리**와 **판정 로직 수렴**은 그대로 수행.
 
 ---
 
@@ -57,47 +84,26 @@ Toulmin 도입 3군데 각각 **설계 문서** 선행:
 ### Part B1. method_from_iface.go 의 7-case switch
 
 - 위치: `pkg/generate/gogin/generate_method_from_iface.go`
-- 축 5개 (이름 접두, QueryOpts 유무, 반환 제네릭, 슬라이스 여부, seqType) × 7 case
-
-**Warrant 초안**:
-- `IsWithTx` (defeater, 최상위 우선)
-- `IsCursorPaginated`, `IsOffsetPaginated`, `IsSliceReturn`
-- `IsFind`, `IsCreate`, `IsUpdate`, `IsDelete`
-
-**Defeat edges**: WithTx > Pagination > Slice > Find/Create/...
-
-**결과**: `Pattern` 타입 반환 → 호출자가 평범한 switch 로 구현 선택.
+- 축 5개 × 7 case → **단일 `switch` + default 내 if = 2-depth**
+- 구현: `DecideMethodPattern(facts MethodFacts) Pattern` 순수 함수
+- 결과: `Pattern` 반환 → 호출자 평범 switch 로 구현 선택
+- 상세: `Phase010-MethodDispatchDesign.md`
 
 ### Part B2. main 초기화 블록 조합
 
 - 위치: `pkg/generate/gogin/generate_main.go`
-- 6축 독립 조건 (auth/queue/authz/session/cache/file)
+- 6축 독립 → **축별 독립 if, depth 1**
+- 구현: `DecideMainInit(facts MainFacts) InitNeeds` 순수 함수
+- 결과: `InitNeeds{Auth, Queue, Authz, Session, Cache, File, NeedsContextImport}` 반환
+- 상세: `Phase010-MainInitDesign.md`
 
-**Warrant**:
-- `NeedsAuth`, `NeedsQueue`, `NeedsAuthz`, `NeedsSession`, `NeedsCache`, `NeedsFile`
+### Part B3. hurl mid classifier
 
-**Defeat edges**: 없음 (축이 독립적).
-
-**결과**: `InitNeeds { Auth, Queue, Authz, Session, Cache, File bool + ... 상세 }` 반환.
-
-렌더링은 평범한 Go if/for (struct 필드 소비).
-
-### Part B3. hurl 시나리오 순서
-
-- 위치: `pkg/generate/hurl/build_scenario_order.go` + `classify_mid_step.go`
-- 5-phase (Auth / Prereq / Mid / Read / Delete)
-- FK topological sort + state BFS + branch skip
-
-**Warrant**:
-- `IsAuthStep`
-- `IsTopLevelCreate`, `IsStateTransition`, `IsNestedCreate`
-- `IsUpdate`, `IsRead`, `IsDelete`
-- `HasFKDependency` (defeat으로 순서 조정)
-
-**Toulmin Loop 후보**: 복잡 루프 조건 (state BFS).
-**Subscribe 후보**: 단계별 이벤트 분산 (phase 전이).
-
-**결과**: 정렬된 `[]Step`.
+- 위치: `pkg/generate/hurl/classify_mid_step.go`
+- 7 분기 early-return chain → **2-depth 이내**
+- 구현: `DecideMidStepClass(step, maps) MidDecision` 순수 함수
+- 5-phase 배치 / FK topo / state BFS / auth order / prereq split 은 **그대로 유지** (알고리즘 교체 대상 아님)
+- 상세: `Phase010-ScenarioOrderDesign.md`
 
 ---
 
@@ -110,28 +116,27 @@ Part B1/B2/B3 각각 설계 문서. 사용자 리뷰 후 구현 착수.
 ### Step 2. Part B1 — method_from_iface
 
 - 설계 문서 → `decide_method_pattern.go` 신설
-- Toulmin graph + Evaluate → Pattern 반환
+- 순수 switch (depth 2 이내) → `Pattern` 반환
 - `generate_method_from_iface.go` 의 switch 를 Pattern 소비로 교체
 - 기존 테스트 유지
 
 ### Step 3. Part B2 — main 초기화
 
 - 설계 문서 → `decide_main_init.go` 신설
-- warrant 6개 + InitNeeds 반환
+- `InitNeeds` 반환 (depth 1 축별 판정 함수)
 - `generate_main.go` 가 InitNeeds 소비해 블록 조립
 
-### Step 4. Part B3 — hurl 시나리오 순서
+### Step 4. Part B3 — hurl mid classifier
 
-- 설계 문서 → `decide_scenario_order.go` 신설
-- Loop 또는 계층 graph
-- Subscribe 적용 여부 평가
-- `build_scenario_order.go` + `classify_mid_step.go` 의 로직을 새 구조로 이전
+- 설계 문서 → `decide_mid_step_class.go` 신설
+- 순수 switch-case (depth 2 이내) → `MidDecision` 반환
+- `build_scenario_order.go` 가 `decideMidStepClass` 호출로 교체. 기존 `classify_mid_step.go` 제거
 
 ### Step 5. 검증
 
 - `go build` + `go vet` + `go test ./pkg/...`
-- `fullend gen` — 실행 에러 없음
-- Toulmin warrant 단위 테스트 추가 (각 warrant 별 true/false 판단)
+- `fullend gen dummys/gigbridge/specs /tmp/x` — 실행 에러 없음
+- `Decide*` 단위 테스트 추가 (분기 전수 표)
 
 ---
 
@@ -143,10 +148,11 @@ Part B1/B2/B3 각각 설계 문서. 사용자 리뷰 후 구현 착수.
 
 ### R2. Toulmin 판정 기준 엄격
 
-이 3군데 외 "내 눈엔 복잡해 보임" 같은 이유로 추가 Toulmin 적용 금지. 기준:
-- 분기 4+ 직교 축
-- 우선순위/defeat 의미 필요
-- 규칙 집합이 증가형
+기준점: **if-else 2-depth 초과 시 Toulmin**. 본 Phase 3 포인트는 모두 2-depth 이내로 해결되어 Toulmin 미적용. "내 눈엔 복잡해 보임" 같은 이유로 Toulmin 추가 금지.
+
+보조 기준 (depth 이내여도 Toulmin 고려 가능한 예외):
+- 규칙 집합이 명시적 증가형 (evidence 기반 defeat 필요)
+- 판정 과정 trace 가 감사/디버깅에 필수
 
 ### R3. 행동 변화 허용 범위
 
@@ -161,13 +167,13 @@ Part B1/B2/B3 각각 설계 문서. 사용자 리뷰 후 구현 착수.
 
 ## 완료 조건 (Definition of Done)
 
-- [ ] Part B1/B2/B3 설계 문서 작성 및 리뷰 통과
-- [ ] method_from_iface switch → Toulmin graph 전환
-- [ ] main 초기화 블록 조합 → Toulmin
-- [ ] hurl 시나리오 순서 → Toulmin
+- [x] Part B1/B2/B3 설계 문서 작성 및 기준점(2-depth) 재평가 반영
+- [ ] method_from_iface switch → `DecideMethodPattern` 순수 함수 전환
+- [ ] main 초기화 블록 조합 → `DecideMainInit` 순수 함수 전환
+- [ ] hurl mid classifier → `DecideMidStepClass` 순수 함수 전환
 - [ ] `go build` + `go vet` + `go test ./pkg/...` 통과
 - [ ] `fullend gen dummys/gigbridge/specs /tmp/x` 실행 성공
-- [ ] 커밋 메시지: `refactor(generate): Toulmin 포인트 3군데 도입`
+- [ ] 커밋 메시지: `refactor(generate): Decide* 순수 함수로 결정 로직 수렴 (3포인트)`
 
 ---
 

@@ -69,8 +69,9 @@ func buildScenarioOrder(doc *openapi3.T, specsDir string, diagrams []*statemachi
 		case "DELETE":
 			deleteSteps = append(deleteSteps, s)
 		default:
-			if ms, ok := classifyMidStep(s, stateOps, branchSkip, transitionOrder, resourceFirstTransition); ok {
-				midSteps = append(midSteps, ms)
+			facts := newStepFacts(s, stateOps, branchSkip, transitionOrder, resourceFirstTransition)
+			if dec := DecideMidStepClass(facts); dec.Include {
+				midSteps = append(midSteps, orderedStep{step: s, order: dec.Order})
 			}
 		}
 	}
