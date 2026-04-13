@@ -1,4 +1,4 @@
-# Phase004 — internal 코드젠을 pkg/generate 로 이식 + 즉각 구조 정리
+# 🟡 Phase004 — internal 코드젠을 pkg/generate 로 이식 + 즉각 구조 정리 (초벌 완료, 후속 대기)
 
 ## 목표
 
