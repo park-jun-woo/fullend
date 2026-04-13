@@ -7,11 +7,11 @@ import (
 	"os"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 // GenerateWith는 지정된 Target으로 코드를 생성한다.
-func GenerateWith(t Target, funcs []ssacparser.ServiceFunc, outDir string, st *validator.SymbolTable) error {
+func GenerateWith(t Target, funcs []ssacparser.ServiceFunc, outDir string, st *rule.Ground) error {
 	if err := os.MkdirAll(outDir, 0755); err != nil {
 		return fmt.Errorf("출력 디렉토리 생성 실패: %w", err)
 	}

@@ -6,24 +6,24 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGenerateModelInterfaceQueryOptsExplicit(t *testing.T) {
-	st := &validator.SymbolTable{
-		Models: map[string]validator.ModelSymbol{
-			"Reservation": {Methods: map[string]validator.MethodInfo{
+	st := &rule.Ground{
+		Models: map[string]rule.ModelInfo{
+			"Reservation": {Methods: map[string]rule.MethodInfo{
 				"ListByUserID": {Cardinality: "many"},
 			}},
-			"User": {Methods: map[string]validator.MethodInfo{
+			"User": {Methods: map[string]rule.MethodInfo{
 				"FindByID": {Cardinality: "one"},
 			}},
 		},
-		DDLTables: map[string]validator.DDLTable{
+		Tables: map[string]rule.TableInfo{
 			"reservations": {Columns: map[string]string{"id": "int64", "user_id": "int64"}},
 			"users":        {Columns: map[string]string{"id": "int64"}},
 		},
-		Operations: map[string]validator.OperationSymbol{},
+		Ops: map[string]rule.OperationInfo{},
 	}
 	funcs := []ssacparser.ServiceFunc{{
 		Name: "ListMyReservations", FileName: "list_my_reservations.go",

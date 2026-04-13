@@ -6,15 +6,15 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func writeFilterConfig(buf *bytes.Buffer, op validator.OperationSymbol) {
-	if op.XFilter == nil || len(op.XFilter.Allowed) == 0 {
+func writeFilterConfig(buf *bytes.Buffer, op rule.OperationInfo) {
+	if op.Filter == nil || len(op.Filter.Allowed) == 0 {
 		return
 	}
 	buf.WriteString("\t\tFilter: &model.FilterConfig{Allowed: []string{")
-	for i, col := range op.XFilter.Allowed {
+	for i, col := range op.Filter.Allowed {
 		if i > 0 {
 			buf.WriteString(", ")
 		}

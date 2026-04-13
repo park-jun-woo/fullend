@@ -6,18 +6,18 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGeneratePostBodySingleField(t *testing.T) {
-	st := &validator.SymbolTable{
-		Models:    map[string]validator.ModelSymbol{},
-		DDLTables: map[string]validator.DDLTable{
+	st := &rule.Ground{
+		Models:    map[string]rule.ModelInfo{},
+		Tables: map[string]rule.TableInfo{
 			"proposals": {Columns: map[string]string{"bid_amount": "int64", "gig_id": "int64", "freelancer_id": "int64"}},
 		},
-		Operations: map[string]validator.OperationSymbol{
+		Ops: map[string]rule.OperationInfo{
 			"SubmitProposal": {
-				PathParams:     []validator.PathParam{{Name: "ID", GoType: "int64"}},
+				PathParams:     []rule.PathParam{{Name: "ID", GoType: "int64"}},
 				HasRequestBody: true,
 			},
 		},

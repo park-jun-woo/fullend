@@ -11,11 +11,11 @@ import (
 
 	"github.com/ettle/strcase"
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 // GenerateHandlerStruct는 도메인별 Handler struct를 생성한다.
-func (g *GoTarget) GenerateHandlerStruct(funcs []ssacparser.ServiceFunc, st *validator.SymbolTable, outDir string) error {
+func (g *GoTarget) GenerateHandlerStruct(funcs []ssacparser.ServiceFunc, st *rule.Ground, outDir string) error {
 	domainModels := collectDomainModels(funcs)
 	for domain, models := range domainModels {
 		if err := writeHandlerFile(domain, models, outDir); err != nil {

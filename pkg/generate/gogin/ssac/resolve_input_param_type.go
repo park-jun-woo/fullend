@@ -7,12 +7,12 @@ import (
 
 	"github.com/jinzhu/inflection"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 // resolveInputParamType는 Inputs value에서 Go 타입을 추론한다.
 // value 형식: "request.Field", "source.Field", "\"literal\"", "currentUser.Field"
-func resolveInputParamType(val string, modelName string, st *validator.SymbolTable) string {
+func resolveInputParamType(val string, modelName string, st *rule.Ground) string {
 	if strings.HasPrefix(val, `"`) {
 		return "string"
 	}
@@ -33,7 +33,7 @@ func resolveInputParamType(val string, modelName string, st *validator.SymbolTab
 	snakeName := toSnakeCase(field)
 
 	tableName := inflection.Plural(toSnakeCase(modelName))
-	if table, ok := st.DDLTables[tableName]; ok {
+	if table, ok := st.Tables[tableName]; ok {
 		if goType, ok := table.Columns[snakeName]; ok {
 			return goType
 		}

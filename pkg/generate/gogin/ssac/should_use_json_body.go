@@ -4,16 +4,16 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func shouldUseJSONBody(seqs []ssacparser.Sequence, st *validator.SymbolTable, operationID string, rawParams []rawParam) bool {
+func shouldUseJSONBody(seqs []ssacparser.Sequence, st *rule.Ground, operationID string, rawParams []rawParam) bool {
 	if len(rawParams) == 0 {
 		return false
 	}
 	// 1차: OpenAPI에 requestBody가 있으면 JSON body
 	if st != nil {
-		if op, ok := st.Operations[operationID]; ok {
+		if op, ok := st.Ops[operationID]; ok {
 			return op.HasRequestBody
 		}
 	}

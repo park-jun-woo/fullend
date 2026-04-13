@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 // GenerateModelInterfaces는 심볼 테이블과 SSaC spec을 교차하여 Model interface를 생성한다.
-func (g *GoTarget) GenerateModelInterfaces(funcs []ssacparser.ServiceFunc, st *validator.SymbolTable, outDir string) error {
+func (g *GoTarget) GenerateModelInterfaces(funcs []ssacparser.ServiceFunc, st *rule.Ground, outDir string) error {
 	modelDir := filepath.Join(outDir, "model")
 	if err := os.MkdirAll(modelDir, 0755); err != nil {
 		return fmt.Errorf("model 디렉토리 생성 실패: %w", err)

@@ -6,16 +6,16 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGenerateRequestStructSnakeCase(t *testing.T) {
-	st := &validator.SymbolTable{
-		DDLTables: map[string]validator.DDLTable{
+	st := &rule.Ground{
+		Tables: map[string]rule.TableInfo{
 			"bids": {Columns: map[string]string{"bid_amount": "int32", "id": "int64"}},
 		},
-		Operations: map[string]validator.OperationSymbol{},
-		Models:     map[string]validator.ModelSymbol{},
+		Ops: map[string]rule.OperationInfo{},
+		Models:     map[string]rule.ModelInfo{},
 	}
 	sf := ssacparser.ServiceFunc{
 		Name: "PlaceBid", FileName: "place_bid.go",

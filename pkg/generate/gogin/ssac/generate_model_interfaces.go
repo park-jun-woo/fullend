@@ -4,10 +4,10 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 // GenerateModelInterfaces는 심볼 테이블과 SSaC spec을 교차하여 Model interface를 생성한다.
-func GenerateModelInterfaces(funcs []ssacparser.ServiceFunc, st *validator.SymbolTable, outDir string) error {
+func GenerateModelInterfaces(funcs []ssacparser.ServiceFunc, st *rule.Ground, outDir string) error {
 	return DefaultTarget().GenerateModelInterfaces(funcs, st, outDir)
 }

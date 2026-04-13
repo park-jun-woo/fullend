@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	"github.com/ettle/strcase"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func buildJSONBodyParams(rawParams []rawParam, rs *validator.RequestSchema) []typedRequestParam {
+func buildJSONBodyParams(rawParams []rawParam, rs *rule.RequestSchemaInfo) []typedRequestParam {
 	var buf bytes.Buffer
 
 	buf.WriteString("\tvar req struct {\n")

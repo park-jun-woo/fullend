@@ -4,10 +4,10 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func collectImports(sf ssacparser.ServiceFunc, reqParams []typedRequestParam, pathParams []validator.PathParam, needsCU bool, needsQO bool) []string {
+func collectImports(sf ssacparser.ServiceFunc, reqParams []typedRequestParam, pathParams []rule.PathParam, needsCU bool, needsQO bool) []string {
 	seen := map[string]bool{
 		"net/http":                  true,
 		"github.com/gin-gonic/gin": true,

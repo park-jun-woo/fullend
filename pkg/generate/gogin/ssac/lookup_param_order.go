@@ -5,11 +5,11 @@ package ssac
 import (
 	"strings"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 // lookupParamOrder는 심볼 테이블에서 모델 메서드의 파라미터 순서를 조회한다.
-func lookupParamOrder(model string, st *validator.SymbolTable) []string {
+func lookupParamOrder(model string, st *rule.Ground) []string {
 	parts := strings.SplitN(model, ".", 2)
 	if len(parts) < 2 {
 		return nil

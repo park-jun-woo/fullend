@@ -5,10 +5,10 @@ package ssac
 import (
 	"github.com/park-jun-woo/fullend/internal/funcspec"
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 // GenerateFunc는 단일 ServiceFunc의 Go 코드를 생성한다.
-func GenerateFunc(sf ssacparser.ServiceFunc, st *validator.SymbolTable, funcSpecs []funcspec.FuncSpec) ([]byte, error) {
+func GenerateFunc(sf ssacparser.ServiceFunc, st *rule.Ground, funcSpecs []funcspec.FuncSpec) ([]byte, error) {
 	return (&GoTarget{FuncSpecs: funcSpecs}).GenerateFunc(sf, st)
 }

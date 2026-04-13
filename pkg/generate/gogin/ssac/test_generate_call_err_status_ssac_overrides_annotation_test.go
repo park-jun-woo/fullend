@@ -6,19 +6,19 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGenerateCallErrStatusSsacOverridesAnnotation(t *testing.T) {
 	// .ssac 파일 명시값(500)이 @error 어노테이션(401)보다 우선
-	st := &validator.SymbolTable{
-		Models: map[string]validator.ModelSymbol{
-			"auth._func": {Methods: map[string]validator.MethodInfo{
+	st := &rule.Ground{
+		Models: map[string]rule.ModelInfo{
+			"auth._func": {Methods: map[string]rule.MethodInfo{
 				"VerifyPassword": {ErrStatus: 401},
 			}},
 		},
-		Operations: map[string]validator.OperationSymbol{},
-		DDLTables:  map[string]validator.DDLTable{},
+		Ops: map[string]rule.OperationInfo{},
+		Tables: map[string]rule.TableInfo{},
 	}
 	sf := ssacparser.ServiceFunc{
 		Name: "Login", FileName: "login.go",

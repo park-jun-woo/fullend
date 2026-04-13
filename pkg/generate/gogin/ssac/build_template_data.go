@@ -4,10 +4,10 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func buildTemplateData(seq ssacparser.Sequence, errDeclared *bool, declaredVars map[string]bool, resultTypes map[string]string, st *validator.SymbolTable, funcName string, useTx bool, resolver *FieldTypeResolver) templateData {
+func buildTemplateData(seq ssacparser.Sequence, errDeclared *bool, declaredVars map[string]bool, resultTypes map[string]string, st *rule.Ground, funcName string, useTx bool, resolver *FieldTypeResolver) templateData {
 	d := templateData{
 		Message: seq.Message,
 		Result:  seq.Result,

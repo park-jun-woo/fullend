@@ -5,10 +5,10 @@ package ssac
 import (
 	"sort"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func deriveInterfaceForModel(modelName string, usages []modelUsage, methodMap map[methodKey]modelUsage, st *validator.SymbolTable) *derivedInterface {
+func deriveInterfaceForModel(modelName string, usages []modelUsage, methodMap map[methodKey]modelUsage, st *rule.Ground) *derivedInterface {
 	ms, ok := st.Models[modelName]
 	if !ok {
 		return nil
@@ -21,7 +21,7 @@ func deriveInterfaceForModel(modelName string, usages []modelUsage, methodMap ma
 	for _, methodName := range usedMethods {
 		mi, methodExists := ms.Methods[methodName]
 		if !methodExists {
-			mi = validator.MethodInfo{}
+			mi = rule.MethodInfo{}
 		}
 		key := methodKey{modelName, methodName}
 		usage := methodMap[key]

@@ -4,10 +4,10 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func collectArgsRequestParams(seq ssacparser.Sequence, st *validator.SymbolTable, pathParamSet map[string]bool, seen map[string]bool) []rawParam {
+func collectArgsRequestParams(seq ssacparser.Sequence, st *rule.Ground, pathParamSet map[string]bool, seen map[string]bool) []rawParam {
 	var params []rawParam
 	for _, a := range seq.Args {
 		if a.Source != "request" || seen[a.Field] || pathParamSet[a.Field] {

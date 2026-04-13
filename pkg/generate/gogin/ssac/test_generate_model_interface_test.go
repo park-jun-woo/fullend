@@ -6,20 +6,20 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGenerateModelInterface(t *testing.T) {
-	st := &validator.SymbolTable{
-		Models: map[string]validator.ModelSymbol{
-			"Course": {Methods: map[string]validator.MethodInfo{
+	st := &rule.Ground{
+		Models: map[string]rule.ModelInfo{
+			"Course": {Methods: map[string]rule.MethodInfo{
 				"FindByID": {Cardinality: "one"},
 			}},
 		},
-		DDLTables: map[string]validator.DDLTable{
+		Tables: map[string]rule.TableInfo{
 			"courses": {Columns: map[string]string{"id": "int64", "title": "string"}},
 		},
-		Operations: map[string]validator.OperationSymbol{},
+		Ops: map[string]rule.OperationInfo{},
 	}
 	funcs := []ssacparser.ServiceFunc{{
 		Name: "GetCourse", FileName: "get_course.go",

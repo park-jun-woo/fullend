@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func buildHTTPFuncBody(sf ssacparser.ServiceFunc, st *validator.SymbolTable, ctx httpFuncContext) bytes.Buffer {
+func buildHTTPFuncBody(sf ssacparser.ServiceFunc, st *rule.Ground, ctx httpFuncContext) bytes.Buffer {
 	var bodyBuf bytes.Buffer
 
 	fmt.Fprintf(&bodyBuf, "func (h *Handler) %s(c *gin.Context) {\n", sf.Name)

@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func writeSubscribeSequences(buf *bytes.Buffer, sf ssacparser.ServiceFunc, st *validator.SymbolTable, resultTypes map[string]string, resolver *FieldTypeResolver, useTx bool) {
+func writeSubscribeSequences(buf *bytes.Buffer, sf ssacparser.ServiceFunc, st *rule.Ground, resultTypes map[string]string, resolver *FieldTypeResolver, useTx bool) {
 	errDeclared := useTx
 	declaredVars := map[string]bool{}
 	usedVars := collectUsedVars(sf.Sequences)

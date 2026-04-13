@@ -2,9 +2,9 @@
 //ff:what 모델 사용 정보와 심볼 테이블에서 인터페이스를 파생
 package ssac
 
-import "github.com/park-jun-woo/fullend/internal/ssac/validator"
+import "github.com/park-jun-woo/fullend/pkg/rule"
 
-func deriveInterfaces(usages []modelUsage, st *validator.SymbolTable) []derivedInterface {
+func deriveInterfaces(usages []modelUsage, st *rule.Ground) []derivedInterface {
 	methodMap := map[methodKey]modelUsage{}
 	modelNames := map[string]bool{}
 

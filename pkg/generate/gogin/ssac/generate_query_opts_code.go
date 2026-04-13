@@ -5,15 +5,15 @@ package ssac
 import (
 	"bytes"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func generateQueryOptsCode(funcName string, st *validator.SymbolTable) string {
+func generateQueryOptsCode(funcName string, st *rule.Ground) string {
 	if st == nil {
 		return "\topts := model.ParseQueryOpts(c, model.QueryOptsConfig{})\n"
 	}
 
-	op, hasOp := st.Operations[funcName]
+	op, hasOp := st.Ops[funcName]
 	if !hasOp {
 		return "\topts := model.ParseQueryOpts(c, model.QueryOptsConfig{})\n"
 	}

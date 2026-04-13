@@ -2,10 +2,10 @@
 //ff:what 전체 DDL 테이블을 순회하여 컬럼 타입을 조회
 package ssac
 
-import "github.com/park-jun-woo/fullend/internal/ssac/validator"
+import "github.com/park-jun-woo/fullend/pkg/rule"
 
-func lookupAllTablesColumn(snakeName string, st *validator.SymbolTable) string {
-	for _, table := range st.DDLTables {
+func lookupAllTablesColumn(snakeName string, st *rule.Ground) string {
+	for _, table := range st.Tables {
 		if goType, ok := table.Columns[snakeName]; ok {
 			return goType
 		}

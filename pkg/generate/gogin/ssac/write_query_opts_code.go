@@ -5,10 +5,10 @@ package ssac
 import (
 	"bytes"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func writeQueryOptsCode(buf *bytes.Buffer, needsQO bool, funcName string, st *validator.SymbolTable) {
+func writeQueryOptsCode(buf *bytes.Buffer, needsQO bool, funcName string, st *rule.Ground) {
 	if needsQO {
 		buf.WriteString(generateQueryOptsCode(funcName, st))
 		buf.WriteString("\n")

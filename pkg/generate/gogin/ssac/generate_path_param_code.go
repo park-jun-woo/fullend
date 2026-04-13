@@ -6,10 +6,10 @@ import (
 	"fmt"
 
 	"github.com/ettle/strcase"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func generatePathParamCode(pp validator.PathParam) string {
+func generatePathParamCode(pp rule.PathParam) string {
 	varName := strcase.ToGoCamel(pp.Name)
 	switch pp.GoType {
 	case "int64":

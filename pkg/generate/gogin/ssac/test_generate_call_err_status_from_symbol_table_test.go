@@ -6,19 +6,19 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGenerateCallErrStatusFromSymbolTable(t *testing.T) {
 	// @call 대상 함수에 @error 401 어노테이션 → .ssac 명시 없으면 401 사용
-	st := &validator.SymbolTable{
-		Models: map[string]validator.ModelSymbol{
-			"auth._func": {Methods: map[string]validator.MethodInfo{
+	st := &rule.Ground{
+		Models: map[string]rule.ModelInfo{
+			"auth._func": {Methods: map[string]rule.MethodInfo{
 				"VerifyPassword": {ErrStatus: 401},
 			}},
 		},
-		Operations: map[string]validator.OperationSymbol{},
-		DDLTables:  map[string]validator.DDLTable{},
+		Ops: map[string]rule.OperationInfo{},
+		Tables: map[string]rule.TableInfo{},
 	}
 	sf := ssacparser.ServiceFunc{
 		Name: "Login", FileName: "login.go",

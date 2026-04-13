@@ -4,10 +4,10 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func resolveArgParamType(a ssacparser.Arg, modelName string, st *validator.SymbolTable) string {
+func resolveArgParamType(a ssacparser.Arg, modelName string, st *rule.Ground) string {
 	if a.Literal != "" {
 		return "string"
 	}

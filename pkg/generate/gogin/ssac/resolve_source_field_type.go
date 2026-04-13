@@ -5,16 +5,16 @@ package ssac
 import (
 	"github.com/jinzhu/inflection"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func resolveSourceFieldType(source, field string, st *validator.SymbolTable) string {
+func resolveSourceFieldType(source, field string, st *rule.Ground) string {
 	if source == "" || source == "request" || source == "currentUser" {
 		return ""
 	}
 	refTable := inflection.Plural(toSnakeCase(source))
 	refCol := toSnakeCase(field)
-	if table, ok := st.DDLTables[refTable]; ok {
+	if table, ok := st.Tables[refTable]; ok {
 		if goType, ok := table.Columns[refCol]; ok {
 			return goType
 		}

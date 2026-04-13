@@ -6,18 +6,18 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGeneratePageReturnType(t *testing.T) {
-	st := &validator.SymbolTable{
-		Models: map[string]validator.ModelSymbol{
-			"Gig": {Methods: map[string]validator.MethodInfo{
+	st := &rule.Ground{
+		Models: map[string]rule.ModelInfo{
+			"Gig": {Methods: map[string]rule.MethodInfo{
 				"List": {Cardinality: "many"},
 			}},
 		},
-		DDLTables:  map[string]validator.DDLTable{},
-		Operations: map[string]validator.OperationSymbol{},
+		Tables: map[string]rule.TableInfo{},
+		Ops: map[string]rule.OperationInfo{},
 	}
 	funcs := []ssacparser.ServiceFunc{{
 		Name: "ListGigs", FileName: "list_gigs.go",

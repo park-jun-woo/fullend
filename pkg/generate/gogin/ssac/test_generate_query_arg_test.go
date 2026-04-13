@@ -6,18 +6,18 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGenerateQueryArg(t *testing.T) {
-	st := &validator.SymbolTable{
-		Models:     map[string]validator.ModelSymbol{},
-		Operations: map[string]validator.OperationSymbol{
+	st := &rule.Ground{
+		Models:     map[string]rule.ModelInfo{},
+		Ops: map[string]rule.OperationInfo{
 			"ListMyReservations": {
-				XPagination: &validator.XPagination{Style: "offset", DefaultLimit: 20, MaxLimit: 100},
+				Pagination: &rule.PaginationSpec{Style: "offset", DefaultLimit: 20, MaxLimit: 100},
 			},
 		},
-		DDLTables: map[string]validator.DDLTable{},
+		Tables: map[string]rule.TableInfo{},
 	}
 	sf := ssacparser.ServiceFunc{
 		Name: "ListMyReservations", FileName: "list_my_reservations.go",

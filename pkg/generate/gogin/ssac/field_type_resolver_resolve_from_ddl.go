@@ -6,7 +6,7 @@ import "github.com/jinzhu/inflection"
 
 func (r *FieldTypeResolver) resolveFromDDL(modelName, fieldName string) string {
 	tableName := inflection.Plural(toSnakeCase(modelName))
-	table, ok := r.st.DDLTables[tableName]
+	table, ok := r.st.Tables[tableName]
 	if !ok {
 		return ""
 	}

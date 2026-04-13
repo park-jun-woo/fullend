@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func buildSubscribeFuncBody(sf ssacparser.ServiceFunc, st *validator.SymbolTable, g *GoTarget) bytes.Buffer {
+func buildSubscribeFuncBody(sf ssacparser.ServiceFunc, st *rule.Ground, g *GoTarget) bytes.Buffer {
 	var bodyBuf bytes.Buffer
 
 	msgType := sf.Subscribe.MessageType

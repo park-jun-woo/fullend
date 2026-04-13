@@ -6,20 +6,20 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func writeSortConfig(buf *bytes.Buffer, op validator.OperationSymbol) {
-	if op.XSort == nil {
+func writeSortConfig(buf *bytes.Buffer, op rule.OperationInfo) {
+	if op.Sort == nil {
 		return
 	}
 	buf.WriteString("\t\tSort: &model.SortConfig{")
-	writeSortAllowed(buf, op.XSort.Allowed)
-	if op.XSort.Default != "" {
-		fmt.Fprintf(buf, ", Default: %q", op.XSort.Default)
+	writeSortAllowed(buf, op.Sort.Allowed)
+	if op.Sort.Default != "" {
+		fmt.Fprintf(buf, ", Default: %q", op.Sort.Default)
 	}
-	if op.XSort.Direction != "" {
-		fmt.Fprintf(buf, ", Direction: %q", op.XSort.Direction)
+	if op.Sort.Direction != "" {
+		fmt.Fprintf(buf, ", Direction: %q", op.Sort.Direction)
 	}
 	buf.WriteString("},\n")
 }

@@ -7,16 +7,16 @@ import (
 
 	"github.com/jinzhu/inflection"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func lookupRefIDType(field string, st *validator.SymbolTable) string {
+func lookupRefIDType(field string, st *rule.Ground) string {
 	if !strings.HasSuffix(field, "ID") {
 		return ""
 	}
 	refModel := field[:len(field)-2]
 	refTable := inflection.Plural(toSnakeCase(refModel))
-	if table, ok := st.DDLTables[refTable]; ok {
+	if table, ok := st.Tables[refTable]; ok {
 		if goType, ok := table.Columns["id"]; ok {
 			return goType
 		}

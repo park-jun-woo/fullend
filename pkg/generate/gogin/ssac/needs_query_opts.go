@@ -4,10 +4,10 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func needsQueryOpts(sf ssacparser.ServiceFunc, st *validator.SymbolTable) bool {
+func needsQueryOpts(sf ssacparser.ServiceFunc, st *rule.Ground) bool {
 	for _, seq := range sf.Sequences {
 		if hasQueryInput(seq.Inputs) {
 			return true

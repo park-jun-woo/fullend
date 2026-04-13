@@ -5,10 +5,10 @@ package ssac
 import (
 	"fmt"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func buildFieldTag(fieldName string, rs *validator.RequestSchema) string {
+func buildFieldTag(fieldName string, rs *rule.RequestSchemaInfo) string {
 	tag := fmt.Sprintf("json:\"%s\"", fieldName)
 	if rs == nil {
 		return tag

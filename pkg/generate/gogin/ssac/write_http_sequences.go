@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func writeHTTPSequences(buf *bytes.Buffer, sf ssacparser.ServiceFunc, st *validator.SymbolTable, ctx httpFuncContext, useTx bool) {
+func writeHTTPSequences(buf *bytes.Buffer, sf ssacparser.ServiceFunc, st *rule.Ground, ctx httpFuncContext, useTx bool) {
 	errDeclared := hasConversionErr(ctx.requestParams)
 	if useTx {
 		errDeclared = true

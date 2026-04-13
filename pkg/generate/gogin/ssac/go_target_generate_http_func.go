@@ -4,11 +4,11 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 // generateHTTPFunc는 HTTP 핸들러 함수를 생성한다.
-func (g *GoTarget) generateHTTPFunc(sf ssacparser.ServiceFunc, st *validator.SymbolTable) ([]byte, error) {
+func (g *GoTarget) generateHTTPFunc(sf ssacparser.ServiceFunc, st *rule.Ground) ([]byte, error) {
 	ctx := analyzeHTTPFunc(sf, st, g)
 	bodyBuf := buildHTTPFuncBody(sf, st, ctx)
 

@@ -4,10 +4,10 @@ package ssac
 
 import (
 	"github.com/ettle/strcase"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func deriveMethod(methodName string, usage modelUsage, mi validator.MethodInfo, st *validator.SymbolTable) derivedMethod {
+func deriveMethod(methodName string, usage modelUsage, mi rule.MethodInfo, st *rule.Ground) derivedMethod {
 	dm := derivedMethod{Name: methodName}
 
 	inputKeys := orderMethodInputKeys(usage.Inputs, mi.Params)

@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func mustGenerate(t *testing.T, sf ssacparser.ServiceFunc, st *validator.SymbolTable) string {
+func mustGenerate(t *testing.T, sf ssacparser.ServiceFunc, st *rule.Ground) string {
 	t.Helper()
 	code, err := GenerateFunc(sf, st, nil)
 	if err != nil {

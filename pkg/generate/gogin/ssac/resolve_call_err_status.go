@@ -2,9 +2,9 @@
 //ff:what @call의 에러 상태 코드를 해석하여 Go 상수 문자열로 반환
 package ssac
 
-import "github.com/park-jun-woo/fullend/internal/ssac/validator"
+import "github.com/park-jun-woo/fullend/pkg/rule"
 
-func resolveCallErrStatus(errStatus int, st *validator.SymbolTable, model string) string {
+func resolveCallErrStatus(errStatus int, st *rule.Ground, model string) string {
 	if errStatus != 0 {
 		return httpStatusConst(errStatus)
 	}

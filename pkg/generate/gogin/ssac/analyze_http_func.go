@@ -4,10 +4,10 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func analyzeHTTPFunc(sf ssacparser.ServiceFunc, st *validator.SymbolTable, g *GoTarget) httpFuncContext {
+func analyzeHTTPFunc(sf ssacparser.ServiceFunc, st *rule.Ground, g *GoTarget) httpFuncContext {
 	pathParams := getPathParams(sf.Name, st)
 	pathParamSet := map[string]bool{}
 	for _, pp := range pathParams {

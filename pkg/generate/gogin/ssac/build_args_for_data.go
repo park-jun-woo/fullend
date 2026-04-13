@@ -4,10 +4,10 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func buildArgsForData(d *templateData, seq ssacparser.Sequence, st *validator.SymbolTable) {
+func buildArgsForData(d *templateData, seq ssacparser.Sequence, st *rule.Ground) {
 	switch seq.Type {
 	case ssacparser.SeqGet, ssacparser.SeqPost, ssacparser.SeqPut, ssacparser.SeqDelete:
 		var paramOrder []string

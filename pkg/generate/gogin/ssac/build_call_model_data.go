@@ -4,10 +4,10 @@ package ssac
 
 import (
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func buildCallModelData(d *templateData, parts []string, seq ssacparser.Sequence, st *validator.SymbolTable) {
+func buildCallModelData(d *templateData, parts []string, seq ssacparser.Sequence, st *rule.Ground) {
 	d.PkgName = parts[0]
 	if len(parts) > 1 {
 		d.FuncMethod = toGoPascal(parts[1])

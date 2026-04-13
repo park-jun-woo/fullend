@@ -5,10 +5,10 @@ package ssac
 import (
 	"fmt"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func deriveReturnType(mi validator.MethodInfo, usage modelUsage, hasQueryOpts bool) string {
+func deriveReturnType(mi rule.MethodInfo, usage modelUsage, hasQueryOpts bool) string {
 	if usage.Result != nil && usage.Result.Wrapper != "" {
 		return fmt.Sprintf("(*pagination.%s[%s], error)", usage.Result.Wrapper, usage.Result.Type)
 	}

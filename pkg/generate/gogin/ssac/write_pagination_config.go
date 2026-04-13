@@ -6,13 +6,13 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func writePaginationConfig(buf *bytes.Buffer, op validator.OperationSymbol) {
-	if op.XPagination == nil {
+func writePaginationConfig(buf *bytes.Buffer, op rule.OperationInfo) {
+	if op.Pagination == nil {
 		return
 	}
 	fmt.Fprintf(buf, "\t\tPagination: &model.PaginationConfig{Style: %q, DefaultLimit: %d, MaxLimit: %d},\n",
-		op.XPagination.Style, op.XPagination.DefaultLimit, op.XPagination.MaxLimit)
+		op.Pagination.Style, op.Pagination.DefaultLimit, op.Pagination.MaxLimit)
 }

@@ -6,11 +6,11 @@ import (
 	"fmt"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 // generateSubscribeFunc는 큐 구독 핸들러 함수를 생성한다.
-func (g *GoTarget) generateSubscribeFunc(sf ssacparser.ServiceFunc, st *validator.SymbolTable) ([]byte, error) {
+func (g *GoTarget) generateSubscribeFunc(sf ssacparser.ServiceFunc, st *rule.Ground) ([]byte, error) {
 	pkgName := "service"
 	if sf.Feature != "" {
 		pkgName = sf.Feature

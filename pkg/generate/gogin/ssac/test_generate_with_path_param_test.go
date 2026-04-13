@@ -6,17 +6,16 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGenerateWithPathParam(t *testing.T) {
-	st := &validator.SymbolTable{
-		Models:    map[string]validator.ModelSymbol{},
-		DDLTables: map[string]validator.DDLTable{},
-		Operations: map[string]validator.OperationSymbol{
+	st := &rule.Ground{
+		Models:    map[string]rule.ModelInfo{},
+		Tables: map[string]rule.TableInfo{},
+		Ops: map[string]rule.OperationInfo{
 			"GetCourse": {
-				PathParams:    []validator.PathParam{{Name: "CourseID", GoType: "int64"}},
-				RequestFields: map[string]bool{"CourseID": true},
+				PathParams: []rule.PathParam{{Name: "CourseID", GoType: "int64"}},
 			},
 		},
 	}

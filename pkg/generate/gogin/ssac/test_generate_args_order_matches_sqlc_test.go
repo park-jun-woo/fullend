@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGenerateArgsOrderMatchesSqlc(t *testing.T) {
@@ -15,14 +15,14 @@ func TestGenerateArgsOrderMatchesSqlc(t *testing.T) {
 	// SSaC: @put Gig.UpdateStatus({ID: request.GigID, Status: "published"})
 	// 알파벳순이면: gigModel.UpdateStatus(gigID, "published") — ID < Status (잘못됨)
 	// SQL 순서:    gigModel.UpdateStatus("published", gigID) — $1=status, $2=id (올바름)
-	st := &validator.SymbolTable{
-		Models: map[string]validator.ModelSymbol{
-			"Gig": {Methods: map[string]validator.MethodInfo{
+	st := &rule.Ground{
+		Models: map[string]rule.ModelInfo{
+			"Gig": {Methods: map[string]rule.MethodInfo{
 				"UpdateStatus": {Cardinality: "exec", Params: []string{"Status", "ID"}},
 			}},
 		},
-		Operations: map[string]validator.OperationSymbol{},
-		DDLTables:  map[string]validator.DDLTable{},
+		Ops: map[string]rule.OperationInfo{},
+		Tables: map[string]rule.TableInfo{},
 	}
 	sf := ssacparser.ServiceFunc{
 		Name: "PublishGig", FileName: "publish_gig.go",

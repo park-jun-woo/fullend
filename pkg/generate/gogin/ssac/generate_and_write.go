@@ -9,10 +9,10 @@ import (
 	"strings"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func generateAndWrite(t Target, sf ssacparser.ServiceFunc, outDir string, st *validator.SymbolTable) error {
+func generateAndWrite(t Target, sf ssacparser.ServiceFunc, outDir string, st *rule.Ground) error {
 	code, err := t.GenerateFunc(sf, st)
 	if err != nil {
 		return fmt.Errorf("%s 코드 생성 실패: %w", sf.Name, err)

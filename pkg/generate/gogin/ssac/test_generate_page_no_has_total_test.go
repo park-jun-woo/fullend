@@ -6,15 +6,15 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGeneratePageNoHasTotal(t *testing.T) {
-	st := &validator.SymbolTable{
-		Models:     map[string]validator.ModelSymbol{},
-		DDLTables:  map[string]validator.DDLTable{},
-		Operations: map[string]validator.OperationSymbol{
-			"ListGigs": {XPagination: &validator.XPagination{Style: "offset", DefaultLimit: 20, MaxLimit: 100}},
+	st := &rule.Ground{
+		Models:     map[string]rule.ModelInfo{},
+		Tables: map[string]rule.TableInfo{},
+		Ops: map[string]rule.OperationInfo{
+			"ListGigs": {Pagination: &rule.PaginationSpec{Style: "offset", DefaultLimit: 20, MaxLimit: 100}},
 		},
 	}
 	sf := ssacparser.ServiceFunc{

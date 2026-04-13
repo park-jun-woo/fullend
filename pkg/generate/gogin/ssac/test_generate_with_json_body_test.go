@@ -6,16 +6,16 @@ import (
 	"testing"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 func TestGenerateWithJSONBody(t *testing.T) {
-	st := &validator.SymbolTable{
-		Models: map[string]validator.ModelSymbol{},
-		DDLTables: map[string]validator.DDLTable{
+	st := &rule.Ground{
+		Models: map[string]rule.ModelInfo{},
+		Tables: map[string]rule.TableInfo{
 			"sessions": {Columns: map[string]string{"project_id": "int64", "command": "string"}},
 		},
-		Operations: map[string]validator.OperationSymbol{},
+		Ops: map[string]rule.OperationInfo{},
 	}
 	sf := ssacparser.ServiceFunc{
 		Name: "CreateSession", FileName: "create_session.go",

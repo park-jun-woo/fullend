@@ -5,10 +5,10 @@ package ssac
 import (
 	"strings"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func resolveParamTypeWithFallback(val, key, modelName string, st *validator.SymbolTable) string {
+func resolveParamTypeWithFallback(val, key, modelName string, st *rule.Ground) string {
 	goType := resolveInputParamType(val, modelName, st)
 	if goType == "string" && !strings.HasPrefix(val, `"`) {
 		if keyType := resolveKeyParamType(key, modelName, st); keyType != "string" {

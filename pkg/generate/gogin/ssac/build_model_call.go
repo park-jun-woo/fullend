@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func buildModelCall(d *templateData, seq ssacparser.Sequence, useTx bool, st *validator.SymbolTable) {
+func buildModelCall(d *templateData, seq ssacparser.Sequence, useTx bool, st *rule.Ground) {
 	if seq.Model == "" {
 		return
 	}

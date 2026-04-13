@@ -5,16 +5,16 @@ package ssac
 import (
 	"github.com/ettle/strcase"
 	ssacparser "github.com/park-jun-woo/fullend/pkg/parser/ssac"
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func collectRequestParams(seqs []ssacparser.Sequence, st *validator.SymbolTable, pathParamSet map[string]bool, operationID string) []typedRequestParam {
+func collectRequestParams(seqs []ssacparser.Sequence, st *rule.Ground, pathParamSet map[string]bool, operationID string) []typedRequestParam {
 	rawParams := collectRawRequestParams(seqs, st, pathParamSet)
 
 	if shouldUseJSONBody(seqs, st, operationID, rawParams) {
-		var rs *validator.RequestSchema
-		if st != nil && st.RequestSchemas != nil {
-			if schema, ok := st.RequestSchemas[operationID]; ok {
+		var rs *rule.RequestSchemaInfo
+		if st != nil && st.ReqSchemas != nil {
+			if schema, ok := st.ReqSchemas[operationID]; ok {
 				rs = &schema
 			}
 		}

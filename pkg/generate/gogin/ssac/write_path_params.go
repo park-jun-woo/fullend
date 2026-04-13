@@ -5,10 +5,10 @@ package ssac
 import (
 	"bytes"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func writePathParams(buf *bytes.Buffer, pathParams []validator.PathParam) {
+func writePathParams(buf *bytes.Buffer, pathParams []rule.PathParam) {
 	for _, pp := range pathParams {
 		buf.WriteString(generatePathParamCode(pp))
 	}

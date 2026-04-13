@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
-func buildBindingTag(fc validator.FieldConstraint) string {
+func buildBindingTag(fc rule.FieldConstraint) string {
 	var parts []string
 	if fc.Required {
 		parts = append(parts, "required")

@@ -5,11 +5,11 @@ package ssac
 import (
 	"strings"
 
-	"github.com/park-jun-woo/fullend/internal/ssac/validator"
+	"github.com/park-jun-woo/fullend/pkg/rule"
 )
 
 // lookupCallErrStatus는 SymbolTable에서 @call 대상 함수의 @error 어노테이션 값을 조회한다.
-func lookupCallErrStatus(st *validator.SymbolTable, model string) int {
+func lookupCallErrStatus(st *rule.Ground, model string) int {
 	if st == nil {
 		return 0
 	}
