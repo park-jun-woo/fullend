@@ -9,14 +9,16 @@ import (
 	"github.com/open-policy-agent/opa/ast"
 
 	"github.com/park-jun-woo/fullend/pkg/diagnostic"
+	"github.com/park-jun-woo/fullend/pkg/parser/ddl"
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 	"github.com/park-jun-woo/fullend/pkg/parser/hurl"
+	"github.com/park-jun-woo/fullend/pkg/parser/iface"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 	oapiparser "github.com/park-jun-woo/fullend/pkg/parser/openapi"
+	"github.com/park-jun-woo/fullend/pkg/parser/rego"
+	"github.com/park-jun-woo/fullend/pkg/parser/sqlc"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
-	"github.com/park-jun-woo/fullend/pkg/parser/ddl"
-	"github.com/park-jun-woo/fullend/pkg/parser/rego"
 	"github.com/park-jun-woo/fullend/pkg/parser/stml"
 	tanglparser "github.com/park-jun-woo/toulmin/pkg/tangl/parser"
 )
@@ -41,5 +43,7 @@ type Fullstack struct {
 	ResponseConstraints map[string]map[string]oapiparser.FieldConstraint
 	TanglFiles       []*tanglparser.File
 	ModelDir         string
+	ModelInterfaces  []iface.Interface
+	SqlcQueries      []sqlc.Query
 	StatesDiags      []diagnostic.Diagnostic
 }

@@ -3,14 +3,18 @@
 package fullend
 
 import (
+	"path/filepath"
+
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/park-jun-woo/fullend/pkg/parser/ddl"
 	"github.com/park-jun-woo/fullend/pkg/parser/funcspec"
 	"github.com/park-jun-woo/fullend/pkg/parser/hurl"
+	"github.com/park-jun-woo/fullend/pkg/parser/iface"
 	"github.com/park-jun-woo/fullend/pkg/parser/manifest"
 	oapiparser "github.com/park-jun-woo/fullend/pkg/parser/openapi"
 	"github.com/park-jun-woo/fullend/pkg/parser/rego"
+	"github.com/park-jun-woo/fullend/pkg/parser/sqlc"
 	"github.com/park-jun-woo/fullend/pkg/parser/ssac"
 	"github.com/park-jun-woo/fullend/pkg/parser/statemachine"
 	"github.com/park-jun-woo/fullend/pkg/parser/stml"
@@ -74,6 +78,10 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Ful
 		if len(tdiags) == 0 {
 			fs.DDLTables = tables
 		}
+		queries, qdiags := sqlc.ParseDir(filepath.Join(d.Path, "queries"))
+		if len(qdiags) == 0 {
+			fs.SqlcQueries = queries
+		}
 	}
 
 	if d, ok := has[KindPolicy]; ok && !skip[KindPolicy] {
@@ -108,6 +116,12 @@ func ParseAll(root string, detected []DetectedSSOT, skip map[SSOTKind]bool) *Ful
 
 	if d, ok := has[KindModel]; ok {
 		fs.ModelDir = d.Path
+		if !skip[KindModel] {
+			ifaces, idiags := iface.ParseDir(d.Path)
+			if len(idiags) == 0 {
+				fs.ModelInterfaces = ifaces
+			}
+		}
 	}
 
 	// fullend built-in pkg/ specs.
