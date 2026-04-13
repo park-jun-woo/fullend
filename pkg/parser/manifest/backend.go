@@ -3,9 +3,10 @@
 package manifest
 
 type Backend struct {
-	Lang       string   `yaml:"lang"`
-	Framework  string   `yaml:"framework"`
-	Module     string   `yaml:"module"`
-	Middleware []string `yaml:"middleware"`
-	Auth       *Auth    `yaml:"auth"`
+	Lang       string    `yaml:"lang"`
+	Framework  string    `yaml:"framework"`
+	Module     string    `yaml:"module"`
+	Middleware []string  `yaml:"middleware"`
+	Auth       *Auth     `yaml:"auth"`
+	DB         *DBConfig `yaml:"db"`
 }

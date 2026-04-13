@@ -1,4 +1,4 @@
-# Phase018 — DDLPipelineIntegration
+# ✅ Phase018 — DDLPipelineIntegration (완료: 2026-04-14, 미커밋)
 
 > DDL 적용 자동화. 위상정렬된 `schema.sql` 통합 산출 + `DEFAULT N FK` 패턴 용 nobody seed 자동 주입.
 
@@ -129,15 +129,25 @@ v5 범위 밖. 감지 시 ERROR 반환, 사용자가 수동으로 schema.sql 작
 
 ## 완료 조건 (Definition of Done)
 
-- [ ] `pkg/generate/db/` 신설, 위상정렬 + schema.sql 생성
-- [ ] `DEFAULT N FK` 패턴 nobody seed 자동 주입
-- [ ] `fullend.yaml` 의 `backend.db.auto_nobody_seed` opt-in 플래그
-- [ ] orchestrator 의 `gen_schema` 단계 통합
-- [ ] gigbridge, zenflow 모두 `schema.sql` 1회 실행으로 DB 초기화 성공
-- [ ] Phase017 1-5 의 임시 spec 수정 되돌리기 (auto seed 대체)
-- [ ] smoke 회귀 없음 (Phase017 수동 DB 초기화 대신 schema.sql 사용해도 동일)
-- [ ] `go build / vet / test ./pkg/...` 통과
-- [ ] 커밋: `feat(generate): DDL 위상정렬 + schema.sql 통합 산출 + auto nobody seed`
+- [x] `pkg/generate/db/` 신설 — 위상정렬 (Kahn) + schema.sql 생성 + auto seed
+- [x] `DEFAULT N FK` 패턴 감지 + nobody seed INSERT 자동 주입
+- [x] `fullend.yaml` 의 `backend.db.auto_nobody_seed` opt-in 플래그
+- [x] orchestrator `gen_schema` 단계 통합 (`✓ schema-gen    schema.sql generated (N tables, M seeds)`)
+- [x] gigbridge `schema.sql` 1회 실행 → CREATE 4 + INSERT 1 (auto nobody) + INDEX 5 → smoke 12/12
+- [x] zenflow `schema.sql` — CREATE 5 + INDEX (DEFAULT FK 패턴 없음 → auto seed 생략)
+- [x] Phase017 1-5 임시 spec 수정 되돌리기 (gigbridge users.sql 수동 INSERT 제거, auto seed 가 대체)
+- [x] `go build / vet / test ./pkg/...` 통과
+- [x] `filefunc validate` baseline 37 유지 (신규 파일 위반 0)
+- [x] sentinel 검증과 auto seed 상호작용: manifest.backend.db.auto_nobody_seed=true 시 기존 `check_sentinel_record` skip (false positive 방지)
+- [ ] 커밋: `feat(generate): DDL 위상정렬 + schema.sql 통합 + auto nobody seed (Phase018)`
+
+### 부산물
+
+- `pkg/generate/db/` 16 파일 신설: 위상정렬 (`sort_tables_by_fk`, `build_fk_graph`, `topo_sort`, `pick_zero_degree`, `pending_tables`, `decrement_dependents`, `apply_zero_degree_batch`), schema 조립 (`generate_schema`, `config`, `assemble_schema_sql`, `read_ddl_file_for_table`, `index_tables_by_name`), auto seed (`build_auto_nobody_seeds`, `collect_required_seed_ids`, `sorted_seed_keys`, `parse_seed_key`, `seed_already_exists`, `build_seed_insert_stmt`, `seed_value_for`, `nobody_placeholder_for`)
+- `pkg/parser/manifest/db_config.go` + `backend.go` (DB 필드 추가)
+- `internal/orchestrator/gen_schema.go`, `run_codegen_steps.go` 등록
+- `internal/orchestrator/{check_column_line,check_ddl_nullable_columns,validate_ddl}.go` — auto seed 활성 시 sentinel 검증 skip
+- `dummys/gigbridge/specs/fullend.yaml` + `db/users.sql` — opt-in 플래그 + 수동 seed 제거
 
 ## 의존
 

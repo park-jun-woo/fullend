@@ -12,7 +12,7 @@ import (
 // checkDDLNullableColumns scans DDL files for columns missing NOT NULL.
 // PRIMARY KEY columns are implicitly NOT NULL and are excluded.
 // Also checks FK + DEFAULT 0 columns for sentinel record (id=0) in referenced table.
-func checkDDLNullableColumns(root string) []string {
+func checkDDLNullableColumns(root string, skipSentinel bool) []string {
 	dbDir := filepath.Join(root, "db")
 	entries, err := os.ReadDir(dbDir)
 	if err != nil {
@@ -52,7 +52,7 @@ func checkDDLNullableColumns(root string) []string {
 	var errs []string
 	for _, f := range files {
 		for _, line := range strings.Split(f.content, "\n") {
-			if msg := checkColumnLine(line, f.tableName, colRe, refRe, tableContents); msg != "" {
+			if msg := checkColumnLine(line, f.tableName, colRe, refRe, tableContents, skipSentinel); msg != "" {
 				errs = append(errs, msg)
 			}
 		}

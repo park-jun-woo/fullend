@@ -25,7 +25,9 @@ func validateDDL(root string, st *ssacvalidator.SymbolTable) reporter.StepResult
 		step.Errors = append(step.Errors, fmt.Sprintf("%s: %s", ve.Rule, ve.Message))
 	}
 	step.Errors = append(step.Errors, checkSqlcQueryDuplicates(root)...)
-	step.Errors = append(step.Errors, checkDDLNullableColumns(root)...)
+	// Phase018: auto_nobody_seed 활성 시 FK DEFAULT 0 센티널 검증 skip (자동 주입됨)
+	autoSeed := fs.Manifest != nil && fs.Manifest.Backend.DB != nil && fs.Manifest.Backend.DB.AutoNobodySeed
+	step.Errors = append(step.Errors, checkDDLNullableColumns(root, autoSeed)...)
 
 	if len(step.Errors) > 0 {
 		step.Status = reporter.Fail

@@ -13,21 +13,21 @@ internal 코드젠을 프로덕션 레벨로 끌어올리는 기반 다지기.
 | 001 | FullendSplitAndFeatureRename | ✅ | `pkg/fullend/` 분리, `Domain→Feature` |
 | 002 | GroundExpansion (+ GroundDesign) | ✅ | Ground 신 필드: Models/Tables/Ops/ReqSchemas. iface + sqlc 파서 신설 |
 | 003 | ValidateCrosscheckAlignment | ✅ | 5개 규칙 Ground 마이그 (S-48, X-12, X-13, X-55, X-9/X-10). `populate_model_lookup` 제거 |
-| 004 | InternalToPkgMigration | 🟡 | pkg/contract, pkg/generate/{gogin, react, hurl, ssac, stml} 이식 완료. orchestrator 잔여 의존은 Phase012 에서 해소 |
+| 004 | InternalToPkgMigration | ✅ | pkg 이식 + orchestrator 잔여 의존 제거 (Phase012 에서 완결). 커밋 `403eae5` |
 | 005 | GroundConvergence | ✅ | ssac generator 의 `validator.SymbolTable` → `rule.Ground` 전수 치환 |
-| 006 | FlatRemovalAndGoginActivation | ✅ | Flat mode 제거 + gogin.Generate stub 해소 (MainGenInput struct 포함) |
-| 007 | ReactHurlActivation | ✅ | react.Generate + hurl.Generate stub 해소. `adapt_policies.go` (rego→internal policy 어댑터) |
-| 008 | OrchestratorWiring | 🟡 | gen_glue.go 배선 교체 완료. **Phase012 에서 genSSaC/genSTML 까지 완결** |
-| 009 | StructuralCleanup | ✅ | generateMain struct 수렴. Toulmin 도입은 Phase010 에서 처리 완료 |
-| 010 | ToulminPoints → **Decide\* 순수 함수 수렴** | ✅ | 2-depth 기준점 적용 결과 Toulmin 미채택. 3 포인트 모두 `Decide*(facts) Decision` 순수 함수로 수렴. 커밋 `aab3c48` |
-| 011 | DummyRegressionValidation | ✅ | Tier 1 통과, gigbridge 빌드 ✓, zenflow 17 type-mismatch (Phase013 이월). `reports/metrics-phase011.md` 생성. 커밋 `304769d` (v0.1.9) |
+| 006 | FlatRemovalAndGoginActivation | ✅ | Flat mode 제거 + gogin.Generate stub 해소 |
+| 007 | ReactHurlActivation | ✅ | react.Generate + hurl.Generate stub 해소 |
+| 008 | OrchestratorWiring | ✅ | gen_glue + genSSaC/genSTML 까지 완결. 커밋 `403eae5` |
+| 009 | StructuralCleanup | ✅ | generateMain struct 수렴. Phase010 Decide\* 수렴으로 마감. 커밋 `aab3c48` |
+| 010 | ToulminPoints → **Decide\* 순수 함수 수렴** | ✅ | 2-depth 기준점 적용 결과 Toulmin 미채택. 커밋 `aab3c48` |
+| 011 | DummyRegressionValidation | ✅ | Tier 1 통과, gigbridge 빌드 ✓, zenflow 14 type-mismatch (Phase013 이월). 커밋 `304769d` (v0.1.9) |
 | 012 | OrchestratorInternalRemoval | ✅ | orchestrator `internal/{gen,ssac/generator,stml/generator,genapi,contract}` import 0 달성. 커밋 `403eae5` |
-| 013 | GenerateQualityFixing | ✅ | zenflow spec 정합화로 14 type-mismatch 해소. `FULLEND_LOCAL_PATH` env replace 옵션. 커밋 `8ed9352` |
-| **014** | **InternalGenRemoval** | **대기** | `internal/gen/*`, `ssac/generator`, `stml/generator`, `genapi`, `contract` 일괄 삭제 (pkg/cmd/crosscheck 선행 정리 필요) |
-| 015 | TemplateAndResiduals | 대기 | `*_template.go` → `text/template` + pkg→internal 역의존(7) 제거 + filefunc F1/F2 정책 결정 |
-| **016** | **CrosscheckStrengthening** | **대기** | 정합성 규칙 6종 추가 — validate/crosscheck 먼저 강화해 spec 결함을 사전 검출 (DDL CHECK↔INSERT / DEFAULT FK↔seed / claims↔DDL / SSaC role↔OPA / @empty↔nilable / @call 인자 타입) |
-| 017 | RuntimeBugFixing | 대기 | 실측 런타임 버그 4종 수정 (zenflow 403, OPA path, DSN, gigbridge seed). Phase016 validate 결과를 작업 리스트로 활용 |
-| 018 | DDLPipelineIntegration | 대기 | DDL 위상정렬 + `schema.sql` 통합 산출 + `DEFAULT N FK` auto nobody seed |
+| 013 | GenerateQualityFixing | ✅ | zenflow spec 정합화로 14 type-mismatch 해소. `FULLEND_LOCAL_PATH` env replace. 커밋 `8ed9352` |
+| 014 | InternalGenRemoval | 대기 | `internal/{gen,ssac/generator,stml/generator,genapi,contract}` 일괄 삭제 |
+| 015 | TemplateAndResiduals | 대기 | `*_template.go` → `text/template` + pkg→internal 역의존 제거 + filefunc F1/F2 정책 |
+| 016 | CrosscheckStrengthening | ✅ | 정합성 규칙 6종 (X-74~X-79) 추가. 파서 확장 (DDL Defaults/Seeds, FuncSpec.ResponsePointer). 커밋 `e870181` (v0.1.10) |
+| 017 | RuntimeBugFixing | ✅ | 런타임 버그 4종 (zenflow 403 ← OPA claims `org_id` 누락 / OPA path 디렉토리+fallback / DSN DATABASE_URL+모듈명 / gigbridge seed). gigbridge smoke 12/12. **미커밋** |
+| 018 | DDLPipelineIntegration | ✅ | DDL 위상정렬 (Kahn) + `schema.sql` 통합 산출 + `DEFAULT N FK` auto nobody seed (opt-in). gigbridge schema.sql 1회 실행으로 DB 초기화. **미커밋** |
 
 ## 검증 상태 (Phase011 기준선)
 
@@ -57,15 +57,14 @@ internal 코드젠을 프로덕션 레벨로 끌어올리는 기반 다지기.
 
 ## 다음 세션 시작 지점
 
-**Phase016 — CrosscheckStrengthening** (권장 — validate/crosscheck 먼저 강화) 또는 **Phase014 — InternalGenRemoval** (구조 정리 트랙)
+**Phase014 — InternalGenRemoval** (구조 정리 마감) 또는 **Phase015 — TemplateAndResiduals** (template 전환 + 잔여 정리)
 
-### Phase016 → 017 → 018 (실측 버그 트랙 — 검증 먼저)
-2026-04-14 docker+hurl 실측에서 드러난 결함 대응을 **3개 Phase 로 분할**. **"도구 먼저 고치고 그 도구로 버그 잡기"** 원칙:
-- **016 CrosscheckStrengthening** (중): 정합성 규칙 6종 추가 — spec 결함을 validate 단계에서 사전 검출
-- **017 RuntimeBugFixing** (소-중): zenflow 403, OPA path, DSN 기본값, gigbridge seed — 016 의 validate 결과 + validate 로 못 잡는 순수 런타임 버그
-- **018 DDLPipelineIntegration** (중): DDL 위상정렬, `schema.sql` 통합, auto nobody seed — 기능 추가
+v5 로드맵의 **버그·검증·자동화 축 (Phase016/017/018) 은 마감**. 남은 건 구조 정리 두 Phase.
 
-권장 순서: **016 → 017 → 018**. 016/018 은 순서 바꿔도 되나 016 먼저 하면 017 조사 범위가 줄어듦.
+### Phase016 → 017 → 018 (실측 버그 트랙 — 마감 ✅)
+- **016 ✅ CrosscheckStrengthening**: 정합성 규칙 6종 (X-74~X-79) 추가. 파서 확장. 커밋 `e870181` / v0.1.10
+- **017 ✅ RuntimeBugFixing**: zenflow ActivateWorkflow 403 root cause (OPA claims.org_id 누락) + OPA path fallback + DSN DATABASE_URL + gigbridge seed. gigbridge smoke 12/12. **미커밋**
+- **018 ✅ DDLPipelineIntegration**: DDL 위상정렬 + schema.sql 통합 + auto nobody seed (opt-in). **미커밋**
 
 ### Phase014 (구조 정리 트랙)
 Phase012 후 잔여 cmd/crosscheck/reporter 의 internal 의존 정리 후 일괄 삭제. Phase015 로 이어짐.

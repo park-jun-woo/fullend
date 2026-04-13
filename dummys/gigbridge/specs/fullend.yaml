@@ -8,6 +8,8 @@ backend:
   module: github.com/example/gigbridge
   middleware:
     - bearerAuth
+  db:
+    auto_nobody_seed: true
   auth:
     type: jwt
     secret_env: JWT_SECRET

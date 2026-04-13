@@ -13,14 +13,19 @@ import (
 
 // runCodegenSteps runs all code generation steps and appends results to report.
 func runCodegenSteps(report *reporter.Report, profile *TargetProfile, specsDir, artifactsDir string, has map[SSOTKind]DetectedSSOT) {
-	if _, ok := has[KindDDL]; ok {
+	if d, ok := has[KindDDL]; ok {
 		report.Steps = append(report.Steps, genSqlc(specsDir, artifactsDir))
+		_ = d // retained for schema-gen below
 	}
 	if _, ok := has[KindOpenAPI]; ok {
 		report.Steps = append(report.Steps, genOpenAPI(specsDir, artifactsDir))
 	}
 
 	fs, g := buildPkgContext(specsDir)
+
+	if d, ok := has[KindDDL]; ok {
+		report.Steps = append(report.Steps, genSchema(d.Path, artifactsDir, fs))
+	}
 
 	if _, ok := has[KindSSaC]; ok {
 		report.Steps = append(report.Steps, genSSaC(profile, specsDir, artifactsDir, fs, g)...)
