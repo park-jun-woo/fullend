@@ -19,8 +19,8 @@ internal 코드젠을 프로덕션 레벨로 끌어올리는 기반 다지기.
 | 007 | ReactHurlActivation | ✅ | react.Generate + hurl.Generate stub 해소. `adapt_policies.go` (rego→internal policy 어댑터) |
 | 008 | OrchestratorWiring | 🟡 | gen_glue.go 배선 교체 완료. genSSaC/genSTML 보류 |
 | 009 | StructuralCleanup | 🟡 | generateMain struct 수렴. 나머지 템플릿 분리는 Phase010 과 통합 |
-| **010** | **ToulminPoints** | **대기** | **설계 문서 체크포인트 선행 필수 — 다음 세션** |
-| 011 | DummyRegressionValidation | 대기 | Tier 1~3 검증 + 구조 건전성 지표 |
+| 010 | ToulminPoints → **Decide\* 순수 함수 수렴** | ✅ | 2-depth 기준점 적용 결과 Toulmin 미채택. 3 포인트 모두 `Decide*(facts) Decision` 순수 함수로 수렴. 커밋 `aab3c48` |
+| 011 | DummyRegressionValidation | ✅ | Tier 1 통과, gigbridge 빌드 ✓, zenflow 17 type-mismatch (Phase012 이월). `reports/metrics-phase011.md` 생성 |
 
 ## 검증 상태
 
@@ -42,26 +42,28 @@ internal 코드젠을 프로덕션 레벨로 끌어올리는 기반 다지기.
 
 ## 다음 세션 시작 지점
 
-**Phase010 — Toulmin 포인트 3군데 도입**
+**Phase012 — 프로덕션화** (구체 플랜 미작성)
 
-설계 선행 필수. 3개 설계 문서 작성 → 사용자 리뷰 → 구현 착수.
+Phase011 의 Tier 2 기록된 zenflow 17건 type-mismatch 를 해소해 생성 산출물의 실 동작 수준을 올린다.
 
-대상:
-1. `method_from_iface.go` 7-case switch (축 5개)
-2. `main` 초기화 블록 조합 (6축 독립)
-3. `hurl` 시나리오 순서 (5-phase + topological)
+대상 범주:
+1. `currentUser.ID (string) vs int64` — currentUser 필드 타입이 ID primary key 와 불일치
+2. `credits == nil (billing.CheckCreditsResponse)` — billing response pointer/value 정규화
+3. `actions ([]model.Action) vs []worker.ActionInput` — 타입 어댑터 생성 누락
+4. (부수) dummy 의 go.mod 에 `replace github.com/park-jun-woo/fullend => <local>` 자동 주입 — 현재는 수동 필요
 
-설계 문서 위치:
-- `plans/v5/Phase010-MethodDispatchDesign.md`
-- `plans/v5/Phase010-MainInitDesign.md`
-- `plans/v5/Phase010-ScenarioOrderDesign.md`
+## 기준점 (사용자 확정, Phase010 에서 도입)
 
-## 보류된 후속 작업 (Phase010 이후)
+**"if-else 2-depth 이내에 해결 안되면 Toulmin"** — `depth 1` = flat chain, `depth 2` = 중첩 1회, `depth 3+` 부터 Toulmin 대상.
+조건식 AND/OR 는 depth 미포함 (수평 확장). 본 기준은 이후 Phase 에도 계승.
+
+## 보류된 후속 작업 (Phase012 이후)
 
 1. **orchestrator 완전 전환** — genSSaC/genSTML 이 여전히 internal 생성기 호출. `parsed.go` 의 SymbolTable 필드도 유지 중. 완전 분리는 별도 Phase.
-2. **템플릿 분리** — `main_template.go`, `query_opts_template.go` 의 `text/template` 화. Phase010 main init Toulmin 재설계와 통합 예정.
+2. **템플릿 분리** — `main_template.go`, `query_opts_template.go` 의 `text/template` 화.
 3. **internal/* 일괄 삭제** — pkg 안정화 후 별도 Phase.
 4. **funcspec/policy/statemachine/manifest** 중 internal 에 남은 의존 정리.
+5. **filefunc F1/F2 완화 논의** — 1 file 1 func / 1 type 이 Go stdlib 관례와 충돌하는 경계 사례 (응집된 Decide\* 4-atom 분해). Phase010 에서 수용한 비용을 장기적으로 평가.
 
 ## 주요 산출 변경
 
