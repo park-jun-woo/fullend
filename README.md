@@ -1,246 +1,199 @@
 # fullend
 
-Full-stack SSOT orchestrator — validates consistency across 9 SSOT sources (fullend.yaml, STML, OpenAPI, SSaC, SQL DDL, Mermaid stateDiagram, OPA Rego, Hurl Scenario, Func Spec) and generates code from them in a single CLI.
+A single-binary specification-substrate orchestrator that imposes a bidirectional
+cross-layer congruence relation over a heterogeneous family of declarative
+source-of-truth artifacts (hereafter SSOT_i, i ∈ {1..9}) and derives a
+deterministic, bit-reproducible projection thereof onto a polyglot code surface
+(Go/Gin backend, TypeScript/React frontend, Hurl probe corpus) subject to the
+constraint that ∀i,j: ψ_{i,j}(SSOT_i, SSOT_j) = ⊤, where ψ_{i,j} denotes the
+pairwise cross-validation predicate enumerated in §4.
+
+## 1. Abstract
+
+The present artifact is a Go 1.22+ command-line program whose primary concern
+is the preservation of referential integrity across a nine-member partition of
+declarative specification media under closed-world assumptions. Neither
+novelty nor ergonomics is claimed; the tool exists to mechanize a
+category-theoretic diagram whose nodes are specification kinds and whose
+edges are syntactic-to-semantic coercions. Readers seeking a framework,
+scaffold, or productivity accelerator are directed elsewhere.
+
+## 2. Substrate Ontology
+
+The canonical disposition of a well-formed project is a directory `specs/`
+whose immediate children constitute the nine SSOT kinds enumerated below.
+Omission of any member beyond the optional `func/` yields a diagnosable
+inconsistency under §4.1.
 
 ```
 specs/
-├── fullend.yaml             → Project config (required)
-├── api/openapi.yaml         → OpenAPI 3.x
-├── db/*.sql                 → SQL DDL + sqlc queries
-├── service/**/*.ssac        → SSaC (comment DSL, .ssac extension)
-├── model/*.go               → Go structs (// @dto for non-DDL types)
-├── func/<pkg>/*.go          → Custom func implementations (optional)
-├── states/*.md              → Mermaid stateDiagram (state transitions)
-├── policy/*.rego            → OPA Rego (authorization policies)
-├── tests/scenario-*.hurl    → Hurl scenario tests
-├── tests/invariant-*.hurl   → Hurl invariant tests
-├── frontend/*.html          → STML (HTML5 + data-*)
+├── fullend.yaml                     ∈ Σ_config
+├── api/openapi.yaml                 ∈ Σ_openapi            (OpenAPI 3.x, cf. OAS §4)
+├── db/*.sql                         ∈ Σ_ddl ∪ Σ_query      (PostgreSQL DDL + sqlc queries)
+├── service/**/*.ssac                ∈ Σ_ssac               (SSaC, comment-directed sequence DSL)
+├── model/*.go                       ∈ Σ_model              (Go struct declarations; //@dto tagged)
+├── func/<pkg>/*.go                  ∈ Σ_func               (optional; custom call targets)
+├── states/*.md                      ∈ Σ_fsm                (Mermaid stateDiagram)
+├── policy/*.rego                    ∈ Σ_rego               (OPA Rego)
+├── tests/{scenario,invariant}-*.hurl ∈ Σ_scenario           (Hurl .hurl corpora)
+└── frontend/*.html                  ∈ Σ_stml               (STML: HTML5 + data-* DSL)
 ```
 
-## Install
+## 3. Acquisition
 
-```bash
+```
 go install github.com/park-jun-woo/fullend/cmd/fullend@latest
 ```
 
-## Commands
+No runtime dependencies are bundled; the following companion executables must
+be resolvable on `PATH` at generation time: `oapi-codegen` (v2.x), `sqlc`
+(>= 1.25.0), `hurl` (>= 4.0, for downstream probe validation). No version
+pinning strategy is provided in-tree.
 
-### validate
+## 4. Operational Verbs
 
-Validates each SSOT individually, then cross-validates consistency between layers. 9 SSOTs are required by default; Func is optional (only when `func/` exists). Use `--skip` to exclude specific kinds.
+The process is parameterised by a quaternary of verbs. All verbs share a
+monotonic parsing stage (`ParseAll`) whose cardinal property is idempotence
+under repeated invocation within a single process lifetime.
 
-```bash
-fullend validate <specs-dir>
-fullend validate --skip states <specs-dir>
+### 4.1 `validate`
+
+Executes (a) intra-layer schematic checks delegated to the corresponding
+parsers, then (b) the transitive closure of cross-layer predicates ψ_{i,j}
+over the nine SSOT kinds, then (c) contract-digest reconciliation against a
+pre-existing `artifacts/` tree, if any. The `--skip k,...` modifier elides
+kinds `k ∈ {openapi, ddl, ssac, model, stml, states, policy, scenario, func}`
+from both stages but does not suppress their absence being recorded as
+`Skip` rather than `Pass` or `Fail`.
+
+### 4.2 `gen`
+
+Composition of `validate` and a deterministic artifact-synthesis procedure Γ
+whose image is an `artifacts/` tree. Γ is defined to be pure modulo the
+external tools enumerated in §3; bit-level reproducibility is an invariant,
+not a heuristic. Violations thereof constitute regressions and are
+prosecuted accordingly.
+
+### 4.3 `status`
+
+Produces a purely informational tally. No side-effect on the filesystem.
+
+### 4.4 `chain`
+
+Given an OpenAPI `operationId` as input, emits the set of SSOT and artifact
+nodes in the transitive connectivity closure thereof, each qualified by
+(kind, file, line, summary, ownership). Intended for post-hoc impact
+analysis rather than routine use.
+
+### 4.5 `gen-model` (auxiliary)
+
+Orthogonal verb accepting an OpenAPI document (file or URI) and producing a
+Go HTTP-client package (`package external`) under the supplied output
+directory. Shares no code path with `gen` beyond the OpenAPI loader and is
+unrelated to the internal DDL-driven model synthesis pipeline.
+
+## 5. Cross-Layer Predicate Enumeration
+
+The following non-exhaustive list identifies the principal ψ_{i,j} predicates
+whose violation constitutes a diagnosable inconsistency. Predicate arity and
+quantifier structure are elided; consult `pkg/crosscheck/` for the normative
+formulation.
+
+- ψ(config, openapi):        middleware-identifier congruence with `components.securitySchemes`
+- ψ(openapi, ddl):            x-sort / x-filter column existence; x-include → table mapping
+- ψ(ssac, ddl):               @result typing vs. DDL-derived structural domain; arg ↔ column surjectivity
+- ψ(fsm, ssac):                transition event ↔ ServiceFunc bijection on guarded functions
+- ψ(fsm, ddl):                 state-column domain embedding
+- ψ(fsm, openapi):             transition event ↔ operationId congruence
+- ψ(rego, ssac):               (action, resource) occurrence in Rego allow-rule antecedent
+- ψ(rego, ddl):                @ownership table/column existence
+- ψ(rego, fsm):                @auth-annotated transitions covered by allow-rules
+- ψ(scenario, openapi):        endpoint existence
+- ψ(queue):                     @publish ↔ @subscribe topic congruence; payload structural match
+- ψ(func, ssac):               @call arity, positional typing, result/response congruence
+- ψ(stml, ssac):               mediated by operationId co-reference
+
+Absence of a predicate between two kinds denotes intentional decoupling, not
+oversight.
+
+## 6. Artifact Surface (Γ)
+
+Γ targets three disjoint artifact substrata:
+
+- **Go/Gin backend** — produced by an ssac→Go handler synthesizer, an
+  oapi-codegen-mediated types/server skeleton, an sqlc-mediated query
+  layer, and an in-tree feature-grouped Handler/Server composer. Feature
+  grouping is induced by the immediate subdirectory of `specs/service/`.
+- **TypeScript/React frontend** — a STML→TSX page synthesizer coupled with
+  a minimal glue surface (`App.tsx`, `main.tsx`, `api.ts`) derived from
+  OpenAPI.
+- **Hurl probe corpus** — deterministic smoke sequence derived from the
+  OpenAPI-×-FSM-×-policy product, ordered by a topological schedule over
+  resource and state-transition dependencies.
+
+Γ deliberately abstains from generating ORM layers, server frameworks,
+build tooling, or bundler configuration beyond the minima required for
+compilation.
+
+## 7. Built-in Call Targets (pkg/)
+
+A fixed set of call targets is vendored for use from SSaC `@call` sites.
+Their implementation stabilities are unspecified. Projects requiring
+alternate semantics shall provide shadowing implementations under
+`specs/<project>/func/<pkg>/`.
+
+Namespaces: `auth` (bcrypt/JWT/reset), `crypto` (AES-256-GCM, TOTP),
+`storage` (S3-compatible), `mail` (SMTP), `text` (Unicode slug, HTML
+sanitization, grapheme-aware truncation), `image` (OG/thumbnail rasterization).
+
+## 8. Built-in Model Interfaces (pkg/)
+
+`SessionModel`, `CacheModel`, `FileModel`, and a Pub/Sub singleton are
+provided as package-scoped `@model` interfaces for I/O not derivable from
+DDL. Backend selection (PostgreSQL, in-memory, S3, local-disk) is
+delegated to `fullend.yaml`. Consult the corresponding package for the
+normative contract; no convenience documentation is duplicated here.
+
+## 9. Cross-Validation Rationale
+
+Intra-layer validators (SSaC, STML, et al.) are necessary but not
+sufficient. The role of fullend is the enforcement of consistency across
+the Cartesian product of layers; individual layer well-formedness is
+presupposed. Violations of intra-layer well-formedness are reported with
+the diagnostic ownership of the responsible parser, not synthesized by
+fullend.
+
+## 10. Runtime Probing
+
+The generated `artifacts/tests/smoke.hurl` is executable via Hurl against
+a running instance of the generated backend. No orchestration of the
+backend process is provided; invocation and teardown are user concerns.
+
+```
+hurl --test --variable host=http://localhost:8080 artifacts/<project>/tests/smoke.hurl
 ```
 
-```
-✓ Config       my-project, go/gin, typescript/react
-✓ OpenAPI      12 endpoints
-✓ DDL          4 tables, 23 columns
-✓ SSaC         12 service functions
-✓ Model        1 files
-✓ STML         2 pages, 2 bindings
-✓ States       2 diagrams, 7 transitions
-✓ Policy       1 files, 7 rules, 3 ownership mappings
-✓ Scenario     3 scenario hurl files
-✓ Func         2 funcs
-✓ Cross        0 mismatches
-— Contract     no artifacts
+Scenario and invariant corpora authored under `specs/<project>/tests/` are
+conveyed verbatim to the artifact tree.
 
-All SSOT sources are consistent.
-```
+## 11. Architectural Notes
 
-Skip kinds: `openapi`, `ddl`, `ssac`, `model`, `stml`, `states`, `policy`, `scenario`, `func`
+SSaC and STML, historically maintained as standalone repositories, are now
+fused into this tree as `internal/ssac/` and `internal/stml/`. The
+upstream repositories (`park-jun-woo/ssac`, `park-jun-woo/stml`) are
+file-copy mirrors of subtrees herein and retain no independent evolutionary
+trajectory. All SSOT acquisition proceeds through a single `ParseAll()`
+entry point that materializes a shared `ParsedSSOTs` structure consumed
+by all verbs.
 
-### gen
+## 12. Acknowledgments
 
-Validates first, then generates code from all SSOTs. Accepts the same `--skip` option.
+The existence of this tool is contingent upon: OpenAPI Initiative, sqlc,
+Open Policy Agent, Mermaid, oapi-codegen, kin-openapi, Hurl, React,
+React Router, TanStack Query, React Hook Form, Vite, Tailwind CSS,
+TypeScript, Gin, and `lib/pq`. No contribution, derivation, or competition
+in respect of any of the foregoing is claimed or implied.
 
-```bash
-fullend gen <specs-dir> <artifacts-dir>
-```
+## 13. License
 
-### gen-model
-
-Generates a Go model file (interface + types + HTTP client) from an external OpenAPI document. Accepts a local file path or URL.
-
-```bash
-fullend gen-model <openapi-source> <output-dir>
-fullend gen-model https://api.stripe.com/openapi.yaml ./external/
-fullend gen-model specs/my-project/external/escrow.openapi.yaml specs/my-project/external/
-```
-
-### chain
-
-Traces all SSOT nodes connected to a single API operation. One operationId in, full cross-layer file:line map out.
-
-```bash
-fullend chain <operationId> <specs-dir>
-```
-
-```
-── Feature Chain: AcceptProposal ──
-
-  OpenAPI    api/openapi.yaml:296                          POST /proposals/{id}/accept
-  SSaC       service/proposal/accept_proposal.ssac:19      @get @empty @auth @state @put @call @post @response
-  DDL        db/gigs.sql:1                                 CREATE TABLE gigs
-  DDL        db/proposals.sql:1                            CREATE TABLE proposals
-  DDL        db/transactions.sql:1                         CREATE TABLE transactions
-  Rego       policy/authz.rego:3                           resource: gig
-  StateDiag  states/gig.md:7                               diagram: gig → AcceptProposal
-  StateDiag  states/proposal.md:6                          diagram: proposal → AcceptProposal
-  FuncSpec   func/billing/hold_escrow.go:8                 @func billing.HoldEscrow
-  Hurl       tests/scenario-gig-lifecycle.hurl:4           scenario: scenario-gig-lifecycle.hurl
-```
-
-### status
-
-Shows a summary of detected SSOTs and their stats.
-
-```bash
-fullend status <specs-dir>
-```
-
-```
-SSOT Status:
-  OpenAPI      api/openapi.yaml               12 endpoints
-  DDL          db                             4 tables, 23 columns
-  SSaC         service                        12 functions
-  STML         frontend                       2 pages
-  States       states                         2 diagrams, 7 transitions
-  Policy       policy                         1 files, 7 rules
-  Scenario     tests                          3 hurl files
-  Func         func                           2 funcs
-```
-
-## Default Functions (pkg/)
-
-fullend ships with built-in function implementations that can be used via SSaC `@call`:
-
-| Package | Function | Description |
-|---|---|---|
-| `auth` | `hashPassword` | bcrypt password hashing |
-| `auth` | `verifyPassword` | bcrypt password verification |
-| `auth` | `issueToken` | JWT access token generation (24h) |
-| `auth` | `verifyToken` | JWT token verification + claims extraction |
-| `auth` | `refreshToken` | Refresh token generation (7 days) |
-| `auth` | `generateResetToken` | Random hex token for password reset |
-| `crypto` | `encrypt` | AES-256-GCM symmetric encryption |
-| `crypto` | `decrypt` | AES-256-GCM decryption |
-| `crypto` | `generateOTP` | TOTP secret + QR provisioning URL |
-| `crypto` | `verifyOTP` | TOTP code verification |
-| `storage` | `uploadFile` | S3-compatible file upload |
-| `storage` | `deleteFile` | S3-compatible file deletion |
-| `storage` | `presignURL` | S3 presigned download URL |
-| `mail` | `sendEmail` | SMTP plain text email |
-| `mail` | `sendTemplateEmail` | Go template HTML email via SMTP |
-| `text` | `generateSlug` | Unicode to URL-safe slug |
-| `text` | `sanitizeHTML` | XSS prevention HTML sanitization |
-| `text` | `truncateText` | Unicode-safe text truncation |
-| `image` | `ogImage` | OG image generation (1200x630, PNG) |
-| `image` | `thumbnail` | Thumbnail generation (200x200, PNG) |
-
-Projects can override these by providing custom implementations in `specs/<project>/func/<pkg>/`.
-
-## Built-in Models (pkg/)
-
-Package-prefix @model interfaces for non-DDL I/O. Configured via `fullend.yaml`.
-
-| Package | Interface | Backends | SSaC Usage |
-|---|---|---|---|
-| `session` | `SessionModel` (Set/Get/Delete + TTL) | PostgreSQL, Memory | `session.Session.Get({key: ...})` |
-| `cache` | `CacheModel` (Set/Get/Delete + TTL) | PostgreSQL, Memory | `cache.Cache.Set({key: ..., value: ..., ttl: ...})` |
-| `file` | `FileModel` (Upload/Download/Delete) | S3, LocalFile | `file.File.Upload({key: ..., body: ...})` |
-| `queue` | Singleton Pub/Sub (Publish/Subscribe) | PostgreSQL, Memory | `@publish "topic" {payload}` |
-
-## Middleware (Generated)
-
-gluegen generates project-specific `internal/middleware/bearerauth.go` from `fullend.yaml` claims config.
-
-| Middleware | Trigger | Description |
-|---|---|---|
-| `BearerAuth(secret)` | `securitySchemes.bearerAuth` + `backend.auth.claims` | Extracts JWT → sets `*model.CurrentUser` in gin context |
-
-Route grouping is determined by OpenAPI `security` field on each operation:
-- Operations with `security: [{bearerAuth: []}]` → auth group (middleware applied)
-- Operations without `security` → public group (no middleware)
-
-## Cross-Validation
-
-Individual tools (SSaC, STML) validate within their own layer. fullend catches mismatches **between** layers:
-
-- **fullend.yaml ↔ OpenAPI** — middleware names match securitySchemes keys
-- **OpenAPI x-sort/x-filter ↔ DDL** — referenced columns exist in tables
-- **OpenAPI x-include ↔ DDL** — referenced resources map to tables
-- **SSaC @result ↔ DDL** — result types match DDL-derived models
-- **SSaC arg ↔ DDL** — arg field names match table columns
-- **States ↔ SSaC** — transition events match SSaC functions, guard state references valid diagrams
-- **States ↔ DDL** — state fields map to existing DDL columns
-- **States ↔ OpenAPI** — transition events match operationIds
-- **Policy ↔ SSaC** — @auth (action, resource) pairs match Rego allow rules
-- **Policy ↔ DDL** — @ownership table/column references exist in DDL
-- **Policy ↔ States** — state transition events with @auth have matching Rego rules
-- **Hurl ↔ OpenAPI** — scenario/invariant tests reference valid endpoints
-- **Queue** — @publish topics match @subscribe functions, payload/message field consistency, queue config required
-- **Func ↔ SSaC** — @call references have matching implementations, arg count matches Request fields, positional types match (via DDL/OpenAPI), result/response consistency
-- **STML ↔ SSaC** (indirect) — both reference the same OpenAPI operationIds
-
-## Runtime Testing
-
-`fullend gen` generates [Hurl](https://hurl.dev) tests from OpenAPI specs.
-
-```bash
-# Start your server, then:
-hurl --test --variable host=http://localhost:8080 artifacts/my-project/tests/*.hurl
-```
-
-Generated tests include:
-- **smoke.hurl** — OpenAPI endpoint smoke tests (auto-generated)
-
-User-written tests (placed in `specs/<project>/tests/`):
-- **scenario-*.hurl** — Business scenario tests
-- **invariant-*.hurl** — Cross-endpoint invariant tests
-
-## Architecture
-
-SSaC (parser/validator/generator) and STML (parser/validator/generator) are integrated into fullend as `internal/ssac/` and `internal/stml/`. The original [SSaC](https://github.com/park-jun-woo/ssac) and [STML](https://github.com/park-jun-woo/stml) repos are simple file-copy mirrors from fullend.
-
-All SSOTs are parsed once per CLI invocation via `ParseAll()` and shared across validate, gen, status, and chain pipelines.
-
-## Acknowledgments
-
-fullend is built on the shoulders of these projects. Without them, this tool would not exist.
-
-### SSOT Foundations
-
-These projects define the standards that fullend orchestrates. They are the reason fullend can exist as a single-CLI full-stack generator.
-
-- [OpenAPI Initiative](https://www.openapis.org/) — The API description standard that connects frontend and backend
-- [sqlc](https://sqlc.dev/) — SQL-first Go code generation. fullend's DDL-driven model approach is directly inspired by sqlc's philosophy
-- [Open Policy Agent](https://www.openpolicyagent.org/) — Policy as code. OPA's Rego language powers fullend's authorization layer
-- [Mermaid](https://mermaid.js.org/) — Diagram as code. State diagrams become runtime-enforceable state machines
-
-### Code Generation & Validation
-
-- [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen) — OpenAPI to Go server/types code generation
-- [kin-openapi](https://github.com/getkin/kin-openapi) — OpenAPI 3.x parsing and validation in Go
-- [Hurl](https://hurl.dev/) — Plain-text HTTP testing. fullend generates Hurl smoke tests from OpenAPI specs
-
-### Generated Code Runtime
-
-Projects that fullend's generated code depends on at runtime:
-
-- [React](https://react.dev/) — UI library for generated frontend
-- [React Router](https://reactrouter.com/) — Client-side routing
-- [TanStack Query](https://tanstack.com/query) — Data fetching and caching
-- [React Hook Form](https://react-hook-form.com/) — Form state management
-- [Vite](https://vite.dev/) — Frontend build tool
-- [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework
-- [TypeScript](https://www.typescriptlang.org/) — Type-safe JavaScript
-- [Gin](https://gin-gonic.com/) — HTTP web framework for Go
-- [lib/pq](https://github.com/lib/pq) — PostgreSQL driver for Go
-
-## License
-
-MIT — see [LICENSE](LICENSE).
+MIT. See `LICENSE`.
