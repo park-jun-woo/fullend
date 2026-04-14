@@ -14,7 +14,7 @@ import (
 func generateReexport(authDir string, claimsHash string) error {
 	src := `package auth
 
-import pkgauth "github.com/park-jun-woo/fullend/pkg/auth"
+import pkgauth "github.com/park-jun-woo/ssac/pkg/auth"
 
 // Re-export pkg/auth utilities for unified import.
 var HashPassword = pkgauth.HashPassword

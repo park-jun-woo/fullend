@@ -13,7 +13,7 @@ func buildDomainImportsBlock(domains []string, modulePath string, anyNeedsAuth b
 	extraImports = append(extraImports, fmt.Sprintf("\n\t\"%s/internal/model\"", modulePath))
 	extraImports = append(extraImports, fmt.Sprintf("\t\"%s/internal/service\"", modulePath))
 	if anyNeedsAuth {
-		extraImports = append(extraImports, "\t\"github.com/park-jun-woo/fullend/pkg/authz\"")
+		extraImports = append(extraImports, "\t\"github.com/park-jun-woo/ssac/pkg/authz\"")
 	}
 	for _, d := range domains {
 		extraImports = append(extraImports, fmt.Sprintf("\t%ssvc \"%s/internal/service/%s\"", d, modulePath, d))

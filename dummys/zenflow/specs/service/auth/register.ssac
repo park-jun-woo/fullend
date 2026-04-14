@@ -1,6 +1,6 @@
 package service
 
-import "github.com/park-jun-woo/fullend/pkg/auth"
+import "github.com/park-jun-woo/ssac/pkg/auth"
 
 // @call auth.HashPasswordResponse hp = auth.HashPassword({Password: request.password})
 // @post User user = User.Create({OrgID: request.org_id, Email: request.email, PasswordHash: hp.HashedPassword, Role: "member", Name: request.name})

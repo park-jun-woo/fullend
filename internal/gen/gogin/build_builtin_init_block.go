@@ -15,7 +15,7 @@ func buildBuiltinInitBlocks(sessionBackend, cacheBackend string, fileConfig *pro
 
 	// --- session ---
 	if sessionBackend == "postgres" {
-		imports = append(imports, `"github.com/park-jun-woo/fullend/pkg/session"`)
+		imports = append(imports, `"github.com/park-jun-woo/ssac/pkg/session"`)
 		inits = append(inits, `
 	sm, err := session.NewPostgresSession(context.Background(), conn)
 	if err != nil {
@@ -23,14 +23,14 @@ func buildBuiltinInitBlocks(sessionBackend, cacheBackend string, fileConfig *pro
 	}
 	session.Init(sm)`)
 	} else if sessionBackend == "memory" {
-		imports = append(imports, `"github.com/park-jun-woo/fullend/pkg/session"`)
+		imports = append(imports, `"github.com/park-jun-woo/ssac/pkg/session"`)
 		inits = append(inits, `
 	session.Init(session.NewMemorySession())`)
 	}
 
 	// --- cache ---
 	if cacheBackend == "postgres" {
-		imports = append(imports, `"github.com/park-jun-woo/fullend/pkg/cache"`)
+		imports = append(imports, `"github.com/park-jun-woo/ssac/pkg/cache"`)
 		inits = append(inits, `
 	cm, err := cache.NewPostgresCache(context.Background(), conn)
 	if err != nil {
@@ -38,7 +38,7 @@ func buildBuiltinInitBlocks(sessionBackend, cacheBackend string, fileConfig *pro
 	}
 	cache.Init(cm)`)
 	} else if cacheBackend == "memory" {
-		imports = append(imports, `"github.com/park-jun-woo/fullend/pkg/cache"`)
+		imports = append(imports, `"github.com/park-jun-woo/ssac/pkg/cache"`)
 		inits = append(inits, `
 	cache.Init(cache.NewMemoryCache())`)
 	}

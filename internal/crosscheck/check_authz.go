@@ -6,7 +6,7 @@ import (
 	ssacparser "github.com/park-jun-woo/fullend/internal/ssac/parser"
 )
 
-// defaultCheckRequestFields are the fields of the default pkg/authz CheckRequest struct.
+// defaultCheckRequestFields are the fields of the default ssac/pkg/authz CheckRequest struct.
 var defaultCheckRequestFields = map[string]bool{
 	"Action":     true,
 	"Resource":   true,

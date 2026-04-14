@@ -16,7 +16,7 @@ func collectSeqImports(sf parser.ServiceFunc, seen map[string]bool) {
 			seen["queue"] = true
 		}
 		if seq.Result != nil && seq.Result.Wrapper != "" && !hasDirectResponse(sf.Sequences) {
-			seen["github.com/park-jun-woo/fullend/pkg/pagination"] = true
+			seen["github.com/park-jun-woo/ssac/pkg/pagination"] = true
 		}
 	}
 }

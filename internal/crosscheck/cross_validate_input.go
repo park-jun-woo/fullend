@@ -15,7 +15,7 @@ type CrossValidateInput struct {
 	Archived        *ArchivedInfo                      // @archived tables/columns from DDL
 	Claims          map[string]projectconfig.ClaimDef  // from fullend.yaml backend.auth.claims
 	QueueBackend    string                             // from fullend.yaml queue.backend ("postgres", "memory", "")
-	AuthzPackage    string                             // from fullend.yaml authz.package ("" = default pkg/authz)
+	AuthzPackage    string                             // from fullend.yaml authz.package ("" = default ssac/pkg/authz)
 	SensitiveCols   map[string]map[string]bool         // @sensitive columns per table (table → column → true)
 	NoSensitiveCols map[string]map[string]bool         // @nosensitive columns per table (suppress WARNING)
 	Roles           []string                           // from fullend.yaml auth.roles

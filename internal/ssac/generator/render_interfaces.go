@@ -20,7 +20,7 @@ func renderInterfaces(interfaces []derivedInterface) []byte {
 		buf.WriteString("\t\"time\"\n")
 	}
 	if needPagination {
-		buf.WriteString("\n\t\"github.com/park-jun-woo/fullend/pkg/pagination\"\n")
+		buf.WriteString("\n\t\"github.com/park-jun-woo/ssac/pkg/pagination\"\n")
 	}
 	buf.WriteString(")\n\n")
 

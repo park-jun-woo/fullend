@@ -12,7 +12,7 @@ import (
 )
 
 // GenerateAuthzPackage copies .rego files to the artifacts directory for runtime loading.
-// Go authz code is provided by fullend/pkg/authz — no code generation needed.
+// Go authz code is provided by ssac/pkg/authz — no code generation needed.
 func GenerateAuthzPackage(policies []*policy.Policy, artifactsDir string) error {
 	authzDir := filepath.Join(artifactsDir, "backend", "internal", "authz")
 	if err := os.MkdirAll(authzDir, 0755); err != nil {

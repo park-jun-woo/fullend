@@ -18,9 +18,9 @@ func buildQueueBlocks(serviceFuncs []ssacparser.ServiceFunc, queueBackend string
 	}
 
 	if len(subscribers) > 0 {
-		queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/park-jun-woo/fullend/pkg/queue\"\n\t\"fmt\""
+		queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/park-jun-woo/ssac/pkg/queue\"\n\t\"fmt\""
 	} else {
-		queueImport = "\n\t\"context\"\n\t\"github.com/park-jun-woo/fullend/pkg/queue\""
+		queueImport = "\n\t\"context\"\n\t\"github.com/park-jun-woo/ssac/pkg/queue\""
 	}
 	queueInitBlock = fmt.Sprintf(`
 	if err := queue.Init(context.Background(), %q, conn); err != nil {

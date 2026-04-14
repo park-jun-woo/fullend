@@ -52,7 +52,7 @@ func generateMain(artifactsDir string, models []string, modulePath string, queue
 	authzImport := ""
 	authzInitBlock := ""
 	if hasAuthSequence(serviceFuncs) {
-		authzImport = "\n\t\"github.com/park-jun-woo/fullend/pkg/authz\""
+		authzImport = "\n\t\"github.com/park-jun-woo/ssac/pkg/authz\""
 		ownershipsCode := buildOwnershipsLiteral(policies)
 		authzInitBlock = fmt.Sprintf(`
 	if err := authz.Init(conn, %s); err != nil {
@@ -68,7 +68,7 @@ func generateMain(artifactsDir string, models []string, modulePath string, queue
 	subscribers := collectSubscribers(serviceFuncs)
 	needsQueue := queueBackend != "" && (len(subscribers) > 0 || hasPublishSequence(serviceFuncs))
 	if needsQueue {
-		queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/park-jun-woo/fullend/pkg/queue\""
+		queueImport = "\n\t\"context\"\n\t\"encoding/json\"\n\t\"github.com/park-jun-woo/ssac/pkg/queue\""
 		queueInitBlock = fmt.Sprintf(`
 	if err := queue.Init(context.Background(), %q, conn); err != nil {
 		log.Fatalf("queue init failed: %%v", err)

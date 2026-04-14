@@ -4,5 +4,5 @@ package manifest
 
 // AuthzConfig configures the authorization package.
 type AuthzConfig struct {
-	Package string `yaml:"package"` // custom authz package path, default: github.com/park-jun-woo/fullend/pkg/authz
+	Package string `yaml:"package"` // custom authz package path, default: github.com/park-jun-woo/ssac/pkg/authz
 }

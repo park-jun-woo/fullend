@@ -54,7 +54,7 @@ func generateModelFile(modelDir string, modelName string, methods []ifaceMethod,
 		b.WriteString("\t\"fmt\"\n")
 	}
 	if needsPagination {
-		b.WriteString("\n\t\"github.com/park-jun-woo/fullend/pkg/pagination\"\n")
+		b.WriteString("\n\t\"github.com/park-jun-woo/ssac/pkg/pagination\"\n")
 	}
 	b.WriteString(")\n\n")
 

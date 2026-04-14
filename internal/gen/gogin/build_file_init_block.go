@@ -10,7 +10,7 @@ import (
 )
 
 func buildFileInitBlock(fileConfig *projectconfig.FileBackend) (imports []string, initSnippet string) {
-	imports = append(imports, `"github.com/park-jun-woo/fullend/pkg/file"`)
+	imports = append(imports, `"github.com/park-jun-woo/ssac/pkg/file"`)
 
 	switch fileConfig.Backend {
 	case "local":
